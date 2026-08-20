@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Noto_Sans_Thaana } from "next/font/google";
+import localFont from "next/font/local";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import "./globals.css";
@@ -8,6 +9,18 @@ const notoSansThaana = Noto_Sans_Thaana({
   variable: "--font-thaana",
   subsets: ["thaana"],
   weight: ["400", "500", "600", "700"],
+});
+
+const democratsAkBlack = localFont({
+  src: "../fonts/Democrats-AK-Black.ttf",
+  variable: "--font-democrats-ak",
+  display: "swap",
+});
+
+const mvMagRoundBold = localFont({
+  src: "../fonts/Mv-MAG-Round-Bold.otf",
+  variable: "--font-mv-mag-round",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -20,7 +33,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="dv"
       dir="rtl"
-      className={`${notoSansThaana.variable} h-full antialiased`}
+      className={`${notoSansThaana.variable} ${democratsAkBlack.variable} ${mvMagRoundBold.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-thaana">
         <Header />

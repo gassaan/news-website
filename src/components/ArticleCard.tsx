@@ -14,7 +14,7 @@ export default function ArticleCard({ article }: { article: Article }) {
           {category.name}
         </span>
       )}
-      <h2 className="text-lg font-bold leading-7 text-zinc-900 group-hover:underline dark:text-zinc-50">
+      <h2 className="font-mv-mag-round text-lg leading-7 text-zinc-900 group-hover:underline dark:text-zinc-50">
         {article.title}
       </h2>
       <p className="line-clamp-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">

@@ -9,7 +9,7 @@ export default function Home() {
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
       {featured.length > 0 && (
         <section className="mb-10">
-          <h1 className="mb-4 text-xl font-bold text-zinc-900 dark:text-zinc-50">
+          <h1 className="font-mv-mag-round mb-4 text-xl text-zinc-900 dark:text-zinc-50">
             މުހިންމު ޚަބަރުތައް
           </h1>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -21,7 +21,7 @@ export default function Home() {
       )}
 
       <section>
-        <h2 className="mb-4 text-xl font-bold text-zinc-900 dark:text-zinc-50">
+        <h2 className="font-mv-mag-round mb-4 text-xl text-zinc-900 dark:text-zinc-50">
           އެންމެ ފަހުގެ ޚަބަރު
         </h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

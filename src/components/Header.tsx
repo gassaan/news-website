@@ -5,7 +5,10 @@ export default function Header() {
   return (
     <header className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-black">
       <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 py-4 sm:px-6">
-        <Link href="/" className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
+        <Link
+          href="/"
+          className="font-democrats-ak text-2xl text-zinc-900 dark:text-zinc-50"
+        >
           ދިވެހި ޚަބަރު
         </Link>
         <nav className="-mx-1 flex flex-wrap gap-1 text-sm">

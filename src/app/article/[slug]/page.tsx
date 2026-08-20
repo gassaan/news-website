@@ -24,7 +24,7 @@ export default async function ArticlePage({
           {category.name}
         </span>
       )}
-      <h1 className="mt-2 text-2xl font-bold leading-9 text-zinc-900 dark:text-zinc-50 sm:text-3xl">
+      <h1 className="font-mv-mag-round mt-2 text-2xl leading-9 text-zinc-900 dark:text-zinc-50 sm:text-3xl">
         {article.title}
       </h1>
       <div className="mt-3 flex gap-3 text-sm text-zinc-500 dark:text-zinc-400">

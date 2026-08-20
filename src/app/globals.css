@@ -9,6 +9,8 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-thaana: var(--font-thaana);
+  --font-democrats-ak: var(--font-democrats-ak);
+  --font-mv-mag-round: var(--font-mv-mag-round);
 }
 
 @media (prefers-color-scheme: dark) {
