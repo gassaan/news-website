@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Noto_Sans_Thaana } from "next/font/google";
 import localFont from "next/font/local";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -8,10 +7,10 @@ import "./globals.css";
 
 const THEME_INIT_SCRIPT = `(function(){try{var t=localStorage.getItem("theme");var d=t==="dark"||(!t&&window.matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.classList.toggle("dark",d);}catch(e){}})();`;
 
-const notoSansThaana = Noto_Sans_Thaana({
+const democratsAkuruRegular = localFont({
+  src: "../fonts/Democrats-Akuru-Regular.ttf",
   variable: "--font-thaana",
-  subsets: ["thaana"],
-  weight: ["400", "500"],
+  display: "swap",
 });
 
 const democratsAkBlack = localFont({
@@ -37,7 +36,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="dv"
       dir="rtl"
       suppressHydrationWarning
-      className={`${notoSansThaana.variable} ${democratsAkBlack.variable} ${mvMagRoundBold.variable} h-full antialiased`}
+      className={`${democratsAkuruRegular.variable} ${democratsAkBlack.variable} ${mvMagRoundBold.variable} h-full antialiased`}
     >
       <body className="bg-background flex min-h-full flex-col font-thaana">
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
