@@ -20,13 +20,11 @@ export default async function CategoryPage({
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
-      <h1 className="font-mv-mag-round mb-6 text-xl text-zinc-900 dark:text-zinc-50">
+      <h1 className="font-mv-mag-round text-foreground mb-6 text-xl">
         {category.name}
       </h1>
       {categoryArticles.length === 0 ? (
-        <p className="text-zinc-500 dark:text-zinc-400">
-          މި ބައިގައި އަދި ޚަބަރެއް ނެތް
-        </p>
+        <p className="text-muted">މި ބައިގައި އަދި ޚަބަރެއް ނެތް</p>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {categoryArticles.map((article) => (

@@ -1,26 +1,59 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #faf8ff;
+  --foreground: #1b1030;
+  --muted: #6b5f8a;
+  --card-accent: #ede7fb;
+  --accent: #6d28d9;
+  --accent-soft: #d8cef0;
+  --nav-bg: #ede7fb;
+  --nav-fg: #4c1d95;
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+.dark {
+  --background: #150c28;
+  --foreground: #f7f4fc;
+  --muted: #b6a9d6;
+  --card-accent: #2a1854;
+  --accent: #a78bfa;
+  --accent-soft: #4b3a72;
+  --nav-bg: #241542;
+  --nav-fg: #f0ebfb;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-card-accent: var(--card-accent);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-nav-bg: var(--nav-bg);
+  --color-nav-fg: var(--nav-fg);
   --font-thaana: var(--font-thaana);
   --font-democrats-ak: var(--font-democrats-ak);
   --font-mv-mag-round: var(--font-mv-mag-round);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 400ms ease-out;
 }

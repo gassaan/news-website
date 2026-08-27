@@ -1,0 +1,65 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { Article, getCategory } from "@/lib/articles";
+import NewsIllustration from "./NewsIllustration";
+
+export default function HeroCarousel({ articles }: { articles: Article[] }) {
+  const [index, setIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
+
+  useEffect(() => {
+    if (paused || articles.length < 2) return;
+    const timer = setInterval(() => {
+      setIndex((i) => (i + 1) % articles.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [paused, articles.length]);
+
+  if (articles.length === 0) return null;
+
+  const article = articles[index];
+  const category = getCategory(article.category);
+
+  return (
+    <div
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      className="mx-auto max-w-xl"
+    >
+      <Link href={`/article/${article.slug}`} key={article.slug} className="group block">
+        <NewsIllustration category={article.category} />
+        <div className="animate-fade-in mt-5">
+          {category && (
+            <span className="text-accent text-xs font-semibold">
+              {category.name}
+            </span>
+          )}
+          <h1 className="font-democrats-ak text-foreground mt-2 text-2xl leading-9 group-hover:underline">
+            {article.title}
+          </h1>
+          <p className="text-muted mt-3 line-clamp-3 text-sm leading-6">
+            {article.excerpt}
+          </p>
+        </div>
+      </Link>
+
+      {articles.length > 1 && (
+        <div className="mt-5 flex items-center justify-center gap-2">
+          {articles.map((a, i) => (
+            <button
+              key={a.slug}
+              type="button"
+              aria-label={`${i + 1} ވަނަ ޚަބަރު`}
+              onClick={() => setIndex(i)}
+              className={`h-2 rounded-full transition-all ${
+                i === index ? "bg-accent w-6" : "bg-accent-soft w-2"
+              }`}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}

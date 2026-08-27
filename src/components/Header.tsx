@@ -1,28 +1,62 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import { categories } from "@/lib/articles";
+import ThemeToggle from "./ThemeToggle";
 
 export default function Header() {
+  const [open, setOpen] = useState(false);
+
   return (
-    <header className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-black">
-      <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 py-4 sm:px-6">
+    <header className="bg-background border-accent-soft/40 sticky top-0 z-20 border-b">
+      <div
+        dir="ltr"
+        className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3 sm:px-6"
+      >
+        <ThemeToggle />
         <Link
           href="/"
-          className="font-democrats-ak text-2xl text-zinc-900 dark:text-zinc-50"
+          className="font-mv-mag-round text-foreground text-xl"
         >
           ދިވެހި ޚަބަރު
         </Link>
-        <nav className="-mx-1 flex flex-wrap gap-1 text-sm">
-          {categories.map((category) => (
-            <Link
-              key={category.slug}
-              href={`/category/${category.slug}`}
-              className="rounded-full px-3 py-1.5 font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-50"
-            >
-              {category.name}
-            </Link>
-          ))}
-        </nav>
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          aria-label="މެނޫ ހުޅުވާ"
+          aria-expanded={open}
+          className="text-accent flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-accent-soft/40"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            className="h-5 w-5"
+          >
+            <path d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
       </div>
+
+      {open && (
+        <nav className="border-accent-soft/40 border-t px-4 py-3 sm:px-6">
+          <div className="mx-auto flex max-w-5xl flex-wrap gap-2">
+            {categories.map((category) => (
+              <Link
+                key={category.slug}
+                href={`/category/${category.slug}`}
+                onClick={() => setOpen(false)}
+                className="bg-card-accent text-foreground rounded-full px-3 py-1.5 text-sm font-medium"
+              >
+                {category.name}
+              </Link>
+            ))}
+          </div>
+        </nav>
+      )}
     </header>
   );
 }

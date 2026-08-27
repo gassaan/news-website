@@ -1,7 +1,7 @@
 export default function Footer() {
   return (
-    <footer className="border-t border-zinc-200 bg-white dark:border-zinc-800 dark:bg-black">
-      <div className="mx-auto max-w-5xl px-4 py-6 text-center text-sm text-zinc-500 sm:px-6 dark:text-zinc-500">
+    <footer className="border-accent-soft/40 border-t">
+      <div className="text-muted mx-auto max-w-5xl px-4 py-6 text-center text-sm sm:px-6">
         © {new Date().getFullYear()} ދިވެހި ޚަބަރު — ހުރިހާ ޙައްޤުތަކެއް ރައްކާތެރިކުރެވިފައި
       </div>
     </footer>

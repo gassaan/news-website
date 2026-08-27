@@ -61,6 +61,7 @@ export const articles: Article[] = [
     category: "kulhivaru",
     author: "ނަމޫނާ ލިޔުންތެރިޔާ",
     publishedAt: "2026-08-16",
+    featured: true,
   },
   {
     slug: "sample-article-4",
