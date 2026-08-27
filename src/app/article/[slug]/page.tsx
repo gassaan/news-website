@@ -36,9 +36,13 @@ export default async function ArticlePage({
         <h1 className="font-mv-mag-round text-foreground mt-6 text-3xl leading-tight sm:text-4xl">
           {article.title}
         </h1>
-        <p className="text-muted mt-4 text-sm">
-          {formatDhivehiDate(article.publishedAt)}
-        </p>
+        <div className="text-muted mt-4 flex items-center justify-center gap-2 text-sm">
+          <span className="text-foreground/80 font-semibold">
+            {article.author}
+          </span>
+          <span aria-hidden="true">·</span>
+          <span>{formatDhivehiDate(article.publishedAt)}</span>
+        </div>
       </header>
 
       <div className="relative left-1/2 right-1/2 -mx-[50vw] my-8 w-screen">
@@ -57,7 +61,7 @@ export default async function ArticlePage({
           {pseudoViewCount(article.slug)}
         </span>
         <span className="text-muted flex items-center gap-1.5">
-          {article.author}
+          ދިވެހި ޚަބަރު
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
             <path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z" />
             <circle cx="12" cy="13" r="3.5" />
