@@ -5,33 +5,6 @@ import Link from "next/link";
 import { Article, getCategory } from "@/lib/articles";
 import NewsIllustration from "./NewsIllustration";
 
-function Slide({ article }: { article: Article }) {
-  const category = getCategory(article.category);
-
-  return (
-    <Link
-      href={`/article/${article.slug}`}
-      dir="rtl"
-      className="group block h-full w-full"
-    >
-      <NewsIllustration category={article.category} />
-      <div className="mt-6">
-        {category && (
-          <span className="bg-accent-soft/40 text-accent inline-block w-fit rounded-full px-2.5 py-1 text-xs font-semibold">
-            {category.name}
-          </span>
-        )}
-        <h1 className="font-democrats-ak text-foreground mt-3 line-clamp-2 text-3xl leading-relaxed group-hover:underline sm:text-4xl">
-          {article.title}
-        </h1>
-        <p className="text-muted mt-3 line-clamp-3 text-sm leading-6">
-          {article.excerpt}
-        </p>
-      </div>
-    </Link>
-  );
-}
-
 export default function HeroCarousel({ articles }: { articles: Article[] }) {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -63,35 +36,60 @@ export default function HeroCarousel({ articles }: { articles: Article[] }) {
 
   if (articles.length === 0) return null;
 
+  const article = articles[index];
+  const category = getCategory(article.category);
+
   return (
     <div
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       className="border-accent-soft/50 bg-card-accent/40 hover:border-accent/60 mx-auto flex w-full max-w-xl min-h-0 flex-1 flex-col overflow-hidden rounded-3xl border p-4 transition-colors sm:p-5"
     >
-      <div dir="ltr" className="relative min-h-0 flex-1 overflow-hidden">
-        {outgoing !== null && (
+      <Link href={`/article/${article.slug}`} dir="rtl" className="group block">
+        <div dir="ltr" className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl sm:aspect-[16/9]">
+          {outgoing !== null && (
+            <div
+              className="absolute inset-0 transition-transform duration-700 ease-in-out"
+              style={{ transform: entered ? "translateX(100%)" : "translateX(0%)" }}
+            >
+              <NewsIllustration
+                category={articles[outgoing].category}
+                className="flex h-full w-full items-center justify-center"
+              />
+            </div>
+          )}
           <div
             className="absolute inset-0 transition-transform duration-700 ease-in-out"
-            style={{ transform: entered ? "translateX(100%)" : "translateX(0%)" }}
-          >
-            <Slide article={articles[outgoing]} />
-          </div>
-        )}
-        <div
-          className="absolute inset-0 transition-transform duration-700 ease-in-out"
-          style={{
-            transform:
-              outgoing === null
-                ? "translateX(0%)"
-                : entered
+            style={{
+              transform:
+                outgoing === null
                   ? "translateX(0%)"
-                  : "translateX(-100%)",
-          }}
-        >
-          <Slide article={articles[index]} />
+                  : entered
+                    ? "translateX(0%)"
+                    : "translateX(-100%)",
+            }}
+          >
+            <NewsIllustration
+              category={article.category}
+              className="flex h-full w-full items-center justify-center"
+            />
+          </div>
         </div>
-      </div>
+
+        <div key={article.slug} className="animate-fade-in mt-6">
+          {category && (
+            <span className="bg-accent-soft/40 text-accent inline-block w-fit rounded-full px-2.5 py-1 text-xs font-semibold">
+              {category.name}
+            </span>
+          )}
+          <h1 className="font-democrats-ak text-foreground mt-3 line-clamp-2 text-3xl leading-relaxed group-hover:underline sm:text-4xl">
+            {article.title}
+          </h1>
+          <p className="text-muted mt-3 line-clamp-3 text-sm leading-6">
+            {article.excerpt}
+          </p>
+        </div>
+      </Link>
 
       {articles.length > 1 && (
         <div className="mt-auto flex items-center justify-center gap-2 pt-6">
