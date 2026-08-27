@@ -76,7 +76,7 @@ export default function HeroCarousel({ articles }: { articles: Article[] }) {
           </div>
         </div>
 
-        <div key={article.slug} className="animate-fade-in mt-6">
+        <div key={article.slug} className="animate-hero-text-in mt-6">
           {category && (
             <span className="bg-accent-soft/40 text-accent inline-block w-fit rounded-full px-2.5 py-1 text-xs font-semibold">
               {category.name}
