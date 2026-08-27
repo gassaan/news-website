@@ -8,10 +8,13 @@ export default function ArticleCard({ article }: { article: Article }) {
   return (
     <Link
       href={`/article/${article.slug}`}
-      className="group border-accent-soft/40 hover:border-accent/60 flex flex-col rounded-lg border p-4 transition-colors"
+      className="group border-accent-soft/40 hover:border-accent/60 flex flex-col rounded-lg border p-5 transition-colors"
     >
-      <div className="mb-4">
-        <NewsIllustration category={article.category} />
+      <div className="mb-5">
+        <NewsIllustration
+          category={article.category}
+          className="flex aspect-[2/1] w-full items-center justify-center overflow-hidden rounded-xl"
+        />
       </div>
 
       {category && (
@@ -20,14 +23,14 @@ export default function ArticleCard({ article }: { article: Article }) {
         </span>
       )}
 
-      <h2 className="font-mv-mag-round text-foreground mt-3 text-xl leading-8 group-hover:underline">
+      <h2 className="font-mv-mag-round text-foreground mt-4 text-2xl leading-9 group-hover:underline">
         {article.title}
       </h2>
-      <p className="text-muted mt-2 line-clamp-2 text-sm leading-6">
+      <p className="text-muted mt-3 line-clamp-2 text-sm leading-6">
         {article.excerpt}
       </p>
 
-      <span className="text-muted/70 mt-4 text-xs">
+      <span className="text-muted/70 mt-5 text-xs">
         {article.publishedAt}
       </span>
     </Link>
