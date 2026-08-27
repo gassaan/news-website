@@ -2,7 +2,10 @@ export default function NewsTicker({ headlines }: { headlines: string[] }) {
   const track = [...headlines, ...headlines];
 
   return (
-    <div dir="ltr" className="bg-nav-bg mt-6 overflow-hidden py-3 sm:mt-8">
+    <div
+      dir="ltr"
+      className="bg-nav-bg sticky top-[61px] z-10 mt-6 overflow-hidden py-3 sm:mt-8"
+    >
       <div className="animate-marquee flex w-max whitespace-nowrap">
         {track.map((headline, index) => (
           <span
