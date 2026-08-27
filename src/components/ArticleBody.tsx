@@ -16,8 +16,8 @@ export default function ArticleBody({
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <div className="bg-card-accent flex items-center gap-2 rounded-full pl-3">
-          <span className="bg-accent flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white">
+        <div className="bg-card-accent flex items-center gap-2 rounded-full py-1 pl-3">
+          <span className="bg-accent flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white">
             {author.charAt(0)}
           </span>
           <span className="text-foreground text-sm font-semibold">
