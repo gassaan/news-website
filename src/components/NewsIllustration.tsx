@@ -7,14 +7,17 @@ const PALETTES: Record<string, { bg: string; shape: string; icon: string }> = {
   default: { bg: "#9b8ce0", shape: "#7a68c9", icon: "#1c1638" },
 };
 
-export default function NewsIllustration({ category }: { category: string }) {
+export default function NewsIllustration({
+  category,
+  className = "flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-2xl sm:aspect-[16/9]",
+}: {
+  category: string;
+  className?: string;
+}) {
   const palette = PALETTES[category] ?? PALETTES.default;
 
   return (
-    <div
-      className="flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-2xl sm:aspect-[16/9]"
-      style={{ backgroundColor: palette.bg }}
-    >
+    <div className={className} style={{ backgroundColor: palette.bg }}>
       <svg viewBox="0 0 200 150" className="h-3/4 w-3/4" aria-hidden="true">
         <circle cx="100" cy="75" r="52" fill={palette.shape} opacity="0.5" />
         <rect

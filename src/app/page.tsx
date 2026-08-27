@@ -1,11 +1,14 @@
-import ArticleCard from "@/components/ArticleCard";
+import CompactArticleCard from "@/components/CompactArticleCard";
 import HeroCarousel from "@/components/HeroCarousel";
 import { articles, getFeaturedArticles } from "@/lib/articles";
 
 export default function Home() {
   const featured = getFeaturedArticles();
   const heroArticles = featured.length > 0 ? featured : articles.slice(0, 3);
-  const rest = articles.filter((a) => !heroArticles.includes(a));
+  const rest = articles
+    .filter((a) => !heroArticles.includes(a))
+    .sort((a, b) => (a.publishedAt < b.publishedAt ? 1 : -1));
+  const latest = rest.slice(0, 6);
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
@@ -17,9 +20,9 @@ export default function Home() {
         <h2 className="font-mv-mag-round text-foreground mb-4 text-xl">
           އެންމެ ފަހުގެ ޚަބަރު
         </h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {rest.map((article) => (
-            <ArticleCard key={article.slug} article={article} />
+        <div className="grid grid-cols-3 gap-2 sm:gap-4">
+          {latest.map((article) => (
+            <CompactArticleCard key={article.slug} article={article} />
           ))}
         </div>
       </section>
