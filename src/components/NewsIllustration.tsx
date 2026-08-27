@@ -12,7 +12,7 @@ export default function NewsIllustration({ category }: { category: string }) {
 
   return (
     <div
-      className="flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-3xl sm:aspect-[16/9]"
+      className="flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-2xl sm:aspect-[16/9]"
       style={{ backgroundColor: palette.bg }}
     >
       <svg viewBox="0 0 200 150" className="h-3/4 w-3/4" aria-hidden="true">

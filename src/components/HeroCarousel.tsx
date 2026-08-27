@@ -26,7 +26,7 @@ export default function HeroCarousel({ articles }: { articles: Article[] }) {
     <div
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
-      className="mx-auto max-w-xl"
+      className="border-accent-soft/50 bg-card-accent/40 hover:border-accent/60 mx-auto max-w-xl rounded-3xl border p-4 transition-colors sm:p-5"
     >
       <Link href={`/article/${article.slug}`} key={article.slug} className="group block">
         <NewsIllustration category={article.category} />
