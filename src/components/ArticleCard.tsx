@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Article, getCategory } from "@/lib/articles";
+import NewsIllustration from "./NewsIllustration";
 
 export default function ArticleCard({ article }: { article: Article }) {
   const category = getCategory(article.category);
@@ -7,8 +8,9 @@ export default function ArticleCard({ article }: { article: Article }) {
   return (
     <Link
       href={`/article/${article.slug}`}
-      className="group border-accent-soft/40 hover:border-accent/60 flex flex-col gap-2 rounded-lg border p-4 transition-colors"
+      className="group border-accent-soft/40 hover:border-accent/60 flex flex-col gap-3 rounded-lg border p-4 transition-colors"
     >
+      <NewsIllustration category={article.category} />
       {category && (
         <span className="text-accent text-xs font-semibold">
           {category.name}

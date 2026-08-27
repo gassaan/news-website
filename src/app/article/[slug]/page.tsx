@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { articles, getArticle, getCategory } from "@/lib/articles";
+import NewsIllustration from "@/components/NewsIllustration";
 
 export function generateStaticParams() {
   return articles.map((article) => ({ slug: article.slug }));
@@ -19,6 +20,9 @@ export default async function ArticlePage({
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
+      <div className="mb-6">
+        <NewsIllustration category={article.category} />
+      </div>
       {category && (
         <span className="text-accent text-sm font-semibold">
           {category.name}
