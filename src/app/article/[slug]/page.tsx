@@ -4,7 +4,6 @@ import {
   formatDhivehiDate,
   getArticle,
   getCategory,
-  pseudoViewCount,
 } from "@/lib/articles";
 import NewsIllustration from "@/components/NewsIllustration";
 import ArticleBody from "@/components/ArticleBody";
@@ -48,14 +47,7 @@ export default async function ArticlePage({
         />
       </div>
 
-      <div className="mx-auto flex max-w-3xl items-center justify-between px-4 text-sm sm:px-6">
-        <span className="text-muted flex items-center gap-1.5">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
-            <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z" />
-            <circle cx="12" cy="12" r="2.5" />
-          </svg>
-          {pseudoViewCount(article.slug)}
-        </span>
+      <div className="mx-auto flex max-w-3xl items-center px-4 text-sm sm:px-6">
         <span className="text-muted flex items-center gap-1.5">
           ދިވެހި ޚަބަރު
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
