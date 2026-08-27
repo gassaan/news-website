@@ -8,12 +8,12 @@ export default function ArticleCard({ article }: { article: Article }) {
   return (
     <Link
       href={`/article/${article.slug}`}
-      className="group border-accent-soft/40 hover:border-accent/60 flex flex-col rounded-lg border p-5 transition-colors"
+      className="group border-accent-soft/40 hover:border-accent/60 flex flex-col rounded-3xl border p-5 transition-colors"
     >
       <div className="mb-5">
         <NewsIllustration
           category={article.category}
-          className="flex aspect-[2/1] w-full items-center justify-center overflow-hidden rounded-xl"
+          className="flex aspect-[2/1] w-full items-center justify-center overflow-hidden rounded-2xl"
         />
       </div>
 

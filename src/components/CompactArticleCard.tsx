@@ -8,11 +8,11 @@ export default function CompactArticleCard({ article }: { article: Article }) {
   return (
     <Link
       href={`/article/${article.slug}`}
-      className="group border-accent-soft/40 hover:border-accent/60 flex flex-col rounded-lg border p-3 transition-colors"
+      className="group border-accent-soft/40 hover:border-accent/60 flex flex-col rounded-2xl border p-3 transition-colors"
     >
       <NewsIllustration
         category={article.category}
-        className="flex aspect-[2/1] w-full items-center justify-center overflow-hidden rounded-md"
+        className="flex aspect-[2/1] w-full items-center justify-center overflow-hidden rounded-lg"
       />
       {category && (
         <span className="text-accent mt-3 text-[10px] font-semibold sm:text-xs">
