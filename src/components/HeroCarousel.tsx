@@ -30,13 +30,13 @@ export default function HeroCarousel({ articles }: { articles: Article[] }) {
     >
       <Link href={`/article/${article.slug}`} key={article.slug} className="group block">
         <NewsIllustration category={article.category} />
-        <div className="animate-fade-in mt-5">
+        <div className="animate-fade-in mt-6">
           {category && (
-            <span className="text-accent text-xs font-semibold">
+            <span className="bg-accent-soft/40 text-accent inline-block w-fit rounded-full px-2.5 py-1 text-xs font-semibold">
               {category.name}
             </span>
           )}
-          <h1 className="font-democrats-ak text-foreground mt-2 text-2xl leading-9 group-hover:underline">
+          <h1 className="font-democrats-ak text-foreground mt-3 text-2xl leading-9 group-hover:underline">
             {article.title}
           </h1>
           <p className="text-muted mt-3 line-clamp-3 text-sm leading-6">
@@ -46,7 +46,7 @@ export default function HeroCarousel({ articles }: { articles: Article[] }) {
       </Link>
 
       {articles.length > 1 && (
-        <div className="mt-5 flex items-center justify-center gap-2">
+        <div className="mt-6 flex items-center justify-center gap-2">
           {articles.map((a, i) => (
             <button
               key={a.slug}
