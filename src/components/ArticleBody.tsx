@@ -16,12 +16,12 @@ export default function ArticleBody({
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <div className="bg-accent-soft/30 flex items-center gap-2 rounded-full py-1 pr-3 pl-1">
-          <span className="bg-accent flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white">
-            {author.charAt(0)}
-          </span>
+        <div className="flex items-center gap-2">
           <span className="text-foreground text-sm font-medium">
             {author}
+          </span>
+          <span className="border-accent-soft/50 text-accent flex h-10 w-10 shrink-0 items-center justify-center rounded-full border text-sm font-bold">
+            {author.charAt(0)}
           </span>
         </div>
 
