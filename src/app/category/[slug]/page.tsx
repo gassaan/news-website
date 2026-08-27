@@ -20,7 +20,7 @@ export default async function CategoryPage({
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
-      <h1 className="font-mv-mag-round text-foreground mb-6 text-xl">
+      <h1 className="font-mv-mag-round text-foreground mb-6 text-2xl">
         {category.name}
       </h1>
       {categoryArticles.length === 0 ? (

@@ -19,7 +19,7 @@ export default function CompactArticleCard({ article }: { article: Article }) {
           {category.name}
         </span>
       )}
-      <h3 className="font-mv-mag-round text-foreground line-clamp-2 text-xs leading-5 group-hover:underline sm:text-sm">
+      <h3 className="font-mv-mag-round text-foreground line-clamp-2 text-sm leading-6 group-hover:underline sm:text-base">
         {article.title}
       </h3>
     </Link>

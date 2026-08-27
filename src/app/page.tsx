@@ -17,7 +17,7 @@ export default function Home() {
       </section>
 
       <section>
-        <h2 className="font-mv-mag-round text-foreground mb-4 text-xl">
+        <h2 className="font-mv-mag-round text-foreground mb-4 text-2xl">
           އެންމެ ފަހުގެ ޚަބަރު
         </h2>
         <div className="grid grid-cols-2 gap-2 sm:gap-4">

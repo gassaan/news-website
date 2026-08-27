@@ -20,7 +20,7 @@ export default function ArticleCard({ article }: { article: Article }) {
         </span>
       )}
 
-      <h2 className="font-mv-mag-round text-foreground mt-3 text-lg leading-7 group-hover:underline">
+      <h2 className="font-mv-mag-round text-foreground mt-3 text-xl leading-8 group-hover:underline">
         {article.title}
       </h2>
       <p className="text-muted mt-2 line-clamp-2 text-sm leading-6">

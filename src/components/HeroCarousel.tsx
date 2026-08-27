@@ -36,7 +36,7 @@ export default function HeroCarousel({ articles }: { articles: Article[] }) {
               {category.name}
             </span>
           )}
-          <h1 className="font-democrats-ak text-foreground mt-3 text-2xl leading-9 group-hover:underline">
+          <h1 className="font-democrats-ak text-foreground mt-3 text-3xl leading-tight group-hover:underline sm:text-4xl">
             {article.title}
           </h1>
           <p className="text-muted mt-3 line-clamp-3 text-sm leading-6">
