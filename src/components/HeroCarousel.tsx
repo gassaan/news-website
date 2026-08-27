@@ -26,7 +26,7 @@ export default function HeroCarousel({ articles }: { articles: Article[] }) {
     <div
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
-      className="border-accent-soft/50 bg-card-accent/40 hover:border-accent/60 mx-auto max-w-xl rounded-3xl border p-4 transition-colors sm:p-5"
+      className="border-accent-soft/50 bg-card-accent/40 hover:border-accent/60 mx-auto flex w-full max-w-xl flex-1 flex-col rounded-3xl border p-4 transition-colors sm:p-5"
     >
       <Link href={`/article/${article.slug}`} key={article.slug} className="group block">
         <NewsIllustration category={article.category} />
@@ -46,7 +46,7 @@ export default function HeroCarousel({ articles }: { articles: Article[] }) {
       </Link>
 
       {articles.length > 1 && (
-        <div className="mt-6 flex items-center justify-center gap-2">
+        <div className="mt-auto flex items-center justify-center gap-2 pt-6">
           {articles.map((a, i) => (
             <button
               key={a.slug}

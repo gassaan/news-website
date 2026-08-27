@@ -12,7 +12,7 @@ export default function Home() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
-      <section className="mb-12">
+      <section className="mb-12 flex min-h-[calc(100svh-6rem)] flex-col">
         <HeroCarousel articles={heroArticles} />
       </section>
 
