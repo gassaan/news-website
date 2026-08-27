@@ -33,7 +33,7 @@ export default async function ArticlePage({
             {category.name}
           </span>
         )}
-        <h1 className="font-mv-mag-round text-foreground mt-6 text-3xl leading-tight sm:text-4xl">
+        <h1 className="font-mv-mag-round text-foreground mt-6 text-3xl leading-relaxed sm:text-4xl">
           {article.title}
         </h1>
         <p className="text-muted mt-4 text-sm">
