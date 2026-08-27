@@ -4,34 +4,51 @@ import { useState } from "react";
 
 const SIZES = ["text-base", "text-lg", "text-xl", "text-2xl"];
 
-export default function ArticleBody({ paragraphs }: { paragraphs: string[] }) {
+export default function ArticleBody({
+  paragraphs,
+  author,
+}: {
+  paragraphs: string[];
+  author: string;
+}) {
   const [sizeIndex, setSizeIndex] = useState(1);
 
   return (
     <div>
-      <div className="mb-6 flex items-center gap-3">
-        <button
-          type="button"
-          onClick={() => setSizeIndex((i) => Math.max(0, i - 1))}
-          disabled={sizeIndex === 0}
-          aria-label="ފޮންޓް ސައިޒް ކުޑަކުރައްވާ"
-          className="border-accent-soft/50 text-accent flex h-10 w-10 items-center justify-center rounded-full border transition-colors hover:bg-accent-soft/30 disabled:opacity-30"
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" className="h-4 w-4">
-            <path d="M5 12h14" />
-          </svg>
-        </button>
-        <button
-          type="button"
-          onClick={() => setSizeIndex((i) => Math.min(SIZES.length - 1, i + 1))}
-          disabled={sizeIndex === SIZES.length - 1}
-          aria-label="ފޮންޓް ސައިޒް ބޮޑުކުރައްވާ"
-          className="border-accent-soft/50 text-accent flex h-10 w-10 items-center justify-center rounded-full border transition-colors hover:bg-accent-soft/30 disabled:opacity-30"
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" className="h-4 w-4">
-            <path d="M12 5v14M5 12h14" />
-          </svg>
-        </button>
+      <div className="mb-6 flex items-center justify-between">
+        <div className="bg-accent-soft/30 flex items-center gap-2 rounded-full py-1 pr-3 pl-1">
+          <span className="bg-accent flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white">
+            {author.charAt(0)}
+          </span>
+          <span className="text-foreground text-sm font-medium">
+            {author}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setSizeIndex((i) => Math.max(0, i - 1))}
+            disabled={sizeIndex === 0}
+            aria-label="ފޮންޓް ސައިޒް ކުޑަކުރައްވާ"
+            className="border-accent-soft/50 text-accent flex h-10 w-10 items-center justify-center rounded-full border transition-colors hover:bg-accent-soft/30 disabled:opacity-30"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" className="h-4 w-4">
+              <path d="M5 12h14" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            onClick={() => setSizeIndex((i) => Math.min(SIZES.length - 1, i + 1))}
+            disabled={sizeIndex === SIZES.length - 1}
+            aria-label="ފޮންޓް ސައިޒް ބޮޑުކުރައްވާ"
+            className="border-accent-soft/50 text-accent flex h-10 w-10 items-center justify-center rounded-full border transition-colors hover:bg-accent-soft/30 disabled:opacity-30"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" className="h-4 w-4">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       <div

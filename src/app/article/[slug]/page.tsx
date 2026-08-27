@@ -36,13 +36,9 @@ export default async function ArticlePage({
         <h1 className="font-mv-mag-round text-foreground mt-6 text-3xl leading-tight sm:text-4xl">
           {article.title}
         </h1>
-        <div className="text-muted mt-4 flex items-center justify-center gap-2 text-sm">
-          <span className="text-foreground/80 font-semibold">
-            {article.author}
-          </span>
-          <span aria-hidden="true">·</span>
-          <span>{formatDhivehiDate(article.publishedAt)}</span>
-        </div>
+        <p className="text-muted mt-4 text-sm">
+          {formatDhivehiDate(article.publishedAt)}
+        </p>
       </header>
 
       <div className="relative left-1/2 right-1/2 -mx-[50vw] my-8 w-screen">
@@ -72,7 +68,7 @@ export default async function ArticlePage({
       <div className="border-accent-soft/40 mx-auto my-8 max-w-3xl border-t px-4 sm:px-6" />
 
       <div className="mx-auto max-w-3xl px-4 sm:px-6">
-        <ArticleBody paragraphs={article.body} />
+        <ArticleBody paragraphs={article.body} author={article.author} />
       </div>
     </article>
   );
