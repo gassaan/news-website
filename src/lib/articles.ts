@@ -268,3 +268,32 @@ export function getArticlesByCategory(categorySlug: string): Article[] {
 export function getFeaturedArticles(): Article[] {
   return articles.filter((a) => a.featured);
 }
+
+const DHIVEHI_MONTHS = [
+  "ޖެނުއަރީ",
+  "ފެބްރުއަރީ",
+  "މާރިޗު",
+  "އޭޕްރީލް",
+  "މޭ",
+  "ޖޫން",
+  "ޖުލައި",
+  "އޯގަސްޓް",
+  "ސެޕްޓެމްބަރު",
+  "އޮކްޓޯބަރު",
+  "ނޮވެމްބަރު",
+  "ޑިސެމްބަރު",
+];
+
+export function formatDhivehiDate(dateStr: string): string {
+  const [year, month, day] = dateStr.split("-").map(Number);
+  return `${day} ${DHIVEHI_MONTHS[month - 1]} ${year}`;
+}
+
+export function pseudoViewCount(slug: string): string {
+  let hash = 0;
+  for (const char of slug) {
+    hash = (hash * 31 + char.charCodeAt(0)) % 100000;
+  }
+  const count = 800 + (hash % 4200);
+  return count.toLocaleString("en-US");
+}
