@@ -15,7 +15,7 @@ export default function Home() {
   return (
     <>
       <div className="mx-auto max-w-5xl px-4 pt-8 sm:px-6">
-        <section className="flex min-h-[calc(100svh-13rem)] flex-col">
+        <section className="flex min-h-[calc(100svh-15rem)] flex-col">
           <HeroCarousel articles={heroArticles} />
         </section>
       </div>
