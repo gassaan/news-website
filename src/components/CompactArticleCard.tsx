@@ -23,7 +23,7 @@ export default function CompactArticleCard({ article }: { article: Article }) {
         {article.title}
       </h3>
       <div className="border-accent-soft/40 mt-3 border-t pt-2">
-        <span className="text-accent text-xs">
+        <span className="text-accent text-[10px] sm:text-xs">
           {formatDhivehiDate(article.publishedAt)}
         </span>
       </div>
