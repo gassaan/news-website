@@ -1,3 +1,4 @@
+import Link from "next/link";
 import CategoryCarousel from "@/components/CategoryCarousel";
 import CompactArticleCard from "@/components/CompactArticleCard";
 import HeroCarousel from "@/components/HeroCarousel";
@@ -53,6 +54,14 @@ export default function Home() {
             {stories.map((article) => (
               <StoryCard key={article.slug} article={article} />
             ))}
+          </div>
+          <div className="mt-6 flex justify-center">
+            <Link
+              href="/stories"
+              className="bg-accent rounded-full px-6 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            >
+              އިތުރު ވާހަކަ
+            </Link>
           </div>
         </section>
       </div>
