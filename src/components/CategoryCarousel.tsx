@@ -1,39 +1,50 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { categories } from "@/lib/articles";
 import NewsIllustration from "./NewsIllustration";
 
 export default function CategoryCarousel() {
   const trackRef = useRef<HTMLDivElement>(null);
-  const draggingRef = useRef(false);
-  const movedRef = useRef(false);
-  const startXRef = useRef(0);
-  const startScrollRef = useRef(0);
-  const [paused, setPaused] = useState(false);
+  const interactingRef = useRef(false);
+  const resumeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const mouseDragRef = useRef<{
+    startX: number;
+    startScroll: number;
+    moved: boolean;
+  } | null>(null);
   const track = [...categories, ...categories, ...categories];
 
   useEffect(() => {
     const el = trackRef.current;
     if (!el) return;
-    const singleSetWidth = el.scrollWidth / 3;
-    el.scrollLeft = singleSetWidth;
+    el.scrollLeft = el.scrollWidth / 3;
 
     let raf: number;
     function step() {
-      if (el && !paused && !draggingRef.current) {
+      if (el && !interactingRef.current) {
         const setWidth = el.scrollWidth / 3;
         el.scrollLeft += 0.6;
-        if (el.scrollLeft >= setWidth * 2) {
-          el.scrollLeft -= setWidth;
-        }
+        if (el.scrollLeft >= setWidth * 2) el.scrollLeft -= setWidth;
       }
       raf = requestAnimationFrame(step);
     }
     raf = requestAnimationFrame(step);
     return () => cancelAnimationFrame(raf);
-  }, [paused]);
+  }, []);
+
+  function pauseForInteraction() {
+    interactingRef.current = true;
+    if (resumeTimeoutRef.current) clearTimeout(resumeTimeoutRef.current);
+  }
+
+  function scheduleResume() {
+    if (resumeTimeoutRef.current) clearTimeout(resumeTimeoutRef.current);
+    resumeTimeoutRef.current = setTimeout(() => {
+      interactingRef.current = false;
+    }, 600);
+  }
 
   function normalizeLoop() {
     const el = trackRef.current;
@@ -44,32 +55,36 @@ export default function CategoryCarousel() {
   }
 
   function handlePointerDown(e: React.PointerEvent<HTMLDivElement>) {
-    const el = trackRef.current;
-    if (!el) return;
-    draggingRef.current = true;
-    movedRef.current = false;
-    startXRef.current = e.clientX;
-    startScrollRef.current = el.scrollLeft;
-    el.setPointerCapture(e.pointerId);
-    setPaused(true);
+    pauseForInteraction();
+    if (e.pointerType === "mouse") {
+      const el = trackRef.current;
+      if (!el) return;
+      mouseDragRef.current = {
+        startX: e.clientX,
+        startScroll: el.scrollLeft,
+        moved: false,
+      };
+      el.setPointerCapture(e.pointerId);
+    }
   }
 
   function handlePointerMove(e: React.PointerEvent<HTMLDivElement>) {
+    if (e.pointerType !== "mouse" || !mouseDragRef.current) return;
     const el = trackRef.current;
-    if (!el || !draggingRef.current) return;
-    const dx = e.clientX - startXRef.current;
-    if (Math.abs(dx) > 5) movedRef.current = true;
-    el.scrollLeft = startScrollRef.current - dx;
+    if (!el) return;
+    const dx = e.clientX - mouseDragRef.current.startX;
+    if (Math.abs(dx) > 5) mouseDragRef.current.moved = true;
+    el.scrollLeft = mouseDragRef.current.startScroll - dx;
   }
 
   function handlePointerUp() {
-    draggingRef.current = false;
     normalizeLoop();
-    setPaused(false);
+    scheduleResume();
+    mouseDragRef.current = null;
   }
 
   function handleLinkClick(e: React.MouseEvent<HTMLAnchorElement>) {
-    if (movedRef.current) {
+    if (mouseDragRef.current?.moved) {
       e.preventDefault();
     }
   }
@@ -78,13 +93,14 @@ export default function CategoryCarousel() {
     <div
       ref={trackRef}
       dir="ltr"
+      onScroll={normalizeLoop}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerUp}
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-      className="[&::-webkit-scrollbar]:hidden flex cursor-grab touch-pan-y gap-4 overflow-x-auto px-4 py-2 active:cursor-grabbing"
+      onMouseEnter={pauseForInteraction}
+      onMouseLeave={scheduleResume}
+      className="[&::-webkit-scrollbar]:hidden flex cursor-grab gap-4 overflow-x-auto px-4 py-2 active:cursor-grabbing"
       style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
     >
       {track.map((category, index) => (
