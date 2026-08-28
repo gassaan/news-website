@@ -48,12 +48,8 @@ export default async function ArticlePage({
       </div>
 
       <div className="mx-auto flex max-w-3xl justify-start px-4 text-sm sm:px-6">
-        <span className="bg-card-accent/50 text-muted flex w-fit items-center gap-1.5 rounded-full px-3 py-1.5">
+        <span className="bg-card-accent/50 text-muted w-fit rounded-full px-3 py-1.5">
           ދިވެހި ޚަބަރު
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
-            <path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z" />
-            <circle cx="12" cy="13" r="3.5" />
-          </svg>
         </span>
       </div>
 
