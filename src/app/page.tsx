@@ -2,6 +2,7 @@ import CategoryCarousel from "@/components/CategoryCarousel";
 import CompactArticleCard from "@/components/CompactArticleCard";
 import HeroCarousel from "@/components/HeroCarousel";
 import NewsTicker from "@/components/NewsTicker";
+import StoryCard from "@/components/StoryCard";
 import { articles, getFeaturedArticles } from "@/lib/articles";
 
 export default function Home() {
@@ -36,11 +37,24 @@ export default function Home() {
         </section>
       </div>
 
-      <div className="pb-8">
+      <div className="py-8">
         <h2 className="font-mv-mag-round text-foreground mx-auto mb-4 max-w-5xl px-4 text-2xl sm:px-6">
           ކެޓަގަރީތައް
         </h2>
         <CategoryCarousel />
+      </div>
+
+      <div className="mx-auto max-w-5xl px-4 pb-8 sm:px-6">
+        <section>
+          <h2 className="font-mv-mag-round text-foreground mb-4 text-2xl">
+            ވާހަކަތައް
+          </h2>
+          <div className="grid grid-cols-2 gap-2 sm:gap-4">
+            {rest.slice(0, 4).map((article) => (
+              <StoryCard key={article.slug} article={article} />
+            ))}
+          </div>
+        </section>
       </div>
     </>
   );

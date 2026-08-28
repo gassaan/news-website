@@ -297,3 +297,12 @@ export function pseudoViewCount(slug: string): string {
   const count = 800 + (hash % 4200);
   return count.toLocaleString("en-US");
 }
+
+export function pseudoRating(slug: string): string {
+  let hash = 0;
+  for (const char of slug) {
+    hash = (hash * 17 + char.charCodeAt(0)) % 100000;
+  }
+  const rating = 4.1 + (hash % 9) / 10;
+  return rating.toFixed(1);
+}
