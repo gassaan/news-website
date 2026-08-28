@@ -47,8 +47,8 @@ export default async function ArticlePage({
         />
       </div>
 
-      <div className="mx-auto flex max-w-3xl justify-start px-4 text-sm sm:px-6">
-        <span className="bg-card-accent/50 text-muted w-fit rounded-full px-3 py-1.5">
+      <div className="mx-auto max-w-3xl px-4 sm:px-6">
+        <span className="bg-card-accent/50 text-muted inline-block w-fit rounded-full px-3 py-1.5 text-sm">
           ދިވެހި ޚަބަރު
         </span>
       </div>
