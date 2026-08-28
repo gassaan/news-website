@@ -1,3 +1,4 @@
+import CategoryCarousel from "@/components/CategoryCarousel";
 import CompactArticleCard from "@/components/CompactArticleCard";
 import HeroCarousel from "@/components/HeroCarousel";
 import NewsTicker from "@/components/NewsTicker";
@@ -33,6 +34,13 @@ export default function Home() {
             ))}
           </div>
         </section>
+      </div>
+
+      <div className="pb-8">
+        <h2 className="font-mv-mag-round text-foreground mx-auto mb-4 max-w-5xl px-4 text-2xl sm:px-6">
+          ބައިތައް
+        </h2>
+        <CategoryCarousel />
       </div>
     </>
   );
