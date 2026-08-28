@@ -24,17 +24,20 @@ export default async function ArticlePage({
     notFound();
   }
 
+  const isStory = stories.some((s) => s.slug === article.slug);
   const category = getCategory(article.category);
+  const tagHref = isStory ? "/stories" : category ? `/category/${category.slug}` : null;
+  const tagName = isStory ? "ވާހަކަ" : category?.name;
 
   return (
     <article className="py-8">
       <header className="mx-auto max-w-2xl px-4 text-center sm:px-6">
-        {category && (
+        {tagHref && (
           <Link
-            href={`/category/${category.slug}`}
+            href={tagHref}
             className="bg-accent-soft/40 text-accent hover:bg-accent-soft/60 inline-block w-fit rounded-full px-4 py-1.5 text-sm font-semibold transition-colors"
           >
-            {category.name}
+            {tagName}
           </Link>
         )}
         <h1 className="font-mv-mag-round text-foreground mt-6 text-3xl leading-relaxed sm:text-4xl">
@@ -52,13 +55,13 @@ export default async function ArticlePage({
         />
       </div>
 
-      {category && (
+      {tagHref && (
         <div className="mx-auto max-w-3xl px-4 sm:px-6">
           <Link
-            href={`/category/${category.slug}`}
+            href={tagHref}
             className="bg-card-accent/50 text-muted hover:text-accent inline-block w-fit rounded-full px-3 py-1.5 text-sm transition-colors"
           >
-            {category.name}
+            {tagName}
           </Link>
         </div>
       )}
