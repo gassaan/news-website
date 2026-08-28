@@ -53,7 +53,7 @@ export default async function ArticlePage({
         </span>
       </div>
 
-      <div className="border-accent-soft/40 mx-auto my-8 max-w-3xl border-t px-4 sm:px-6" />
+      <div className="border-accent-soft/40 mx-auto my-4 max-w-3xl border-t px-4 sm:px-6" />
 
       <div className="mx-auto max-w-3xl px-4 sm:px-6">
         <ArticleBody paragraphs={article.body} author={article.author} />
