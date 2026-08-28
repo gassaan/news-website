@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import {
   articles,
+  stories,
   formatDhivehiDate,
   getArticle,
   getCategory,
@@ -9,7 +10,7 @@ import NewsIllustration from "@/components/NewsIllustration";
 import ArticleBody from "@/components/ArticleBody";
 
 export function generateStaticParams() {
-  return articles.map((article) => ({ slug: article.slug }));
+  return [...articles, ...stories].map((article) => ({ slug: article.slug }));
 }
 
 export default async function ArticlePage({

@@ -3,7 +3,7 @@ import CompactArticleCard from "@/components/CompactArticleCard";
 import HeroCarousel from "@/components/HeroCarousel";
 import NewsTicker from "@/components/NewsTicker";
 import StoryCard from "@/components/StoryCard";
-import { articles, getFeaturedArticles } from "@/lib/articles";
+import { articles, getFeaturedArticles, stories } from "@/lib/articles";
 
 export default function Home() {
   const featured = getFeaturedArticles();
@@ -50,7 +50,7 @@ export default function Home() {
             ވާހަކަތައް
           </h2>
           <div className="grid grid-cols-2 gap-2 sm:gap-4">
-            {rest.slice(0, 4).map((article) => (
+            {stories.map((article) => (
               <StoryCard key={article.slug} article={article} />
             ))}
           </div>

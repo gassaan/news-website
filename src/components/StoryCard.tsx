@@ -23,7 +23,7 @@ export default function StoryCard({ article }: { article: Article }) {
           {pseudoRating(article.slug)}
         </span>
 
-        <h3 className="absolute inset-x-3 bottom-3 line-clamp-2 text-base font-bold text-white group-hover:underline sm:text-lg">
+        <h3 className="font-mv-mag-round absolute inset-x-3 bottom-3 line-clamp-2 text-base text-white group-hover:underline sm:text-lg">
           {article.title}
         </h3>
       </div>
