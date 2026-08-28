@@ -38,7 +38,7 @@ export default function Home() {
 
       <div className="pb-8">
         <h2 className="font-mv-mag-round text-foreground mx-auto mb-4 max-w-5xl px-4 text-2xl sm:px-6">
-          ބައިތައް
+          ކެޓަގަރީތައް
         </h2>
         <CategoryCarousel />
       </div>
