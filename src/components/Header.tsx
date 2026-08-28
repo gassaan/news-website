@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { categories } from "@/lib/articles";
 import ThemeToggle from "./ThemeToggle";
+import logoMask from "@/assets/logo-mask.png";
 
 export default function Header() {
   const [open, setOpen] = useState(false);
@@ -17,10 +18,19 @@ export default function Header() {
         <ThemeToggle />
         <Link
           href="/"
-          className="font-mv-mag-round text-foreground text-xl"
-        >
-          ދިވެހި ޚަބަރު
-        </Link>
+          aria-label="ދިވެހި ޚަބަރު"
+          className="bg-foreground block h-8 w-24"
+          style={{
+            maskImage: `url(${logoMask.src})`,
+            maskRepeat: "no-repeat",
+            maskPosition: "center",
+            maskSize: "contain",
+            WebkitMaskImage: `url(${logoMask.src})`,
+            WebkitMaskRepeat: "no-repeat",
+            WebkitMaskPosition: "center",
+            WebkitMaskSize: "contain",
+          }}
+        />
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
