@@ -25,8 +25,8 @@ export default function CategoryCarousel() {
     function step() {
       if (el && !interactingRef.current) {
         const setWidth = el.scrollWidth / 3;
-        el.scrollLeft += 0.6;
-        if (el.scrollLeft >= setWidth * 2) el.scrollLeft -= setWidth;
+        el.scrollLeft -= 0.6;
+        if (el.scrollLeft <= 0) el.scrollLeft += setWidth;
       }
       raf = requestAnimationFrame(step);
     }
