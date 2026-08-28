@@ -107,7 +107,7 @@ export default function CategoryCarousel() {
       onPointerCancel={handlePointerUp}
       onMouseEnter={pauseForInteraction}
       onMouseLeave={scheduleResume}
-      className="[&::-webkit-scrollbar]:hidden flex cursor-grab gap-4 overflow-x-auto px-4 py-2 active:cursor-grabbing"
+      className="[&::-webkit-scrollbar]:hidden flex cursor-grab gap-2 overflow-x-auto px-4 py-2 active:cursor-grabbing sm:gap-4"
       style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
     >
       {track.map((category, index) => (
