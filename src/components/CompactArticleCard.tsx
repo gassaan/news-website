@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Article, getCategory } from "@/lib/articles";
+import { Article, formatDhivehiDate, getCategory } from "@/lib/articles";
 import NewsIllustration from "./NewsIllustration";
 
 export default function CompactArticleCard({ article }: { article: Article }) {
@@ -22,6 +22,11 @@ export default function CompactArticleCard({ article }: { article: Article }) {
       <h3 className="font-mv-mag-round text-foreground mt-2 line-clamp-2 text-base leading-6 group-hover:underline sm:text-lg">
         {article.title}
       </h3>
+      <div className="border-accent-soft/40 mt-3 border-t pt-2">
+        <span className="text-accent text-xs">
+          {formatDhivehiDate(article.publishedAt)}
+        </span>
+      </div>
     </Link>
   );
 }
