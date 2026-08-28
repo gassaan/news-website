@@ -55,10 +55,10 @@ export default function Home() {
               <StoryCard key={article.slug} article={article} />
             ))}
           </div>
-          <div className="mt-6 flex justify-center">
+          <div className="mt-5 flex justify-center">
             <Link
               href="/stories"
-              className="bg-accent rounded-full px-6 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+              className="bg-accent-soft/40 text-accent hover:bg-accent-soft/60 rounded-full px-4 py-1.5 text-xs font-semibold transition-colors"
             >
               އިތުރު ވާހަކަ
             </Link>
