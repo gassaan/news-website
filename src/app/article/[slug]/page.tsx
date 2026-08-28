@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import {
   articles,
   stories,
@@ -48,11 +49,16 @@ export default async function ArticlePage({
         />
       </div>
 
-      <div className="mx-auto max-w-3xl px-4 sm:px-6">
-        <span className="bg-card-accent/50 text-muted inline-block w-fit rounded-full px-3 py-1.5 text-sm">
-          ދިވެހި ޚަބަރު
-        </span>
-      </div>
+      {category && (
+        <div className="mx-auto max-w-3xl px-4 sm:px-6">
+          <Link
+            href={`/category/${category.slug}`}
+            className="bg-card-accent/50 text-muted hover:text-accent inline-block w-fit rounded-full px-3 py-1.5 text-sm transition-colors"
+          >
+            {category.name}
+          </Link>
+        </div>
+      )}
 
       <div className="border-accent-soft/40 mx-auto my-4 max-w-3xl border-t px-4 sm:px-6" />
 
