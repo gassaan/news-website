@@ -38,7 +38,15 @@ export default function ThemeToggle() {
           />
         </svg>
       ) : (
-        <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="h-5 w-5"
+        >
           <path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9Z" />
         </svg>
       )}
