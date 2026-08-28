@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import CategoryArticleGrid from "@/components/CategoryArticleGrid";
+import CategoryTabs from "@/components/CategoryTabs";
 import { categories, getArticlesByCategory, getCategory } from "@/lib/articles";
 
 export function generateStaticParams() {
@@ -26,24 +26,7 @@ export default async function CategoryPage({
           ކެޓަގަރީތައް
         </h1>
 
-        <div
-          className="mb-6 flex gap-2 overflow-x-auto pb-1 [&::-webkit-scrollbar]:hidden"
-          style={{ scrollbarWidth: "none" }}
-        >
-          {categories.map((c) => (
-            <Link
-              key={c.slug}
-              href={`/category/${c.slug}`}
-              className={`shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
-                c.slug === slug
-                  ? "bg-background text-foreground border-accent-soft border"
-                  : "text-muted hover:bg-background/40"
-              }`}
-            >
-              {c.name}
-            </Link>
-          ))}
-        </div>
+        <CategoryTabs active={slug} />
 
         {categoryArticles.length === 0 ? (
           <p className="text-muted">މި ބައިގައި އަދި ޚަބަރެއް ނެތް</p>

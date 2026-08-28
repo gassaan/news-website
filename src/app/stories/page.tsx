@@ -1,16 +1,18 @@
-import StoryCard from "@/components/StoryCard";
+import CategoryTabs from "@/components/CategoryTabs";
+import StoryGrid from "@/components/StoryGrid";
 import { stories } from "@/lib/articles";
 
 export default function StoriesPage() {
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
-      <h1 className="font-mv-mag-round text-foreground mb-6 text-2xl">
-        ވާހަކަތައް
-      </h1>
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-4">
-        {stories.map((story) => (
-          <StoryCard key={story.slug} article={story} />
-        ))}
+    <div className="bg-card-accent/70 relative left-1/2 right-1/2 -mx-[50vw] w-screen py-8">
+      <div className="mx-auto max-w-5xl px-4 sm:px-6">
+        <h1 className="font-mv-mag-round text-foreground mb-6 text-right text-2xl">
+          ކެޓަގަރީތައް
+        </h1>
+
+        <CategoryTabs active="vaahaka" />
+
+        <StoryGrid stories={stories} />
       </div>
     </div>
   );
