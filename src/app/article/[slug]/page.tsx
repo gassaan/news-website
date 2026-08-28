@@ -30,9 +30,12 @@ export default async function ArticlePage({
     <article className="py-8">
       <header className="mx-auto max-w-2xl px-4 text-center sm:px-6">
         {category && (
-          <span className="bg-accent-soft/40 text-accent inline-block w-fit rounded-full px-4 py-1.5 text-sm font-semibold">
+          <Link
+            href={`/category/${category.slug}`}
+            className="bg-accent-soft/40 text-accent hover:bg-accent-soft/60 inline-block w-fit rounded-full px-4 py-1.5 text-sm font-semibold transition-colors"
+          >
             {category.name}
-          </span>
+          </Link>
         )}
         <h1 className="font-mv-mag-round text-foreground mt-6 text-3xl leading-relaxed sm:text-4xl">
           {article.title}
