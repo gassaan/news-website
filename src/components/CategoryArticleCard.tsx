@@ -6,7 +6,7 @@ export default function CategoryArticleCard({ article }: { article: Article }) {
   return (
     <Link
       href={`/article/${article.slug}`}
-      className="group bg-background/80 border-accent-soft/30 hover:border-accent/50 flex flex-col rounded-3xl border p-3 transition-colors"
+      className="group border-accent-soft/40 hover:border-accent/60 flex flex-col rounded-2xl border p-3 transition-colors"
     >
       <NewsIllustration
         category={article.category}

@@ -20,8 +20,8 @@ export default function CategoryTabs({ active }: { active: string }) {
             href={href}
             className={`shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
               isActive
-                ? "bg-background text-foreground border-accent-soft border"
-                : "text-muted hover:bg-background/40"
+                ? "bg-accent-soft/40 text-accent"
+                : "text-muted hover:bg-accent-soft/20"
             }`}
           >
             {tab.name}
