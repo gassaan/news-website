@@ -47,7 +47,7 @@ export default function ThemeToggle() {
           strokeLinejoin="round"
           className="h-5 w-5"
         >
-          <path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9Z" />
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z" />
         </svg>
       )}
     </button>
