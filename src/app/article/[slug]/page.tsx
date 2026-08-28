@@ -40,7 +40,7 @@ export default async function ArticlePage({
         </p>
       </header>
 
-      <div className="relative left-1/2 right-1/2 -mx-[50vw] my-8 w-screen">
+      <div className="relative left-1/2 right-1/2 -mx-[50vw] mt-8 mb-3 w-screen">
         <NewsIllustration
           category={article.category}
           className="flex aspect-[4/3] w-full items-center justify-center overflow-hidden sm:aspect-[16/9]"
