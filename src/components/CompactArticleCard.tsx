@@ -12,7 +12,7 @@ export default function CompactArticleCard({ article }: { article: Article }) {
     >
       <NewsIllustration
         category={article.category}
-        className="flex aspect-[2/1] w-full items-center justify-center overflow-hidden rounded-lg"
+        className="flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-lg"
       />
       {category && (
         <span className="text-accent mt-3 text-[10px] font-semibold sm:text-xs">
