@@ -22,28 +22,9 @@ export default async function CategoryPage({
   return (
     <div className="bg-card-accent/70 relative left-1/2 right-1/2 -mx-[50vw] w-screen py-8">
       <div className="mx-auto max-w-5xl px-4 sm:px-6">
-        <div className="mb-6 flex items-center justify-end gap-2">
-          <h1 className="font-mv-mag-round text-foreground text-2xl">
-            ކެޓަގަރީތައް
-          </h1>
-          <Link
-            href="/"
-            aria-label="މައި ޞަފްޙާއަށް"
-            className="text-foreground flex h-8 w-8 items-center justify-center"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-5 w-5"
-            >
-              <path d="M9 6l6 6-6 6" />
-            </svg>
-          </Link>
-        </div>
+        <h1 className="font-mv-mag-round text-foreground mb-6 text-right text-2xl">
+          ކެޓަގަރީތައް
+        </h1>
 
         <div
           className="mb-6 flex gap-2 overflow-x-auto pb-1 [&::-webkit-scrollbar]:hidden"
