@@ -16,15 +16,22 @@ export default function CategoryCarousel() {
   } | null>(null);
   const track = [...categories, ...categories, ...categories];
 
+  function getSetWidth(el: HTMLDivElement) {
+    const first = el.children[0] as HTMLElement | undefined;
+    const secondSetFirst = el.children[categories.length] as HTMLElement | undefined;
+    if (!first || !secondSetFirst) return el.scrollWidth / 3;
+    return secondSetFirst.offsetLeft - first.offsetLeft;
+  }
+
   useEffect(() => {
     const el = trackRef.current;
     if (!el) return;
-    el.scrollLeft = el.scrollWidth / 3;
+    el.scrollLeft = getSetWidth(el);
 
     let raf: number;
     function step() {
       if (el && !interactingRef.current) {
-        const setWidth = el.scrollWidth / 3;
+        const setWidth = getSetWidth(el);
         el.scrollLeft -= 0.6;
         if (el.scrollLeft <= 0) el.scrollLeft += setWidth;
       }
@@ -49,7 +56,7 @@ export default function CategoryCarousel() {
   function normalizeLoop() {
     const el = trackRef.current;
     if (!el) return;
-    const setWidth = el.scrollWidth / 3;
+    const setWidth = getSetWidth(el);
     if (el.scrollLeft >= setWidth * 2) el.scrollLeft -= setWidth;
     if (el.scrollLeft <= 0) el.scrollLeft += setWidth;
   }
