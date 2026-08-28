@@ -19,7 +19,7 @@ export default function Header() {
         <Link
           href="/"
           aria-label="ދިވެހި ޚަބަރު"
-          className="bg-foreground block h-8 w-24"
+          className="bg-accent dark:bg-foreground block h-8 w-24"
           style={{
             maskImage: `url(${logoMask.src})`,
             maskRepeat: "no-repeat",
