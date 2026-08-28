@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import AuthorAvatar from "./AuthorAvatar";
 
 const SIZES = ["text-base", "text-lg", "text-xl", "text-2xl"];
 
@@ -17,9 +18,7 @@ export default function ArticleBody({
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div className="border-accent-soft/50 flex items-center gap-2 rounded-full border p-1 pl-3">
-          <span className="bg-accent flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white">
-            {author.charAt(0)}
-          </span>
+          <AuthorAvatar name={author} />
           <span className="text-foreground text-sm font-semibold">
             {author}
           </span>
