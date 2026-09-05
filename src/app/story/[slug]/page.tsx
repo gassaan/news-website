@@ -31,14 +31,17 @@ export default async function StoryEpisodeListPage({
           {story.title}
         </h1>
 
-        <div className="mt-3 flex items-center gap-2">
-          <AuthorAvatar name={story.author} className="h-6 w-6" />
-          <span className="text-foreground text-sm font-semibold">
-            {story.author}
+        <div className="border-accent-soft/50 bg-card-accent/40 mt-4 flex items-center gap-3 rounded-full border p-1 pl-4">
+          <AuthorAvatar name={story.author} className="h-9 w-9" />
+          <span className="flex flex-col items-start text-right">
+            <span className="text-foreground text-sm font-semibold">
+              {story.author}
+            </span>
+            <span className="text-muted text-xs">ވާހަކަ ލިޔުންތެރިޔާ</span>
           </span>
         </div>
 
-        <div className="mt-2">
+        <div className="mt-3">
           <StoryRatingBadge slug={story.slug} episodeCount={story.episodes.length} />
         </div>
 
