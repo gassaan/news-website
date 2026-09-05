@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { categories } from "@/lib/articles";
 
@@ -5,6 +8,14 @@ const STORIES_TAB = { slug: "vaahaka", name: "ވާހަކަ" };
 
 export default function CategoryTabs({ active }: { active: string }) {
   const tabs = [STORIES_TAB, ...categories];
+  const activeRef = useRef<HTMLAnchorElement>(null);
+
+  useEffect(() => {
+    activeRef.current?.scrollIntoView({
+      block: "nearest",
+      inline: "center",
+    });
+  }, [active]);
 
   return (
     <div
@@ -18,6 +29,7 @@ export default function CategoryTabs({ active }: { active: string }) {
           <Link
             key={tab.slug}
             href={href}
+            ref={isActive ? activeRef : undefined}
             className={`shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
               isActive
                 ? "bg-accent-soft/40 text-accent"
