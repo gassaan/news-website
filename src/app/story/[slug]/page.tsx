@@ -2,8 +2,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { stories } from "@/lib/articles";
 import AuthorAvatar from "@/components/AuthorAvatar";
+import BookCoverIllustration from "@/components/BookCoverIllustration";
 import EpisodeRatingLabel from "@/components/EpisodeRatingLabel";
-import NewsIllustration from "@/components/NewsIllustration";
 import StoryRatingBadge from "@/components/StoryRatingBadge";
 
 export function generateStaticParams() {
@@ -23,9 +23,9 @@ export default async function StoryEpisodeListPage({
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6">
       <div className="mb-6 flex flex-col items-center text-center">
-        <NewsIllustration
+        <BookCoverIllustration
           category={story.category}
-          className="mb-4 aspect-[3/4] w-40 overflow-hidden rounded-2xl"
+          className="mb-4 aspect-[3/4] w-40 overflow-hidden rounded-2xl drop-shadow-lg"
         />
         <h1 className="font-mv-mag-round text-foreground text-2xl">
           {story.title}

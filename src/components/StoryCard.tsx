@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Article } from "@/lib/articles";
-import NewsIllustration from "./NewsIllustration";
+import BookCoverIllustration from "./BookCoverIllustration";
 import StoryPosterRating from "./StoryPosterRating";
 
 export default function StoryCard({ article }: { article: Article }) {
@@ -11,7 +11,7 @@ export default function StoryCard({ article }: { article: Article }) {
       className="group border-accent-soft/50 hover:border-accent/60 block rounded-2xl border p-3 transition-colors"
     >
       <div className="relative aspect-[3/4] w-full overflow-hidden rounded-lg">
-        <NewsIllustration
+        <BookCoverIllustration
           category={article.category}
           className="absolute inset-0 flex h-full w-full items-center justify-center"
         />
