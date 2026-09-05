@@ -8,7 +8,7 @@ export default function StoryCard({ article }: { article: Article }) {
     <Link
       href={`/story/${article.slug}`}
       dir="rtl"
-      className="group border-accent-soft/50 hover:border-accent/60 block rounded-2xl border p-3 transition-colors"
+      className="group border-accent-soft/50 hover:border-accent/60 bg-card-accent/40 block rounded-2xl border p-3 transition-colors"
     >
       <div className="relative aspect-[3/4] w-full overflow-hidden rounded-lg">
         <NewsIllustration

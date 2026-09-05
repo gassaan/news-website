@@ -55,7 +55,7 @@ export default async function StoryEpisodeListPage({
           <Link
             key={index}
             href={`/story/${slug}/${index + 1}`}
-            className="border-accent-soft/40 hover:border-accent/60 flex items-center justify-between rounded-xl border px-4 py-3 transition-colors"
+            className="border-accent-soft/40 hover:border-accent/60 bg-card-accent/40 flex items-center justify-between rounded-xl border px-4 py-3 transition-colors"
           >
             <span className="text-foreground font-semibold">
               {episode.title}

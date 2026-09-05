@@ -8,7 +8,7 @@ export default function CompactArticleCard({ article }: { article: Article }) {
   return (
     <Link
       href={`/article/${article.slug}`}
-      className="group border-accent-soft/40 hover:border-accent/60 flex flex-col rounded-2xl border p-3 transition-colors"
+      className="group border-accent-soft/40 hover:border-accent/60 bg-card-accent/40 flex flex-col rounded-2xl border p-3 transition-colors"
     >
       <NewsIllustration
         category={article.category}
