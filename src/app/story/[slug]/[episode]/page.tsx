@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { stories } from "@/lib/articles";
 import ArticleBody from "@/components/ArticleBody";
+import EpisodeRatingWidget from "@/components/EpisodeRatingWidget";
 
 export function generateStaticParams() {
   return stories.flatMap((story) =>
@@ -55,6 +56,7 @@ export default async function StoryEpisodePage({
 
       <div className="mx-auto mt-8 max-w-3xl px-4 sm:px-6">
         <ArticleBody paragraphs={currentEpisode.body} author={story.author} />
+        <EpisodeRatingWidget slug={slug} episode={episodeNumber} />
       </div>
 
       <div className="mx-auto mt-8 flex max-w-3xl items-center justify-between px-4 sm:px-6">

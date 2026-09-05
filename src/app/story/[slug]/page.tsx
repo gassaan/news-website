@@ -1,7 +1,9 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { stories } from "@/lib/articles";
+import { pseudoRating, stories } from "@/lib/articles";
+import AuthorAvatar from "@/components/AuthorAvatar";
 import NewsIllustration from "@/components/NewsIllustration";
+import StoryRatingBadge from "@/components/StoryRatingBadge";
 
 export function generateStaticParams() {
   return stories.map((story) => ({ slug: story.slug }));
@@ -27,7 +29,23 @@ export default async function StoryEpisodeListPage({
         <h1 className="font-mv-mag-round text-foreground text-2xl">
           {story.title}
         </h1>
-        <p className="text-muted mt-2 text-sm leading-6">{story.excerpt}</p>
+
+        <div className="mt-3 flex items-center gap-2">
+          <AuthorAvatar name={story.author} className="h-6 w-6" />
+          <span className="text-foreground text-sm font-semibold">
+            {story.author}
+          </span>
+        </div>
+
+        <div className="mt-2">
+          <StoryRatingBadge
+            slug={story.slug}
+            baseline={Number(pseudoRating(story.slug))}
+            episodeCount={story.episodes.length}
+          />
+        </div>
+
+        <p className="text-muted mt-3 text-sm leading-6">{story.excerpt}</p>
       </div>
 
       <div className="flex flex-col gap-2">
