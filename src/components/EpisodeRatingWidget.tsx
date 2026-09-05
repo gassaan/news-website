@@ -1,10 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
-function ratingKey(slug: string, episode: number) {
-  return `vaahaka-rating:${slug}:${episode}`;
-}
+import { getUserRating, setUserRating } from "@/lib/storyRating";
 
 export default function EpisodeRatingWidget({
   slug,
@@ -17,22 +14,12 @@ export default function EpisodeRatingWidget({
   const [hovered, setHovered] = useState<number | null>(null);
 
   useEffect(() => {
-    try {
-      const raw = window.localStorage.getItem(ratingKey(slug, episode));
-      const value = raw ? Number(raw) : NaN;
-      setRating(Number.isFinite(value) && value >= 1 && value <= 5 ? value : null);
-    } catch {
-      setRating(null);
-    }
+    setRating(getUserRating(slug, episode));
   }, [slug, episode]);
 
   function rate(value: number) {
     setRating(value);
-    try {
-      window.localStorage.setItem(ratingKey(slug, episode), String(value));
-    } catch {
-      // localStorage unavailable; rating still reflected for this view
-    }
+    setUserRating(slug, episode, value);
   }
 
   const display = hovered ?? rating ?? 0;

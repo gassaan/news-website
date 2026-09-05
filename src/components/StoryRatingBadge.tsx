@@ -1,47 +1,27 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
-const BASELINE_WEIGHT = 20;
-
-function ratingKey(slug: string, episode: number) {
-  return `vaahaka-rating:${slug}:${episode}`;
-}
-
-function readUserRatings(slug: string, episodeCount: number): number[] {
-  const ratings: number[] = [];
-  for (let episode = 1; episode <= episodeCount; episode++) {
-    try {
-      const raw = window.localStorage.getItem(ratingKey(slug, episode));
-      const value = raw ? Number(raw) : NaN;
-      if (Number.isFinite(value) && value >= 1 && value <= 5) {
-        ratings.push(value);
-      }
-    } catch {
-      // localStorage unavailable; skip
-    }
-  }
-  return ratings;
-}
+import {
+  countUserRatings,
+  getBaselineAverage,
+  getEffectiveEpisodeRatings,
+} from "@/lib/storyRating";
 
 export default function StoryRatingBadge({
   slug,
-  baseline,
   episodeCount,
 }: {
   slug: string;
-  baseline: number;
   episodeCount: number;
 }) {
-  const [rating, setRating] = useState(baseline);
-  const [voteCount, setVoteCount] = useState(0);
+  const [rating, setRating] = useState(() => getBaselineAverage(slug, episodeCount));
+  const [ratedCount, setRatedCount] = useState(0);
 
   useEffect(() => {
-    const userRatings = readUserRatings(slug, episodeCount);
-    const total = baseline * BASELINE_WEIGHT + userRatings.reduce((a, b) => a + b, 0);
-    setRating(total / (BASELINE_WEIGHT + userRatings.length));
-    setVoteCount(userRatings.length);
-  }, [slug, baseline, episodeCount]);
+    const effective = getEffectiveEpisodeRatings(slug, episodeCount);
+    setRating(effective.reduce((a, b) => a + b, 0) / effective.length);
+    setRatedCount(countUserRatings(slug, episodeCount));
+  }, [slug, episodeCount]);
 
   return (
     <div className="flex items-center justify-center gap-1.5">
@@ -51,8 +31,10 @@ export default function StoryRatingBadge({
       <span className="text-foreground text-sm font-semibold">
         {rating.toFixed(1)}
       </span>
-      {voteCount > 0 && (
-        <span className="text-muted text-xs">({voteCount} ރޭޓިންގ)</span>
+      {ratedCount > 0 && (
+        <span className="text-muted text-xs">
+          ({ratedCount}/{episodeCount} ބައި ރޭޓްކުރެވިފައި)
+        </span>
       )}
     </div>
   );

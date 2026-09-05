@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { pseudoRating, stories } from "@/lib/articles";
+import { stories } from "@/lib/articles";
 import AuthorAvatar from "@/components/AuthorAvatar";
+import EpisodeRatingLabel from "@/components/EpisodeRatingLabel";
 import NewsIllustration from "@/components/NewsIllustration";
 import StoryRatingBadge from "@/components/StoryRatingBadge";
 
@@ -38,11 +39,7 @@ export default async function StoryEpisodeListPage({
         </div>
 
         <div className="mt-2">
-          <StoryRatingBadge
-            slug={story.slug}
-            baseline={Number(pseudoRating(story.slug))}
-            episodeCount={story.episodes.length}
-          />
+          <StoryRatingBadge slug={story.slug} episodeCount={story.episodes.length} />
         </div>
 
         <p className="text-muted mt-3 text-sm leading-6">{story.excerpt}</p>
@@ -58,17 +55,20 @@ export default async function StoryEpisodeListPage({
             <span className="text-foreground font-semibold">
               {episode.title}
             </span>
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="text-muted h-4 w-4"
-            >
-              <path d="M15 6l-6 6 6 6" />
-            </svg>
+            <span className="flex items-center gap-3">
+              <EpisodeRatingLabel slug={slug} episode={index + 1} />
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-muted h-4 w-4"
+              >
+                <path d="M15 6l-6 6 6 6" />
+              </svg>
+            </span>
           </Link>
         ))}
       </div>
