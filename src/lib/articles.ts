@@ -636,7 +636,7 @@ export const stories: Article[] = [
       },
     ],
     category: "life",
-    author: "ވާހަކަ ޓީމު",
+    author: "މަރިޔަމް މަނިކޭ",
     publishedAt: "2026-08-24",
   },
   {
@@ -676,7 +676,7 @@ export const stories: Article[] = [
       },
     ],
     category: "dhuniye",
-    author: "ވާހަކަ ޓީމު",
+    author: "މަރިޔަމް މަނިކޭ",
     publishedAt: "2026-08-25",
   },
   {
@@ -716,7 +716,7 @@ export const stories: Article[] = [
       },
     ],
     category: "viyafaari",
-    author: "ވާހަކަ ޓީމު",
+    author: "މަރިޔަމް މަނިކޭ",
     publishedAt: "2026-08-26",
   },
   {
@@ -756,7 +756,7 @@ export const stories: Article[] = [
       },
     ],
     category: "siyaasee",
-    author: "ވާހަކަ ޓީމު",
+    author: "މަރިޔަމް މަނިކޭ",
     publishedAt: "2026-08-27",
   },
   {
@@ -796,7 +796,7 @@ export const stories: Article[] = [
       },
     ],
     category: "life",
-    author: "ވާހަކަ ޓީމު",
+    author: "މަރިޔަމް މަނިކޭ",
     publishedAt: "2026-08-28",
   },
   {
@@ -836,7 +836,7 @@ export const stories: Article[] = [
       },
     ],
     category: "viyafaari",
-    author: "ވާހަކަ ޓީމު",
+    author: "މަރިޔަމް މަނިކޭ",
     publishedAt: "2026-08-29",
   },
 ];

@@ -33,11 +33,13 @@ export default async function StoryEpisodeListPage({
 
         <div className="border-accent-soft/50 bg-card-accent/40 mt-4 flex items-center gap-3 rounded-full border p-1 pl-4">
           <AuthorAvatar name={story.author} className="h-9 w-9" />
-          <span className="flex flex-col items-start text-right">
-            <span className="text-foreground text-sm font-semibold">
+          <span className="flex flex-col items-start gap-1 text-right">
+            <span className="text-foreground text-sm leading-none font-semibold">
               {story.author}
             </span>
-            <span className="text-muted text-xs">ވާހަކަ ލިޔުންތެރިޔާ</span>
+            <span className="text-muted text-[11px] leading-none">
+              ވާހަކަ ލިޔުންތެރިޔާ
+            </span>
           </span>
         </div>
 
