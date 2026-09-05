@@ -4,6 +4,12 @@ import { useState } from "react";
 import AuthorAvatar from "./AuthorAvatar";
 
 const SIZES = ["text-base", "text-lg", "text-xl", "text-2xl"];
+const LEADINGS = [
+  "leading-8",
+  "leading-9",
+  "leading-10",
+  "leading-[3rem]",
+];
 
 export default function ArticleBody({
   paragraphs,
@@ -51,7 +57,7 @@ export default function ArticleBody({
       </div>
 
       <div
-        className={`text-foreground/90 flex flex-col gap-6 leading-8 ${SIZES[sizeIndex]}`}
+        className={`text-foreground/90 flex flex-col gap-6 ${LEADINGS[sizeIndex]} ${SIZES[sizeIndex]}`}
       >
         {paragraphs.map((paragraph, index) => (
           <p key={index}>{paragraph}</p>
