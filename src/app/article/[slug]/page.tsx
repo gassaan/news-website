@@ -1,17 +1,11 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import {
-  articles,
-  stories,
-  formatDhivehiDate,
-  getArticle,
-  getCategory,
-} from "@/lib/articles";
+import { articles, formatDhivehiDate, getArticle, getCategory } from "@/lib/articles";
 import NewsIllustration from "@/components/NewsIllustration";
 import ArticleBody from "@/components/ArticleBody";
 
 export function generateStaticParams() {
-  return [...articles, ...stories].map((article) => ({ slug: article.slug }));
+  return articles.map((article) => ({ slug: article.slug }));
 }
 
 export default async function ArticlePage({
@@ -24,20 +18,17 @@ export default async function ArticlePage({
     notFound();
   }
 
-  const isStory = stories.some((s) => s.slug === article.slug);
   const category = getCategory(article.category);
-  const tagHref = isStory ? "/stories" : category ? `/category/${category.slug}` : null;
-  const tagName = isStory ? "ވާހަކަ" : category?.name;
 
   return (
     <article className="py-8">
       <header className="mx-auto max-w-2xl px-4 text-center sm:px-6">
-        {tagHref && (
+        {category && (
           <Link
-            href={tagHref}
+            href={`/category/${category.slug}`}
             className="bg-accent-soft/40 text-accent hover:bg-accent-soft/60 inline-block w-fit rounded-full px-4 py-1.5 text-sm font-semibold transition-colors"
           >
-            {tagName}
+            {category.name}
           </Link>
         )}
         <h1 className="font-mv-mag-round text-foreground mt-6 text-3xl leading-relaxed sm:text-4xl">
@@ -55,13 +46,13 @@ export default async function ArticlePage({
         />
       </div>
 
-      {tagHref && (
+      {category && (
         <div className="mx-auto max-w-3xl px-4 sm:px-6">
           <Link
-            href={tagHref}
+            href={`/category/${category.slug}`}
             className="bg-card-accent/50 text-muted hover:text-accent inline-block w-fit rounded-full px-3 py-1.5 text-sm transition-colors"
           >
-            {tagName}
+            {category.name}
           </Link>
         </div>
       )}

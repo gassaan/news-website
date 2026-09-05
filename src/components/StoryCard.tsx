@@ -5,7 +5,7 @@ import NewsIllustration from "./NewsIllustration";
 export default function StoryCard({ article }: { article: Article }) {
   return (
     <Link
-      href={`/article/${article.slug}`}
+      href={`/story/${article.slug}`}
       dir="rtl"
       className="group border-accent-soft/50 hover:border-accent/60 block rounded-2xl border p-3 transition-colors"
     >
