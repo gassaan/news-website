@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { Article, pseudoRating } from "@/lib/articles";
+import { Article } from "@/lib/articles";
 import NewsIllustration from "./NewsIllustration";
+import StoryPosterRating from "./StoryPosterRating";
 
 export default function StoryCard({ article }: { article: Article }) {
   return (
@@ -16,12 +17,10 @@ export default function StoryCard({ article }: { article: Article }) {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
 
-        <span className="bg-background/90 text-foreground absolute top-3 right-3 flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold">
-          <svg viewBox="0 0 24 24" fill="#eab308" className="h-3.5 w-3.5">
-            <path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.6l-5.9 3 1.3-6.6-4.9-4.6 6.6-.8Z" />
-          </svg>
-          {pseudoRating(article.slug)}
-        </span>
+        <StoryPosterRating
+          slug={article.slug}
+          episodeCount={article.episodes?.length ?? 1}
+        />
 
         <h3 className="font-mv-mag-round absolute inset-x-3 bottom-3 line-clamp-2 text-base text-white group-hover:underline sm:text-lg">
           {article.title}
