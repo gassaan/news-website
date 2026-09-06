@@ -72,9 +72,17 @@ export default function Home() {
             ރިޕޯޓު
           </h2>
           <div className="grid grid-cols-2 gap-2 sm:gap-4">
-            {reports.map((article) => (
+            {reports.slice(0, 6).map((article) => (
               <CompactArticleCard key={article.slug} article={article} />
             ))}
+          </div>
+          <div className="mt-5 flex justify-center">
+            <Link
+              href="/category/report"
+              className="bg-accent-soft/40 text-accent hover:bg-accent-soft/60 rounded-full px-4 py-1.5 text-xs font-semibold transition-colors"
+            >
+              އިތުރު ރިޕޯޓު
+            </Link>
           </div>
         </section>
       </div>
