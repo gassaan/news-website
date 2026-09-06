@@ -32,8 +32,6 @@ export default async function StoryEpisodeListPage({
         </h1>
 
         <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
-          <StoryRatingBadge slug={story.slug} episodeCount={story.episodes.length} />
-
           <div className="border-accent-soft/50 bg-card-accent/40 flex items-center gap-3 rounded-full border p-1 pl-4">
             <AuthorAvatar name={story.author} className="h-9 w-9" />
             <span className="flex flex-col items-start gap-1 text-right">
@@ -45,6 +43,8 @@ export default async function StoryEpisodeListPage({
               </span>
             </span>
           </div>
+
+          <StoryRatingBadge slug={story.slug} episodeCount={story.episodes.length} />
         </div>
 
         <p className="text-muted mt-4 text-sm leading-6">{story.excerpt}</p>
