@@ -1,11 +1,11 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { articles, formatDhivehiDate, getArticle, getCategory } from "@/lib/articles";
+import { articles, formatDhivehiDate, getArticle, getCategory, reports } from "@/lib/articles";
 import NewsIllustration from "@/components/NewsIllustration";
 import ArticleBody from "@/components/ArticleBody";
 
 export function generateStaticParams() {
-  return articles.map((article) => ({ slug: article.slug }));
+  return [...articles, ...reports].map((article) => ({ slug: article.slug }));
 }
 
 export default async function ArticlePage({

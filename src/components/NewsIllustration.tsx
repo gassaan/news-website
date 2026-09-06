@@ -4,6 +4,7 @@ const PALETTES: Record<string, { bg: string; shape: string; icon: string }> = {
   kulhivaru: { bg: "#e8815f", shape: "#c8613f", icon: "#2e150a" },
   dhuniye: { bg: "#5ea3e0", shape: "#3f7fc0", icon: "#0d1f33" },
   life: { bg: "#e07bb0", shape: "#c25a90", icon: "#2e1220" },
+  report: { bg: "#7c93bf", shape: "#5c7099", icon: "#141c2b" },
   default: { bg: "#9b8ce0", shape: "#7a68c9", icon: "#1c1638" },
 };
 

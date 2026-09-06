@@ -4,7 +4,7 @@ import CompactArticleCard from "@/components/CompactArticleCard";
 import HeroCarousel from "@/components/HeroCarousel";
 import NewsTicker from "@/components/NewsTicker";
 import StoryCard from "@/components/StoryCard";
-import { articles, getFeaturedArticles, stories } from "@/lib/articles";
+import { articles, getFeaturedArticles, reports, stories } from "@/lib/articles";
 
 export default function Home() {
   const featured = getFeaturedArticles();
@@ -24,6 +24,19 @@ export default function Home() {
       </div>
 
       <NewsTicker headlines={tickerHeadlines} />
+
+      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
+        <section>
+          <h2 className="font-mv-mag-round text-foreground mb-4 text-2xl">
+            އެންމެ ފަހުގެ ޚަބަރު
+          </h2>
+          <div className="grid grid-cols-2 gap-2 sm:gap-4">
+            {latest.map((article) => (
+              <CompactArticleCard key={article.slug} article={article} />
+            ))}
+          </div>
+        </section>
+      </div>
 
       <div className="py-8">
         <h2 className="font-mv-mag-round text-foreground mx-auto mb-4 max-w-5xl px-4 text-2xl sm:px-6">
@@ -56,10 +69,10 @@ export default function Home() {
       <div className="mx-auto max-w-5xl px-4 pb-8 sm:px-6">
         <section>
           <h2 className="font-mv-mag-round text-foreground mb-4 text-2xl">
-            އެންމެ ފަހުގެ ޚަބަރު
+            ރިޕޯޓު
           </h2>
           <div className="grid grid-cols-2 gap-2 sm:gap-4">
-            {latest.map((article) => (
+            {reports.map((article) => (
               <CompactArticleCard key={article.slug} article={article} />
             ))}
           </div>
