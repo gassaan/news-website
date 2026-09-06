@@ -10,7 +10,7 @@ export default function CategoryArticleCard({ article }: { article: Article }) {
     >
       <NewsIllustration
         category={article.category}
-        className="flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-2xl"
+        className="flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-lg"
       />
       <h3 className="font-mv-mag-round text-foreground mt-3 line-clamp-2 text-base leading-6 group-hover:underline">
         {article.title}
