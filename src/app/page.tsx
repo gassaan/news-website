@@ -25,19 +25,6 @@ export default function Home() {
 
       <NewsTicker headlines={tickerHeadlines} />
 
-      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
-        <section>
-          <h2 className="font-mv-mag-round text-foreground mb-4 text-2xl">
-            އެންމެ ފަހުގެ ޚަބަރު
-          </h2>
-          <div className="grid grid-cols-2 gap-2 sm:gap-4">
-            {latest.map((article) => (
-              <CompactArticleCard key={article.slug} article={article} />
-            ))}
-          </div>
-        </section>
-      </div>
-
       <div className="py-8">
         <h2 className="font-mv-mag-round text-foreground mx-auto mb-4 max-w-5xl px-4 text-2xl sm:px-6">
           ކެޓަގަރީތައް
@@ -45,7 +32,7 @@ export default function Home() {
         <CategoryCarousel />
       </div>
 
-      <div className="mx-auto max-w-5xl px-4 pb-8 sm:px-6">
+      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
         <section>
           <h2 className="font-mv-mag-round text-foreground mb-4 text-2xl">
             ވާހަކަތައް
@@ -62,6 +49,19 @@ export default function Home() {
             >
               އިތުރު ވާހަކަ
             </Link>
+          </div>
+        </section>
+      </div>
+
+      <div className="mx-auto max-w-5xl px-4 pb-8 sm:px-6">
+        <section>
+          <h2 className="font-mv-mag-round text-foreground mb-4 text-2xl">
+            އެންމެ ފަހުގެ ޚަބަރު
+          </h2>
+          <div className="grid grid-cols-2 gap-2 sm:gap-4">
+            {latest.map((article) => (
+              <CompactArticleCard key={article.slug} article={article} />
+            ))}
           </div>
         </section>
       </div>
