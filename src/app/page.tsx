@@ -88,19 +88,21 @@ export default function Home() {
         </section>
       </div>
 
-      <div className="mx-auto max-w-5xl px-4 pb-8 sm:px-6">
-        <section>
-          <h2 className="font-mv-mag-round text-foreground mb-4 text-2xl">
-            ހޯއްދަވާ
-          </h2>
-          <div className="grid grid-cols-2 gap-3 sm:gap-4">
-            {categories
-              .filter((category) => category.slug !== "report")
-              .map((category) => (
-                <CategoryShowcaseCard key={category.slug} category={category} />
-              ))}
-          </div>
-        </section>
+      <div className="pb-8">
+        <h2 className="font-mv-mag-round text-foreground mx-auto mb-4 max-w-5xl px-4 text-2xl sm:px-6">
+          ހޯއްދަވާ
+        </h2>
+        <div
+          dir="rtl"
+          className="[&::-webkit-scrollbar]:hidden mx-auto flex max-w-5xl snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 sm:gap-4 sm:px-6"
+          style={{ scrollbarWidth: "none" }}
+        >
+          {categories
+            .filter((category) => category.slug !== "report")
+            .map((category) => (
+              <CategoryShowcaseCard key={category.slug} category={category} />
+            ))}
+        </div>
       </div>
     </>
   );

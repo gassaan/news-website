@@ -29,7 +29,7 @@ export default function CategoryShowcaseCard({
     <Link
       href={`/category/${category.slug}`}
       dir="rtl"
-      className="group relative block aspect-[3/4] overflow-hidden rounded-3xl border border-black/10"
+      className="group relative block aspect-[3/4] w-64 shrink-0 snap-center overflow-hidden rounded-3xl border border-black/10"
     >
       <div
         className="absolute inset-0"
@@ -56,7 +56,7 @@ export default function CategoryShowcaseCard({
 
       <div className="absolute inset-x-0 bottom-0 h-[58%] bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
 
-      <div className="absolute inset-x-0 bottom-0 flex flex-col items-end gap-2 p-4">
+      <div className="absolute inset-x-0 bottom-0 flex flex-col items-start gap-2 p-4">
         <span
           className="rounded-full px-3 py-1 text-[11px] font-bold"
           style={{ backgroundColor: palette.bg, color: palette.icon }}
