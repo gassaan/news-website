@@ -1,10 +1,11 @@
 import Link from "next/link";
 import CategoryCarousel from "@/components/CategoryCarousel";
+import CategoryShowcaseCard from "@/components/CategoryShowcaseCard";
 import CompactArticleCard from "@/components/CompactArticleCard";
 import HeroCarousel from "@/components/HeroCarousel";
 import NewsTicker from "@/components/NewsTicker";
 import StoryCard from "@/components/StoryCard";
-import { articles, getFeaturedArticles, reports, stories } from "@/lib/articles";
+import { articles, categories, getFeaturedArticles, reports, stories } from "@/lib/articles";
 
 export default function Home() {
   const featured = getFeaturedArticles();
@@ -83,6 +84,21 @@ export default function Home() {
             >
               އިތުރު ރިޕޯޓު
             </Link>
+          </div>
+        </section>
+      </div>
+
+      <div className="mx-auto max-w-5xl px-4 pb-8 sm:px-6">
+        <section>
+          <h2 className="font-mv-mag-round text-foreground mb-4 text-2xl">
+            ހޯއްދަވާ
+          </h2>
+          <div className="grid grid-cols-2 gap-3 sm:gap-4">
+            {categories
+              .filter((category) => category.slug !== "report")
+              .map((category) => (
+                <CategoryShowcaseCard key={category.slug} category={category} />
+              ))}
           </div>
         </section>
       </div>

@@ -1,4 +1,4 @@
-const PALETTES: Record<string, { bg: string; shape: string; icon: string }> = {
+export const PALETTES: Record<string, { bg: string; shape: string; icon: string }> = {
   siyaasee: { bg: "#e8c257", shape: "#c9a13f", icon: "#2b2110" },
   viyafaari: { bg: "#4fb8a6", shape: "#3a8f81", icon: "#0f2a26" },
   kulhivaru: { bg: "#e8815f", shape: "#c8613f", icon: "#2e150a" },
