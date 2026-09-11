@@ -29,7 +29,7 @@ export default function CategoryShowcaseCard({
     <Link
       href={`/category/${category.slug}`}
       dir="rtl"
-      className="group relative block aspect-[3/4] w-64 shrink-0 snap-center overflow-hidden rounded-3xl border border-black/10"
+      className="group relative block aspect-[3/4] w-64 shrink-0 overflow-hidden rounded-3xl border border-black/10 select-none"
     >
       <div
         className="absolute inset-0"

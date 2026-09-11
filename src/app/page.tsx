@@ -1,6 +1,6 @@
 import Link from "next/link";
 import CategoryCarousel from "@/components/CategoryCarousel";
-import CategoryShowcaseCard from "@/components/CategoryShowcaseCard";
+import CategoryGallery from "@/components/CategoryGallery";
 import CompactArticleCard from "@/components/CompactArticleCard";
 import HeroCarousel from "@/components/HeroCarousel";
 import NewsTicker from "@/components/NewsTicker";
@@ -92,17 +92,9 @@ export default function Home() {
         <h2 className="font-mv-mag-round text-foreground mx-auto mb-4 max-w-5xl px-4 text-2xl sm:px-6">
           ހޯއްދަވާ
         </h2>
-        <div
-          dir="rtl"
-          className="[&::-webkit-scrollbar]:hidden mx-auto flex max-w-5xl snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 sm:gap-4 sm:px-6"
-          style={{ scrollbarWidth: "none" }}
-        >
-          {categories
-            .filter((category) => category.slug !== "report")
-            .map((category) => (
-              <CategoryShowcaseCard key={category.slug} category={category} />
-            ))}
-        </div>
+        <CategoryGallery
+          categories={categories.filter((category) => category.slug !== "report")}
+        />
       </div>
     </>
   );
