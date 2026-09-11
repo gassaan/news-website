@@ -7,7 +7,7 @@ const PALETTES: Record<string, { bg: string; shape: string; icon: string }> = {
   default: { bg: "#9b8ce0", shape: "#7a68c9", icon: "#1c1638" },
 };
 
-const PAGE_LINES = Array.from({ length: 10 });
+const PAGE_LINES = Array.from({ length: 22 });
 
 export default function BookCoverIllustration({
   category,
@@ -20,14 +20,18 @@ export default function BookCoverIllustration({
 
   return (
     <div className={`relative ${className}`}>
-      <div className="absolute inset-y-[3%] left-0 flex w-[7%] flex-col justify-evenly rounded-l-sm bg-[#f4ecdb] px-px">
+      {/* page stack: layered sheets peeking out from behind the cover */}
+      <div className="absolute inset-y-[1.5%] left-0 w-[10%] rounded-l-[1px] bg-[#d9caa3]" />
+      <div className="absolute inset-y-[3.5%] left-0 w-[9.5%] rounded-l-[1px] bg-[#e9dcb8]" />
+      <div className="absolute inset-y-[5.5%] left-0 flex w-[9%] flex-col justify-evenly rounded-l-[1px] bg-[#f8f0da] px-px py-[6%]">
         {PAGE_LINES.map((_, i) => (
-          <div key={i} className="h-px bg-black/10" />
+          <div key={i} className="h-px bg-black/[0.08]" />
         ))}
+        <div className="absolute inset-y-0 right-0 w-1/3 bg-gradient-to-l from-black/10 to-transparent" />
       </div>
 
       <div
-        className="absolute inset-0 left-[6%] flex items-center justify-center rounded-r-2xl rounded-l-[3px]"
+        className="absolute inset-0 left-[8%] flex items-center justify-center rounded-r-2xl rounded-l-[3px]"
         style={{
           backgroundColor: palette.bg,
           boxShadow: "inset 3px 0 6px -2px rgba(0,0,0,0.35)",
