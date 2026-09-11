@@ -1,14 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  --background: #eaedf5;
-  --foreground: #121a33;
-  --muted: #4c577a;
-  --card-accent: #dadfef;
-  --accent: #2a4bd7;
-  --accent-soft: #5a6fc0;
-  --nav-bg: #dadfef;
-  --nav-fg: #121a33;
+  --background: #eff0f2;
+  --foreground: #1b2029;
+  --muted: #5b6472;
+  --card-accent: #e2e4e9;
+  --accent: #35519e;
+  --accent-soft: #6d84b8;
+  --nav-bg: #e2e4e9;
+  --nav-fg: #1b2029;
 }
 
 @custom-variant dark (&:where(.dark, .dark *));
