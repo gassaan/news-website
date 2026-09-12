@@ -25,7 +25,7 @@ export default async function StoryEpisodeListPage({
       <div className="mb-6 flex flex-col items-center text-center">
         <BookCoverIllustration
           category={story.category}
-          className="mb-4 aspect-[3/4] w-40 overflow-hidden rounded-2xl drop-shadow-lg"
+          className="mb-4 aspect-[3/4] w-40"
         />
         <h1 className="font-mv-mag-round text-foreground text-2xl">
           {story.title}
