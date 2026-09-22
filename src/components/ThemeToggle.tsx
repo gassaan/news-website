@@ -36,12 +36,12 @@ export default function ThemeToggle({ className = "" }: { className?: string }) 
       </svg>
       <svg
         className="i-moon"
-        width="22"
-        height="22"
+        width="26"
+        height="26"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
-        strokeWidth="1.6"
+        strokeWidth="2"
         strokeLinejoin="round"
       >
         <path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z" />
