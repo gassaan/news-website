@@ -550,7 +550,7 @@ section {
   color: var(--on-band);
   overflow: hidden;
   margin-top: 56px;
-  height: clamp(50px, 6vw, 90px);
+  height: clamp(58px, 6.6vw, 98px);
   display: flex;
   align-items: center;
 }
@@ -563,7 +563,7 @@ section {
 .ticker-row span {
   font-family: var(--font-head);
   font-weight: 900;
-  font-size: clamp(16px, 1.9vw, 28px);
+  font-size: clamp(18px, 2.1vw, 30px);
   display: flex;
   align-items: center;
   gap: 36px;
