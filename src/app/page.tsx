@@ -44,7 +44,7 @@ export default function Home() {
         <CardGrid articles={latest} />
       </section>
 
-      <section id="cats" className="wrap">
+      <section id="cats">
         <div className="cats">
           {categories
             .filter((c) => c.slug !== "report")

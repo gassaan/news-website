@@ -706,6 +706,7 @@ section {
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
   padding-block: 6px;
+  padding-inline: 16px;
 }
 .cats::-webkit-scrollbar {
   display: none;
