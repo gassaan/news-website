@@ -1624,20 +1624,26 @@ footer .logo {
     background: var(--mh-field);
   }
   .mobile-nav {
-    display: flex;
-    flex-direction: column;
-    max-height: 0;
+    display: grid;
+    grid-template-rows: 0fr;
     opacity: 0;
-    overflow: hidden;
-    padding-block: 0;
     transition:
-      max-height 0.3s ease,
-      opacity 0.2s ease,
-      padding-block 0.3s ease;
+      grid-template-rows 0.32s ease,
+      opacity 0.22s ease;
   }
   .mobile-nav.open {
-    max-height: 480px;
+    grid-template-rows: 1fr;
     opacity: 1;
+  }
+  .mobile-nav-inner {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+    padding-block: 0;
+    transition: padding-block 0.32s ease;
+  }
+  .mobile-nav.open .mobile-nav-inner {
     padding-block: 17px 12px;
   }
   .m-search {

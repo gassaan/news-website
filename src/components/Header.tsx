@@ -92,25 +92,27 @@ export default function Header() {
         </div>
 
         <nav className={`mobile-nav ${menuOpen ? "open" : ""}`} aria-label="Mobile">
-          <label className="m-search" htmlFor="mq">
-            <input id="mq" type="search" placeholder="ހޯދާ" />
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-              <circle cx="11" cy="11" r="8" />
-              <path d="M21 21l-4.3-4.3" />
-            </svg>
-          </label>
-          <Link href="/#latest" onClick={() => setMenuOpen(false)}>
-            ފަހުގެ ޚަބަރު
-          </Link>
-          <Link href="/#popular" onClick={() => setMenuOpen(false)}>
-            އެންމެ މަގުބޫލް
-          </Link>
-          <Link href="/polls" onClick={() => setMenuOpen(false)}>
-            ޕޯލްސް
-          </Link>
-          <Link href={`/category/${categories[0].slug}`} onClick={() => setMenuOpen(false)}>
-            ކެޓެގަރީ
-          </Link>
+          <div className="mobile-nav-inner">
+            <label className="m-search" htmlFor="mq">
+              <input id="mq" type="search" placeholder="ހޯދާ" />
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+                <circle cx="11" cy="11" r="8" />
+                <path d="M21 21l-4.3-4.3" />
+              </svg>
+            </label>
+            <Link href="/#latest" onClick={() => setMenuOpen(false)}>
+              ފަހުގެ ޚަބަރު
+            </Link>
+            <Link href="/#popular" onClick={() => setMenuOpen(false)}>
+              އެންމެ މަގުބޫލް
+            </Link>
+            <Link href="/polls" onClick={() => setMenuOpen(false)}>
+              ޕޯލްސް
+            </Link>
+            <Link href={`/category/${categories[0].slug}`} onClick={() => setMenuOpen(false)}>
+              ކެޓެގަރީ
+            </Link>
+          </div>
         </nav>
       </div>
     </header>
