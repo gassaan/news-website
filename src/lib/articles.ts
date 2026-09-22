@@ -20,6 +20,30 @@ export type Article = {
   episodes?: Episode[];
 };
 
+export type Author = {
+  slug: string;
+  name: string;
+  role: string;
+  bio: string;
+};
+
+export type Poll = {
+  id: string;
+  question: string;
+  options: string[];
+  votes: number[];
+};
+
+export type Comment = {
+  id: string;
+  author: string;
+  text: string;
+  timeAgo: string;
+  likes: number;
+  dislikes: number;
+  replies?: Comment[];
+};
+
 export const categories: Category[] = [
   { slug: "siyaasee", name: "ސިޔާސީ" },
   { slug: "viyafaari", name: "ވިޔަފާރި" },
@@ -949,6 +973,26 @@ export function getFeaturedArticles(): Article[] {
   return articles.filter((a) => a.featured);
 }
 
+export function getLatestArticles(limit = 6): Article[] {
+  return [...articles]
+    .sort((a, b) => (a.publishedAt < b.publishedAt ? 1 : -1))
+    .slice(0, limit);
+}
+
+export function getPopularArticles(limit = 6): Article[] {
+  const viewsOf = (slug: string) => Number(pseudoViewCount(slug).replace(/,/g, ""));
+  return [...articles]
+    .sort((a, b) => viewsOf(b.slug) - viewsOf(a.slug))
+    .slice(0, limit);
+}
+
+export function getRelatedArticles(article: Article, limit = 6): Article[] {
+  const sameCategory = articles.filter(
+    (a) => a.category === article.category && a.slug !== article.slug,
+  );
+  return sameCategory.slice(0, limit);
+}
+
 const DHIVEHI_MONTHS = [
   "ޖެނުއަރީ",
   "ފެބްރުއަރީ",
@@ -986,3 +1030,175 @@ export function pseudoRating(slug: string): string {
   const rating = 4.1 + (hash % 9) / 10;
   return rating.toFixed(1);
 }
+
+// Deterministic hue (0-359) used to seed the .ph gradient placeholder for a
+// given slug, so the same item always gets the same placeholder colour.
+export function pseudoHue(slug: string): number {
+  let hash = 0;
+  for (const char of slug) {
+    hash = (hash * 53 + char.charCodeAt(0)) % 100000;
+  }
+  return hash % 360;
+}
+
+// Deterministic HH:MM used until real publish times exist.
+export function pseudoTime(slug: string): string {
+  let hash = 0;
+  for (const char of slug) {
+    hash = (hash * 29 + char.charCodeAt(0)) % 100000;
+  }
+  const hours = String(6 + (hash % 16)).padStart(2, "0");
+  const minutes = String((hash * 7) % 60).padStart(2, "0");
+  return `${hours}:${minutes}`;
+}
+
+// ---------- Authors ----------
+
+export const authors: Author[] = [
+  {
+    slug: "khabaru-team",
+    name: "ޚަބަރު ޓީމު",
+    role: "ރިޕޯޓަރު",
+    bio: "ދިވެހި ޚަބަރުގެ ޚަބަރު ޓީމަކީ ސިޔާސީ، އިޤްތިޞާދީ އަދި އިޖްތިމާޢީ ދާއިރާތަކުން ފާއިތުވެދިޔަ ދުވަސްތަކުގެ އެންމެ މުހިންމު ޚަބަރުތައް ރައްޔިތުންނާ ހަމައަށް ގެނެސްދިނުމުގައި ހަރަކާތްތެރިވާ ޓީމެކެވެ.",
+  },
+  {
+    slug: "mariyam-manike",
+    name: "މަރިޔަމް މަނިކޭ",
+    role: "ވާހަކަ ލިޔުންތެރިޔާ",
+    bio: "މަރިޔަމް މަނިކޭއަކީ ވާހަކަ ލިޔުމުގެ ދާއިރާގައި ފުންނާބު އުސް ލިޔުންތެރިއެކެވެ. ހިތްގައިމު، އަސަރުން ފުރިގެންވާ ގިނަ ވާހަކަތަކެއް ވަނީ ލިޔެފައެވެ.",
+  },
+  {
+    slug: "report-team",
+    name: "ރިޕޯޓު ޓީމު",
+    role: "ރިޕޯޓަރު",
+    bio: "ރިޕޯޓު ޓީމަކީ ފުން ދިރާސާތަކާއެކު، މުހިންމު މައުޟޫޢުތަކުގެ މައްޗަށް ތަފްޞީލީ ރިޕޯޓުތައް ތައްޔާރުކުރާ ޓީމެކެވެ.",
+  },
+];
+
+const AUTHOR_SLUG_BY_NAME: Record<string, string> = Object.fromEntries(
+  authors.map((a) => [a.name, a.slug]),
+);
+
+export function getAuthorSlug(authorName: string): string {
+  return AUTHOR_SLUG_BY_NAME[authorName] ?? authors[0].slug;
+}
+
+export function getAuthor(slug: string): Author | undefined {
+  return authors.find((a) => a.slug === slug);
+}
+
+export function getArticlesByAuthor(slug: string): Article[] {
+  const author = getAuthor(slug);
+  if (!author) return [];
+  return [...articles, ...reports].filter((a) => a.author === author.name);
+}
+
+// ---------- Polls ----------
+
+export const polls: Poll[] = [
+  {
+    id: "poll-1",
+    question: "ޓެކްސީ ޚިދުމަތުގެ އެންމެ ބޮޑު މައްސަލައަކީ ކޮބާ؟",
+    options: [
+      "މަދުވެގެން 25 ޕަސެންޓަކީ ތިމާވެއްޓާއި ރައްޓެހި އިލެކްޓްރިކް އުޅަނދުތައް",
+      "މާލޭގައި ޓެކްސީ ހިދުމަތް ހޯދާ ފަރާތްތަކުގެ ކަންބޮޑުވުމާއި",
+      "މާލޭގައި އެމްޓީސީސީން އާރްޓީއައި ބަސް ދުއްވާ ގޮތަށް ޔުނިފޯމް އެޅި",
+    ],
+    votes: [61, 24, 15],
+  },
+  {
+    id: "poll-2",
+    question: "ސަރުކާރުގެ އައު ސިޔާސަތާ މެދު ދެކެނީ ކިހިނެއް؟",
+    options: [
+      "ވަރަށް ރަނގަޅު ބަދަލެއް",
+      "އިތުރަށް ބަދަލުތަކެއް ބޭނުންވޭ",
+      "މިއީ ރަނގަޅު ސިޔާސަތެއް ނޫން",
+    ],
+    votes: [40, 35, 25],
+  },
+  {
+    id: "poll-3",
+    question: "ރާއްޖޭގެ ފަތުރުވެރިކަމުގެ މުސްތަޤްބަލާ މެދު ދެކެނީ ކިހިނެއް؟",
+    options: [
+      "ވަރަށް އުޖާލާ",
+      "ގޮންޖެހުންތަކާ ކުރިމަތިލާން ޖެހޭނެ",
+      "ބަދަލުތަކެއް ބޭނުންވޭ",
+    ],
+    votes: [55, 28, 17],
+  },
+  {
+    id: "poll-4",
+    question: "ސްކޫލްތަކުގެ ފެންވަރު ރަނގަޅުކުރުމަށް އެންމެ މުހިންމީ ކޮބާ؟",
+    options: [
+      "ޓީޗަރުންނަށް ދޭ ތަމްރީނު އިތުރުކުރުން",
+      "ޑިޖިޓަލް ވަޞީލަތްތައް ފޯރުކޮށްދިނުން",
+      "ވަޞީލަތްތައް އިތުރުކުރުން",
+    ],
+    votes: [48, 30, 22],
+  },
+];
+
+export function getPolls(): Poll[] {
+  return polls;
+}
+
+export function getPoll(id: string): Poll | undefined {
+  return polls.find((p) => p.id === id);
+}
+
+// ---------- Comments ----------
+// Phase 1 has no backend, so every article page shows this same sample
+// thread. TODO(phase 2): save comments to the database, keyed by article.
+
+export const sampleComments: Comment[] = [
+  {
+    id: "c1",
+    author: "އަހުމަދު އަލީ",
+    text: "މާލޭގައި ޓެކްސީ ހިދުމަތް ހޯދާ ފަރާތްތަކުގެ ކަންބޮޑުވުމާއި ޝަކުވާތައް މަދެއް ނޫނެވެ. މާލެއިން މާލެ އަށް ދަތުރެއް ޖަހައިގެން ނުލިބުމެވެ. ޓެކްސީއެއް ހުއްޓާތޯ އަތް ނަގައިގެން އެތައް އިރަކު ހުއްޓަސް ނުލިބުމެވެ.",
+    timeAgo: "3 ގަޑިއިރު ކުރިން",
+    likes: 20,
+    dislikes: 18,
+    replies: [
+      {
+        id: "c1-r1",
+        author: "އަހުމަދު އަލީ",
+        text: "މާލޭގައި ޓެކްސީ ހިދުމަތް ހޯދާ ފަރާތްތަކުގެ ކަންބޮޑުވުމާއި ޝަކުވާތައް މަދެއް ނޫނެވެ. މާލެއިން މާލެ އަށް ދަތުރެއް ޖަހައިގެން ނުލިބުމެވެ.",
+        timeAgo: "3 ގަޑިއިރު ކުރިން",
+        likes: 20,
+        dislikes: 18,
+      },
+    ],
+  },
+  {
+    id: "c2",
+    author: "އަހުމަދު އަލީ",
+    text: "މާލޭގައި ޓެކްސީ ހިދުމަތް ހޯދާ ފަރާތްތަކުގެ ކަންބޮޑުވުމާއި ޝަކުވާތައް މަދެއް ނޫނެވެ. މާލެއިން މާލެ އަށް ދަތުރެއް ޖަހައިގެން ނުލިބުމެވެ. ޓެކްސީއެއް ހުއްޓާތޯ އަތް ނަގައިގެން އެތައް އިރަކު ހުއްޓަސް ނުލިބުމެވެ. ބައެއް ޑްރައިވަރުންގެ އުނދަގުލާއި މައްސަލަތައް އެހާ ބޮޑުވުމެވެ.",
+    timeAgo: "3 ގަޑިއިރު ކުރިން",
+    likes: 20,
+    dislikes: 18,
+  },
+];
+
+export function getSampleComments(): Comment[] {
+  return sampleComments;
+}
+
+// ---------- Gallery ----------
+
+export type GalleryShot = {
+  slug: string;
+  title: string;
+  date: string;
+};
+
+export const galleryShots: GalleryShot[] = [
+  { slug: "gallery-1", title: "މަޖިލީސް އިންތިހާބު", date: "2026-03-23" },
+  { slug: "gallery-2", title: "މަޖިލީސް އިންތިހާބު", date: "2026-03-23" },
+  { slug: "gallery-3", title: "މަޖިލީސް އިންތިހާބު", date: "2026-03-23" },
+  { slug: "gallery-4", title: "މަޖިލީސް އިންތިހާބު", date: "2026-03-23" },
+];
+
+export function getGalleryShots(): GalleryShot[] {
+  return galleryShots;
+}
+

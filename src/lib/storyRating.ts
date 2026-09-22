@@ -4,6 +4,18 @@ export function ratingKey(slug: string, episode: number): string {
   return `vaahaka-rating:${slug}:${episode}`;
 }
 
+type Listener = () => void;
+const listeners = new Set<Listener>();
+
+export function subscribeUserRatings(listener: Listener): () => void {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
+
+function notifyUserRatingsChanged(): void {
+  listeners.forEach((listener) => listener());
+}
+
 export function episodeBaseline(slug: string, episode: number): number {
   return Number(pseudoRating(`${slug}:${episode}`));
 }
@@ -24,6 +36,7 @@ export function setUserRating(slug: string, episode: number, value: number): voi
   } catch {
     // localStorage unavailable; rating still reflected for this view
   }
+  notifyUserRatingsChanged();
 }
 
 /** Each episode's current rating: the reader's own rating if given, else its baseline. */
