@@ -1,8 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { stories } from "@/lib/articles";
-import AuthorAvatar from "@/components/AuthorAvatar";
-import BookCoverIllustration from "@/components/BookCoverIllustration";
+import { getAuthorSlug, stories } from "@/lib/articles";
+import ArticleImage from "@/components/ArticleImage";
 import EpisodeRatingLabel from "@/components/EpisodeRatingLabel";
 import StoryRatingBadge from "@/components/StoryRatingBadge";
 
@@ -21,51 +20,31 @@ export default async function StoryEpisodeListPage({
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6">
-      <div className="mb-6 flex flex-col items-center text-center">
-        <BookCoverIllustration
-          category={story.category}
-          className="mb-4 aspect-[3/4] w-40"
-        />
-        <h1 className="font-mv-mag-round text-foreground text-2xl">
-          {story.title}
-        </h1>
+    <div className="wrap author-page">
+      <div className="mb-8 flex flex-col items-center gap-4 text-center">
+        <ArticleImage slug={story.slug} alt={story.title} className="story-poster" />
+        <h1 className="story-title">{story.title}</h1>
 
-        <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
-          <div className="border-accent-soft/50 bg-card-accent/40 flex items-center gap-3 rounded-full border p-1 pl-4">
-            <AuthorAvatar name={story.author} className="h-9 w-9" />
-            <span className="text-foreground text-sm font-bold">
-              {story.author}
-            </span>
-          </div>
-
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <Link href={`/author/${getAuthorSlug(story.author)}`} className="author">
+            <ArticleImage slug={`author-${getAuthorSlug(story.author)}`} alt={story.author} className="avatar" />
+            <span>{story.author}</span>
+          </Link>
           <StoryRatingBadge slug={story.slug} episodeCount={story.episodes.length} />
         </div>
 
-        <p className="text-muted mt-4 text-sm leading-6">{story.excerpt}</p>
+        <p className="bio" style={{ margin: 0, maxWidth: "60ch" }}>
+          {story.excerpt}
+        </p>
       </div>
 
-      <div className="flex flex-col gap-2">
+      <div className="episode-list">
         {story.episodes.map((episode, index) => (
-          <Link
-            key={index}
-            href={`/story/${slug}/${index + 1}`}
-            className="border-accent-soft/40 hover:border-accent/60 bg-card-accent/40 flex items-center justify-between rounded-xl border px-4 py-3 transition-colors"
-          >
-            <span className="text-foreground font-semibold">
-              {episode.title}
-            </span>
-            <span className="flex items-center gap-3">
+          <Link key={index} href={`/story/${slug}/${index + 1}`} className="episode-row">
+            <span>{episode.title}</span>
+            <span className="ep-meta">
               <EpisodeRatingLabel slug={slug} episode={index + 1} />
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="text-muted h-4 w-4"
-              >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
                 <path d="M15 6l-6 6 6 6" />
               </svg>
             </span>

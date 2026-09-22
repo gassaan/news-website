@@ -1,8 +1,25 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { articles, formatDhivehiDate, getArticle, getCategory, reports } from "@/lib/articles";
-import NewsIllustration from "@/components/NewsIllustration";
+import {
+  articles,
+  formatDhivehiDate,
+  getArticle,
+  getCategory,
+  getPolls,
+  getRelatedArticles,
+  getSampleComments,
+  pseudoTime,
+  pseudoViewCount,
+  reports,
+} from "@/lib/articles";
+import ArticleImage from "@/components/ArticleImage";
 import ArticleBody from "@/components/ArticleBody";
+import ArticleActions from "@/components/ArticleActions";
+import PollCard from "@/components/PollCard";
+import CommentSection from "@/components/CommentSection";
+import SectionCarousel from "@/components/SectionCarousel";
+import Card from "@/components/Card";
+import AdSlot from "@/components/AdSlot";
 
 export function generateStaticParams() {
   return [...articles, ...reports].map((article) => ({ slug: article.slug }));
@@ -19,49 +36,69 @@ export default async function ArticlePage({
   }
 
   const category = getCategory(article.category);
+  const polls = getPolls();
+  const poll = polls[Math.abs(slug.length) % polls.length];
+  const related = getRelatedArticles(article);
 
   return (
-    <article className="py-8">
-      <header className="mx-auto max-w-2xl px-4 text-center sm:px-6">
-        {category && (
-          <Link
-            href={`/category/${category.slug}`}
-            className="bg-accent-soft/40 text-accent hover:bg-accent-soft/60 inline-block w-fit rounded-full px-4 py-1.5 text-sm font-semibold transition-colors"
-          >
-            {category.name}
-          </Link>
-        )}
-        <h1 className="font-mv-mag-round text-foreground mt-6 text-3xl leading-relaxed sm:text-4xl">
-          {article.title}
-        </h1>
-        <p className="text-muted mt-4 text-sm">
-          {formatDhivehiDate(article.publishedAt)}
-        </p>
-      </header>
+    <>
+      <AdSlot className="art-top-ad" />
 
-      <div className="relative left-1/2 right-1/2 -mx-[50vw] mt-8 mb-3 w-screen">
-        <NewsIllustration
-          category={article.category}
-          className="flex aspect-[4/3] w-full items-center justify-center overflow-hidden sm:aspect-[16/9]"
-        />
-      </div>
+      <article className="story-page">
+        <header className="wrap art-head">
+          {category && (
+            <Link className="cat-pill" href={`/category/${category.slug}`}>
+              {category.name}
+            </Link>
+          )}
+          <h1 className="headline">{article.title}</h1>
+          <p className="dateline">
+            {formatDhivehiDate(article.publishedAt)} <span aria-hidden="true">-</span>{" "}
+            {pseudoTime(article.slug)}
+          </p>
+        </header>
 
-      {category && (
-        <div className="mx-auto max-w-3xl px-4 sm:px-6">
-          <Link
-            href={`/category/${category.slug}`}
-            className="bg-card-accent/50 text-muted hover:text-accent inline-block w-fit rounded-full px-3 py-1.5 text-sm transition-colors"
-          >
-            {category.name}
-          </Link>
+        <figure className="lead">
+          <ArticleImage slug={article.slug} alt={article.title} className="lead-img" />
+          <figcaption>
+            <span className="cap">
+              <svg width="24" height="22" viewBox="0 0 24 22" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round">
+                <path d="M2 7.5A2.5 2.5 0 0 1 4.5 5h2.2l1.6-2.5h7.4L17.3 5h2.2A2.5 2.5 0 0 1 22 7.5v10a2.5 2.5 0 0 1-2.5 2.5h-15A2.5 2.5 0 0 1 2 17.5z" />
+                <circle cx="12" cy="12" r="4" />
+              </svg>
+              <span>{article.excerpt}</span>
+            </span>
+            <span className="views">
+              <span className="num">{pseudoViewCount(article.slug)}</span>
+              <svg width="26" height="18" viewBox="0 0 26 18" fill="none" stroke="currentColor" strokeWidth="1.6">
+                <path d="M1.5 9S5.5 1.5 13 1.5 24.5 9 24.5 9 20.5 16.5 13 16.5 1.5 9 1.5 9z" />
+                <circle cx="13" cy="9" r="3.6" />
+              </svg>
+            </span>
+          </figcaption>
+        </figure>
+
+        <div className="wrap">
+          <ArticleBody slug={article.slug} paragraphs={article.body} author={article.author} />
+          <ArticleActions title={article.title} />
         </div>
+      </article>
+
+      <AdSlot />
+
+      <section className="wrap narrow">
+        <PollCard poll={poll} />
+      </section>
+
+      <CommentSection initialComments={getSampleComments()} />
+
+      {related.length > 0 && (
+        <SectionCarousel id="related" title="ގުޅުންހުރި ލިޔުން">
+          {related.map((a) => (
+            <Card key={a.slug} article={a} />
+          ))}
+        </SectionCarousel>
       )}
-
-      <div className="border-accent-soft/40 mx-auto my-4 max-w-3xl border-t px-4 sm:px-6" />
-
-      <div className="mx-auto max-w-3xl px-4 sm:px-6">
-        <ArticleBody paragraphs={article.body} author={article.author} />
-      </div>
-    </article>
+    </>
   );
 }

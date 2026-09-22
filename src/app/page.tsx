@@ -1,101 +1,111 @@
 import Link from "next/link";
-import CategoryCarousel from "@/components/CategoryCarousel";
-import CategoryGallery from "@/components/CategoryGallery";
-import CompactArticleCard from "@/components/CompactArticleCard";
-import HeroCarousel from "@/components/HeroCarousel";
+import HeroSlider from "@/components/HeroSlider";
 import NewsTicker from "@/components/NewsTicker";
+import SectionCarousel from "@/components/SectionCarousel";
+import Card from "@/components/Card";
+import CategoryTile from "@/components/CategoryTile";
+import AdSlot from "@/components/AdSlot";
 import StoryCard from "@/components/StoryCard";
-import { articles, categories, getFeaturedArticles, reports, stories } from "@/lib/articles";
+import GalleryShot from "@/components/GalleryShot";
+import ArticleImage from "@/components/ArticleImage";
+import {
+  categories,
+  getFeaturedArticles,
+  getGalleryShots,
+  getLatestArticles,
+  getPopularArticles,
+  reports,
+  stories,
+  articles,
+} from "@/lib/articles";
 
 export default function Home() {
   const featured = getFeaturedArticles();
   const heroArticles = featured.length > 0 ? featured : articles.slice(0, 3);
-  const rest = articles
-    .filter((a) => !heroArticles.includes(a))
-    .sort((a, b) => (a.publishedAt < b.publishedAt ? 1 : -1));
-  const latest = rest.slice(0, 6);
-  const tickerHeadlines = rest.slice(0, 4).map((a) => a.title);
+  const latest = getLatestArticles(6);
+  const popular = getPopularArticles(6);
+  const tickerHeadlines = latest.slice(0, 4).map((a) => a.title);
+  const galleryShots = getGalleryShots();
 
   return (
     <>
-      <div className="mx-auto max-w-5xl px-4 pt-8 sm:px-6">
-        <section className="flex h-[36rem] flex-col">
-          <HeroCarousel articles={heroArticles} />
-        </section>
-      </div>
+      <HeroSlider articles={heroArticles} />
 
       <NewsTicker headlines={tickerHeadlines} />
 
-      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
-        <section>
-          <h2 className="font-mv-mag-round text-foreground mb-4 text-2xl">
-            އެންމެ ފަހުގެ ޚަބަރު
-          </h2>
-          <div className="grid grid-cols-2 gap-2 sm:gap-4">
-            {latest.map((article) => (
-              <CompactArticleCard key={article.slug} article={article} />
+      <SectionCarousel id="latest" title="އެންމެ ފަހުގެ ޚަބަރު" moreHref="/category/siyaasee">
+        {latest.map((article) => (
+          <Card key={article.slug} article={article} />
+        ))}
+      </SectionCarousel>
+
+      <section id="cats" className="wrap">
+        <div className="cats">
+          {categories
+            .filter((c) => c.slug !== "report")
+            .map((category) => (
+              <CategoryTile key={category.slug} category={category} />
+            ))}
+        </div>
+      </section>
+
+      <AdSlot />
+
+      <SectionCarousel id="popular" title="އެންމެ މަގުބޫލް" moreHref="/category/siyaasee">
+        {popular.map((article) => (
+          <Card key={article.slug} article={article} />
+        ))}
+      </SectionCarousel>
+
+      <SectionCarousel id="reports" title="ރިޕޯޓް" moreHref="/category/report">
+        {reports.map((article) => (
+          <Card key={article.slug} article={article} />
+        ))}
+      </SectionCarousel>
+
+      <AdSlot />
+
+      <section id="stories" className="wrap">
+        <div className="sec-head">
+          <h2>ވާހަކަ</h2>
+          <Link className="more" href="/stories">
+            އިތުރު ލިޔުން <span aria-hidden="true">‹</span>
+          </Link>
+        </div>
+        <div className="carousel">
+          <div className="track">
+            {stories.map((story) => (
+              <StoryCard key={story.slug} article={story} />
             ))}
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
 
-      <div className="py-8">
-        <h2 className="font-mv-mag-round text-foreground mx-auto mb-4 max-w-5xl px-4 text-2xl sm:px-6">
-          ކެޓަގަރީތައް
-        </h2>
-        <CategoryCarousel />
-      </div>
-
-      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
-        <section>
-          <h2 className="font-mv-mag-round text-foreground mb-4 text-2xl">
-            ވާހަކަތައް
-          </h2>
-          <div className="grid grid-cols-2 gap-2 sm:gap-4">
-            {stories.map((article) => (
-              <StoryCard key={article.slug} article={article} />
+      <section className="graphics" id="graphics">
+        <div className="wrap">
+          <div className="sec-head">
+            <h2>ގުރެފިކްސް</h2>
+          </div>
+          <div className="track">
+            {galleryShots.map((shot) => (
+              <ArticleImage key={shot.slug} slug={`gfx-${shot.slug}`} alt="" className="gfx" />
             ))}
           </div>
-          <div className="mt-5 flex justify-center">
-            <Link
-              href="/stories"
-              className="bg-accent-soft/40 text-accent hover:bg-accent-soft/60 rounded-full px-4 py-1.5 text-xs font-semibold transition-colors"
-            >
-              އިތުރު ވާހަކަ
-            </Link>
-          </div>
-        </section>
-      </div>
+        </div>
+      </section>
 
-      <div className="mx-auto max-w-5xl px-4 pb-8 sm:px-6">
-        <section>
-          <h2 className="font-mv-mag-round text-foreground mb-4 text-2xl">
-            ރިޕޯޓު
-          </h2>
-          <div className="grid grid-cols-2 gap-2 sm:gap-4">
-            {reports.slice(0, 6).map((article) => (
-              <CompactArticleCard key={article.slug} article={article} />
+      <section className="wrap gallery" id="gallery">
+        <div className="sec-head">
+          <h2>ފޮޓޯ ގެލެރީ</h2>
+        </div>
+        <div className="carousel">
+          <div className="track">
+            {galleryShots.map((shot) => (
+              <GalleryShot key={shot.slug} shot={shot} />
             ))}
           </div>
-          <div className="mt-5 flex justify-center">
-            <Link
-              href="/category/report"
-              className="bg-accent-soft/40 text-accent hover:bg-accent-soft/60 rounded-full px-4 py-1.5 text-xs font-semibold transition-colors"
-            >
-              އިތުރު ރިޕޯޓު
-            </Link>
-          </div>
-        </section>
-      </div>
-
-      <div className="pb-8">
-        <h2 className="font-mv-mag-round text-foreground mx-auto mb-4 max-w-5xl px-4 text-2xl sm:px-6">
-          ހޯއްދަވާ
-        </h2>
-        <CategoryGallery
-          categories={categories.filter((category) => category.slug !== "report")}
-        />
-      </div>
+        </div>
+      </section>
     </>
   );
 }

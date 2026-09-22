@@ -1,17 +1,24 @@
-import CategoryTabs from "@/components/CategoryTabs";
-import StoryGrid from "@/components/StoryGrid";
+import Link from "next/link";
+import StoryCard from "@/components/StoryCard";
 import { stories } from "@/lib/articles";
 
 export default function StoriesPage() {
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
-      <h1 className="font-mv-mag-round text-foreground mb-6 text-right text-2xl">
-        ކެޓަގަރީތައް
-      </h1>
+    <div className="wrap cat-page">
+      <div className="page-head">
+        <Link className="back" href="/" aria-label="ފަހަތަށް">
+          <svg width="14" height="26" viewBox="0 0 13 26" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M1 1l11 12L1 25" />
+          </svg>
+        </Link>
+        <h1 className="page-title">ވާހަކަ</h1>
+      </div>
 
-      <CategoryTabs active="vaahaka" />
-
-      <StoryGrid stories={stories} />
+      <div className="cat-grid">
+        {stories.map((story) => (
+          <StoryCard key={story.slug} article={story} />
+        ))}
+      </div>
     </div>
   );
 }

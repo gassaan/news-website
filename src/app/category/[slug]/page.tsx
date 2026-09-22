@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
-import CategoryArticleGrid from "@/components/CategoryArticleGrid";
-import CategoryTabs from "@/components/CategoryTabs";
+import Link from "next/link";
+import Chips from "@/components/Chips";
+import CardGrid from "@/components/CardGrid";
+import AdSlot from "@/components/AdSlot";
 import { categories, getArticlesByCategory, getCategory } from "@/lib/articles";
 
 export function generateStaticParams() {
@@ -20,18 +22,26 @@ export default async function CategoryPage({
   const categoryArticles = getArticlesByCategory(slug);
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
-      <h1 className="font-mv-mag-round text-foreground mb-6 text-right text-2xl">
-        ކެޓަގަރީތައް
-      </h1>
+    <>
+      <div className="wrap cat-page">
+        <div className="page-head">
+          <Link className="back" href="/" aria-label="ފަހަތަށް">
+            <svg width="14" height="26" viewBox="0 0 13 26" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M1 1l11 12L1 25" />
+            </svg>
+          </Link>
+          <h1 className="page-title">{category.name}</h1>
+        </div>
 
-      <CategoryTabs active={slug} />
+        <Chips categories={categories.filter((c) => c.slug !== "report")} active={slug} />
 
-      {categoryArticles.length === 0 ? (
-        <p className="text-muted">މި ބައިގައި އަދި ޚަބަރެއް ނެތް</p>
-      ) : (
-        <CategoryArticleGrid articles={categoryArticles} />
-      )}
-    </div>
+        {categoryArticles.length === 0 ? (
+          <p className="text-muted mt-8">މި ބައިގައި އަދި ޚަބަރެއް ނެތް</p>
+        ) : (
+          <CardGrid articles={categoryArticles} />
+        )}
+      </div>
+      <AdSlot />
+    </>
   );
 }

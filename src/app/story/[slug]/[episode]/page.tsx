@@ -38,49 +38,38 @@ export default async function StoryEpisodePage({
     episodeNumber < totalEpisodes ? `/story/${slug}/${episodeNumber + 1}` : null;
 
   return (
-    <article className="py-8">
-      <header className="mx-auto max-w-2xl px-4 text-center sm:px-6">
-        <Link
-          href={`/story/${slug}`}
-          className="bg-accent-soft/40 text-accent hover:bg-accent-soft/60 inline-block rounded-full px-4 py-1.5 text-sm font-semibold transition-colors"
-        >
+    <article className="story-page">
+      <header className="wrap art-head">
+        <Link className="cat-pill" href={`/story/${slug}`}>
           ވާހަކަ
         </Link>
-        <h1 className="font-mv-mag-round text-foreground mt-6 text-3xl leading-relaxed sm:text-4xl">
-          {story.title}
-        </h1>
-        <p className="text-muted mt-3 text-sm">
-          {currentEpisode.title} — {episodeNumber}/{totalEpisodes}
+        <h1 className="headline">{story.title}</h1>
+        <p className="dateline">
+          {currentEpisode.title} <span aria-hidden="true">-</span> {episodeNumber}/{totalEpisodes}
         </p>
       </header>
 
-      <div className="mx-auto mt-8 max-w-3xl px-4 sm:px-6">
-        <ArticleBody paragraphs={currentEpisode.body} author={story.author} />
+      <div className="wrap">
+        <ArticleBody slug={`${slug}-${episodeNumber}`} paragraphs={currentEpisode.body} author={story.author} />
         <EpisodeRatingWidget slug={slug} episode={episodeNumber} />
-      </div>
 
-      <div className="mx-auto mt-8 flex max-w-3xl items-center justify-between px-4 sm:px-6">
-        {prevHref ? (
-          <Link
-            href={prevHref}
-            className="border-accent-soft/50 text-foreground hover:border-accent/60 rounded-full border px-4 py-2 text-sm font-semibold transition-colors"
-          >
-            ކުރީގެ ބައި
-          </Link>
-        ) : (
-          <span />
-        )}
+        <div className="mt-10 flex items-center justify-between">
+          {prevHref ? (
+            <Link href={prevHref} className="more">
+              ކުރީގެ ބައި
+            </Link>
+          ) : (
+            <span />
+          )}
 
-        {nextHref ? (
-          <Link
-            href={nextHref}
-            className="bg-accent rounded-full px-5 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-          >
-            ދެން އޮތް ބައި
-          </Link>
-        ) : (
-          <span className="text-muted text-sm">ވާހަކަ ނިމިއްޖެ</span>
-        )}
+          {nextHref ? (
+            <Link href={nextHref} className="btn-solid" style={{ alignSelf: "auto" }}>
+              ދެން އޮތް ބައި
+            </Link>
+          ) : (
+            <span className="text-muted text-sm">ވާހަކަ ނިމިއްޖެ</span>
+          )}
+        </div>
       </div>
     </article>
   );
