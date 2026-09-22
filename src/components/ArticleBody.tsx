@@ -1,68 +1,70 @@
 "use client";
 
-import { useState } from "react";
-import AuthorAvatar from "./AuthorAvatar";
-
-const SIZES = ["text-base", "text-lg", "text-xl", "text-2xl"];
-const LEADINGS = [
-  "leading-8",
-  "leading-9",
-  "leading-10",
-  "leading-[3rem]",
-];
+import { Fragment, useState } from "react";
+import Link from "next/link";
+import { getAuthorSlug } from "@/lib/articles";
+import ArticleImage from "./ArticleImage";
 
 export default function ArticleBody({
+  slug,
   paragraphs,
   author,
 }: {
+  slug: string;
   paragraphs: string[];
   author: string;
 }) {
-  const [sizeIndex, setSizeIndex] = useState(1);
+  const [scale, setScale] = useState(1);
+  const authorSlug = getAuthorSlug(author);
 
   return (
-    <div>
-      <div className="mb-6 flex items-center justify-between">
-        <div className="border-accent-soft/50 flex items-center gap-2 rounded-full border p-1 pl-3">
-          <AuthorAvatar name={author} />
-          <span className="text-foreground text-sm font-semibold">
-            {author}
-          </span>
-        </div>
-
-        <div className="flex items-center gap-3">
+    <>
+      <div className="art-tools">
+        <Link href={`/author/${authorSlug}`} className="author">
+          <ArticleImage slug={`author-${authorSlug}`} alt={author} className="avatar" />
+          <span>{author}</span>
+        </Link>
+        <div className="zoom">
           <button
             type="button"
-            onClick={() => setSizeIndex((i) => Math.max(0, i - 1))}
-            disabled={sizeIndex === 0}
-            aria-label="ފޮންޓް ސައިޒް ކުޑަކުރައްވާ"
-            className="border-accent-soft/50 text-accent flex h-10 w-10 items-center justify-center rounded-full border transition-colors hover:bg-accent-soft/30 disabled:opacity-30"
+            id="zoomIn"
+            aria-label="ލިޔުން ބޮޑުކުރޭ"
+            className="round-btn"
+            onClick={() => setScale((s) => Math.min(1.5, s + 0.1))}
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" className="h-4 w-4">
-              <path d="M5 12h14" />
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+              <circle cx="11" cy="11" r="8" />
+              <path d="M21 21l-4.3-4.3M11 8v6M8 11h6" />
             </svg>
           </button>
           <button
             type="button"
-            onClick={() => setSizeIndex((i) => Math.min(SIZES.length - 1, i + 1))}
-            disabled={sizeIndex === SIZES.length - 1}
-            aria-label="ފޮންޓް ސައިޒް ބޮޑުކުރައްވާ"
-            className="border-accent-soft/50 text-accent flex h-10 w-10 items-center justify-center rounded-full border transition-colors hover:bg-accent-soft/30 disabled:opacity-30"
+            id="zoomOut"
+            aria-label="ލިޔުން ކުޑަކުރޭ"
+            className="round-btn"
+            onClick={() => setScale((s) => Math.max(0.8, s - 0.1))}
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" className="h-4 w-4">
-              <path d="M12 5v14M5 12h14" />
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+              <circle cx="11" cy="11" r="8" />
+              <path d="M21 21l-4.3-4.3M8 11h6" />
             </svg>
           </button>
         </div>
       </div>
 
-      <div
-        className={`text-foreground/90 flex flex-col gap-6 ${LEADINGS[sizeIndex]} ${SIZES[sizeIndex]}`}
-      >
+      <div className="art-body" id="artBody" style={{ fontSize: `calc(var(--fs) * ${scale})` }}>
         {paragraphs.map((paragraph, index) => (
-          <p key={index}>{paragraph}</p>
+          <Fragment key={index}>
+            <p>{paragraph}</p>
+            {index === 0 && (
+              <figure className="in-ad">
+                <ArticleImage slug={`${slug}-ad`} alt="" />
+                <small>Sponsored</small>
+              </figure>
+            )}
+          </Fragment>
         ))}
       </div>
-    </div>
+    </>
   );
 }

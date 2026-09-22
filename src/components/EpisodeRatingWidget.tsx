@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { getUserRating, setUserRating } from "@/lib/storyRating";
+import { useState, useSyncExternalStore } from "react";
+import { getUserRating, setUserRating, subscribeUserRatings } from "@/lib/storyRating";
 
 export default function EpisodeRatingWidget({
   slug,
@@ -10,22 +10,21 @@ export default function EpisodeRatingWidget({
   slug: string;
   episode: number;
 }) {
-  const [rating, setRating] = useState<number | null>(null);
+  const rating = useSyncExternalStore(
+    subscribeUserRatings,
+    () => getUserRating(slug, episode),
+    () => null,
+  );
   const [hovered, setHovered] = useState<number | null>(null);
 
-  useEffect(() => {
-    setRating(getUserRating(slug, episode));
-  }, [slug, episode]);
-
   function rate(value: number) {
-    setRating(value);
     setUserRating(slug, episode, value);
   }
 
   const display = hovered ?? rating ?? 0;
 
   return (
-    <div className="border-accent-soft/40 mt-8 flex flex-col items-center gap-2 border-t pt-6">
+    <div className="border-line mt-8 flex flex-col items-center gap-2 border-t pt-6">
       <p className="text-muted text-sm">
         {rating ? "މި ބައި ރޭޓްކުރެއްވިއްޖެ، ޝުކުރިއްޔާ" : "މި ބައި ރޭޓްކުރައްވާ"}
       </p>
