@@ -495,6 +495,9 @@ section {
   overflow: hidden;
   min-height: clamp(420px, 48vw, 704px);
 }
+.slide > a {
+  display: contents;
+}
 .slide .ph {
   border-radius: 50px;
   order: -1;
@@ -1459,6 +1462,9 @@ section {
   display: none;
 }
 .chip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex: none;
   min-width: clamp(120px, 14vw, 200px);
   height: clamp(48px, 5.4vw, 78px);
