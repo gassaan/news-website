@@ -4,10 +4,10 @@ import { useEffect, useRef } from "react";
 import ArticleImage from "./ArticleImage";
 import { GalleryShot } from "@/lib/articles";
 
-const MAX_ROTATE = 32;
-const MAX_SCALE_DROP = 0.2;
-const MAX_TRANSLATE_Z = 30;
-const MAX_DIM = 0.55;
+const MAX_ROTATE = 28;
+const MAX_SCALE_DROP = 0.16;
+const MAX_TRANSLATE_Z = 16;
+const MAX_DIM = 0.5;
 
 export default function GraphicsCoverflow({ shots }: { shots: GalleryShot[] }) {
   const trackRef = useRef<HTMLDivElement>(null);

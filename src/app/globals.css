@@ -782,7 +782,7 @@ section {
 .graphics {
   background: var(--surface);
   margin-top: 56px;
-  padding-block: 56px;
+  padding-block: 32px;
   overflow: hidden;
 }
 .gfx {
@@ -795,13 +795,13 @@ section {
   perspective: 1400px;
 }
 .coverflow {
-  --cf-w: clamp(180px, 55vw, 260px);
+  --cf-w: clamp(220px, 68vw, 320px);
   display: flex;
-  gap: 6px;
+  gap: 0px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
-  padding-block: 24px;
+  padding-block: 12px;
   padding-inline: calc(50% - var(--cf-w) / 2);
 }
 .coverflow::-webkit-scrollbar {
