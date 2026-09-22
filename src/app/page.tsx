@@ -69,7 +69,7 @@ export default function Home() {
         <div className="sec-head">
           <h2>ވާހަކަ</h2>
           <Link className="more" href="/stories">
-            އިތުރު ލިޔުން <span aria-hidden="true">‹</span>
+            އިތުރު ލިޔުން <span aria-hidden="true">›</span>
           </Link>
         </div>
         <div className="carousel">

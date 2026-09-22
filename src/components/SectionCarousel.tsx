@@ -34,7 +34,7 @@ export default function SectionCarousel({
         <h2>{title}</h2>
         {moreHref && (
           <Link className="more" href={moreHref}>
-            އިތުރު ލިޔުން <span aria-hidden="true">‹</span>
+            އިތުރު ލިޔުން <span aria-hidden="true">›</span>
           </Link>
         )}
       </div>
