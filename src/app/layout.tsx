@@ -1,31 +1,35 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { Inter } from "next/font/google";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import "./globals.css";
 
-const THEME_INIT_SCRIPT = `(function(){try{var t=localStorage.getItem("theme");var d=t==="dark"||(!t&&window.matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.classList.toggle("dark",d);}catch(e){}})();`;
-
-const democratsAkuruRegular = localFont({
-  src: "../fonts/Democrats-Akuru-Regular.ttf",
-  variable: "--font-thaana",
-  display: "swap",
-});
+const THEME_INIT_SCRIPT = `(function(){try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark"){document.documentElement.setAttribute("data-theme",t);}}catch(e){}})();`;
 
 const democratsAkBlack = localFont({
   src: "../fonts/Democrats-AK-Black.ttf",
+  weight: "900",
   variable: "--font-democrats-ak",
   display: "swap",
 });
 
-const mvMagRoundBold = localFont({
-  src: "../fonts/Mv-MAG-Round-Bold.otf",
-  variable: "--font-mv-mag-round",
+const democratsAkuruBold = localFont({
+  src: "../fonts/Democrats-Akuru-Bold.ttf",
+  weight: "700",
+  variable: "--font-akuru-bold",
+  display: "swap",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-inter",
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "ދިވެހި ޚަބަރު",
+  title: "Hulhangu",
   description: "ދިވެހި ބަހުން ޚަބަރު ފެތުރުމަށް ހަދާފައިވާ ސައިޓެއް",
 };
 
@@ -35,9 +39,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="dv"
       dir="rtl"
       suppressHydrationWarning
-      className={`${democratsAkuruRegular.variable} ${democratsAkBlack.variable} ${mvMagRoundBold.variable} h-full antialiased`}
+      className={`${democratsAkBlack.variable} ${democratsAkuruBold.variable} ${inter.variable} h-full antialiased`}
     >
-      <body className="bg-background flex min-h-full flex-col font-thaana">
+      <body className="bg-ground text-text font-body flex min-h-full flex-col font-bold">
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         <Header />
         <main className="flex-1">{children}</main>
