@@ -725,6 +725,9 @@ section {
   inset: 0;
   filter: blur(2px);
 }
+.cat .ph::after {
+  display: none;
+}
 .cat::before {
   content: "";
   position: absolute;
