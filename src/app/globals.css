@@ -225,6 +225,7 @@ a {
 .ph {
   position: relative;
   overflow: hidden;
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
   background:
     radial-gradient(120% 90% at 80% 10%, hsla(var(--h, 265), 70%, 55%, 0.55), transparent 60%),
     radial-gradient(100% 80% at 10% 100%, hsla(calc(var(--h, 265) + 40), 70%, 45%, 0.5), transparent 60%),
