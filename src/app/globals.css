@@ -701,7 +701,7 @@ section {
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: minmax(220px, 1fr);
-  gap: 14px;
+  gap: 30px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
@@ -1722,7 +1722,7 @@ footer .logo {
   }
   .cats {
     grid-auto-columns: 150px;
-    gap: 4px;
+    gap: 10px;
   }
   .cat {
     border-radius: 20px;
