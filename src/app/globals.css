@@ -570,8 +570,8 @@ section {
 }
 .ticker-row span::after {
   content: "";
-  width: 11px;
-  height: 11px;
+  width: 0.34em;
+  height: 0.34em;
   background: var(--on-band);
   transform: rotate(45deg);
 }
