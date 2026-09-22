@@ -56,11 +56,15 @@ export default function Home() {
 
       <AdSlot />
 
-      <SectionCarousel id="popular" title="އެންމެ މަގުބޫލް" moreHref="/category/siyaasee">
-        {popular.map((article) => (
-          <Card key={article.slug} article={article} />
-        ))}
-      </SectionCarousel>
+      <section id="popular" className="wrap">
+        <div className="sec-head">
+          <h2>އެންމެ މަގުބޫލް</h2>
+          <Link className="more" href="/category/siyaasee">
+            އިތުރު ލިޔުން <span aria-hidden="true">›</span>
+          </Link>
+        </div>
+        <CardGrid articles={popular} />
+      </section>
 
       <SectionCarousel id="reports" title="ރިޕޯޓް" moreHref="/category/report">
         {reports.map((article) => (
