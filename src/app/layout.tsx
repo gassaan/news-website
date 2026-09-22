@@ -21,6 +21,13 @@ const democratsAkuruBold = localFont({
   display: "swap",
 });
 
+const democratsAkuruRegular = localFont({
+  src: "../fonts/Democrats-Akuru-Regular.ttf",
+  weight: "400",
+  variable: "--font-akuru-regular",
+  display: "swap",
+});
+
 const inter = Inter({
   subsets: ["latin"],
   weight: ["400", "500"],
@@ -39,7 +46,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="dv"
       dir="rtl"
       suppressHydrationWarning
-      className={`${democratsAkBlack.variable} ${democratsAkuruBold.variable} ${inter.variable} h-full antialiased`}
+      className={`${democratsAkBlack.variable} ${democratsAkuruBold.variable} ${democratsAkuruRegular.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="bg-ground text-text font-body flex min-h-full flex-col font-bold">
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />

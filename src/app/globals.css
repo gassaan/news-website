@@ -181,6 +181,7 @@
   --color-story: var(--story);
   --font-head: var(--font-democrats-ak), var(--font-akuru-bold), "Noto Sans Thaana", sans-serif;
   --font-body: var(--font-akuru-bold), "Noto Sans Thaana", sans-serif;
+  --font-reading: var(--font-akuru-regular), "Noto Sans Thaana", sans-serif;
   --font-latin: var(--font-inter), system-ui, sans-serif;
 }
 
@@ -968,6 +969,8 @@ section {
 }
 .art-body {
   --fs: clamp(18px, 1.7vw, 24px);
+  font-family: var(--font-reading);
+  font-weight: 400;
   font-size: var(--fs);
   line-height: 2.6;
   color: var(--body-ink);
