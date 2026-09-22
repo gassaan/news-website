@@ -698,24 +698,29 @@ section {
 
 /* ---------- Categories ---------- */
 .cats {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(220px, 1fr);
-  gap: 30px;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
+  overflow: hidden;
   padding-block: 6px;
   padding-inline: 16px;
 }
-.cats::-webkit-scrollbar {
-  display: none;
+.cats-track {
+  display: flex;
+  gap: 30px;
+  width: max-content;
+  animation: cats-move 26s linear infinite;
 }
-.cats > * {
-  scroll-snap-align: start;
+@keyframes cats-move {
+  to {
+    transform: translateX(50%);
+  }
+}
+.cats:hover .cats-track,
+.cats:focus-within .cats-track {
+  animation-play-state: paused;
 }
 .cat {
   position: relative;
+  flex: none;
+  width: 220px;
   aspect-ratio: 1;
   border-radius: 30px;
   border: 1px solid var(--line);
@@ -1720,11 +1725,11 @@ footer .logo {
   .gallery .track {
     grid-auto-columns: 85%;
   }
-  .cats {
-    grid-auto-columns: 150px;
+  .cats-track {
     gap: 10px;
   }
   .cat {
+    width: 150px;
     border-radius: 20px;
   }
   .cat span {

@@ -27,6 +27,7 @@ export default function Home() {
   const popular = getPopularArticles(6);
   const tickerHeadlines = latest.slice(0, 4).map((a) => a.title);
   const galleryShots = getGalleryShots();
+  const visibleCategories = categories.filter((c) => c.slug !== "report");
 
   return (
     <>
@@ -46,11 +47,11 @@ export default function Home() {
 
       <section id="cats">
         <div className="cats">
-          {categories
-            .filter((c) => c.slug !== "report")
-            .map((category) => (
-              <CategoryTile key={category.slug} category={category} />
+          <div className="cats-track">
+            {[...visibleCategories, ...visibleCategories].map((category, index) => (
+              <CategoryTile key={`${category.slug}-${index}`} category={category} />
             ))}
+          </div>
         </div>
       </section>
 
