@@ -4,7 +4,7 @@ import NewsTicker from "@/components/NewsTicker";
 import SectionCarousel from "@/components/SectionCarousel";
 import Card from "@/components/Card";
 import CardGrid from "@/components/CardGrid";
-import CategoryTile from "@/components/CategoryTile";
+import CategoryMarquee from "@/components/CategoryMarquee";
 import AdSlot from "@/components/AdSlot";
 import StoryCard from "@/components/StoryCard";
 import GalleryShot from "@/components/GalleryShot";
@@ -46,13 +46,7 @@ export default function Home() {
       </section>
 
       <section id="cats">
-        <div className="cats">
-          <div className="cats-track">
-            {[...visibleCategories, ...visibleCategories].map((category, index) => (
-              <CategoryTile key={`${category.slug}-${index}`} category={category} />
-            ))}
-          </div>
-        </div>
+        <CategoryMarquee categories={visibleCategories} />
       </section>
 
       <AdSlot />

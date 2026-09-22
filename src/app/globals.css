@@ -698,24 +698,15 @@ section {
 
 /* ---------- Categories ---------- */
 .cats {
-  overflow: hidden;
+  display: flex;
+  gap: 30px;
+  overflow-x: auto;
+  scrollbar-width: none;
   padding-block: 6px;
   padding-inline: 16px;
 }
-.cats-track {
-  display: flex;
-  gap: 30px;
-  width: max-content;
-  animation: cats-move 26s linear infinite;
-}
-@keyframes cats-move {
-  to {
-    transform: translateX(50%);
-  }
-}
-.cats:hover .cats-track,
-.cats:focus-within .cats-track {
-  animation-play-state: paused;
+.cats::-webkit-scrollbar {
+  display: none;
 }
 .cat {
   position: relative;
@@ -1725,7 +1716,7 @@ footer .logo {
   .gallery .track {
     grid-auto-columns: 85%;
   }
-  .cats-track {
+  .cats {
     gap: 10px;
   }
   .cat {
