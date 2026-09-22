@@ -703,11 +703,15 @@ section {
   grid-auto-columns: minmax(220px, 1fr);
   gap: 30px;
   overflow-x: auto;
+  scroll-snap-type: x mandatory;
   scrollbar-width: none;
   padding-block: 6px;
 }
 .cats::-webkit-scrollbar {
   display: none;
+}
+.cats > * {
+  scroll-snap-align: start;
 }
 .cat {
   position: relative;
