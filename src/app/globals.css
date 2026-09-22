@@ -795,9 +795,9 @@ section {
   perspective: 1400px;
 }
 .coverflow {
-  --cf-w: clamp(130px, 34vw, 200px);
+  --cf-w: clamp(180px, 55vw, 260px);
   display: flex;
-  gap: 16px;
+  gap: 6px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
