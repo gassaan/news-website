@@ -802,7 +802,7 @@ section {
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
   padding-block: 12px;
-  padding-inline: calc(50% - var(--cf-w) / 2);
+  padding-inline: calc(50% - var(--cf-w) / 2 + 22px);
 }
 .coverflow::-webkit-scrollbar {
   display: none;
@@ -810,6 +810,7 @@ section {
 .coverflow-item {
   flex: none;
   width: var(--cf-w);
+  margin-inline: -22px;
   scroll-snap-align: center;
   transition:
     transform 0.15s ease-out,
