@@ -19,7 +19,7 @@ export default function Footer() {
     <footer>
       <div className="wrap">
         <Link href="/" aria-label="Hulhangu home" className="logo">
-          <Logo className="h-12" />
+          <Logo className="h-10" />
         </Link>
         <p className="brand-name">Hulhangu</p>
 

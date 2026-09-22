@@ -15,7 +15,7 @@ export default function Header() {
       <div className="wrap">
         <div className="bar">
           <Link href="/" aria-label="Hulhangu home" className="logo">
-            <Logo className="h-10" />
+            <Logo className="h-8" />
           </Link>
 
           <nav className="main" aria-label="Main">
