@@ -719,6 +719,7 @@ section {
   display: grid;
   place-items: center;
   max-width: 100%;
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
 }
 .cat .ph {
   position: absolute;
@@ -1698,6 +1699,9 @@ footer .logo {
   }
   .cat {
     border-radius: 20px;
+  }
+  .cat span {
+    font-size: 22px;
   }
   .art-body {
     column-count: 1;
