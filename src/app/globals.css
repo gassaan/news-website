@@ -783,14 +783,38 @@ section {
   background: var(--surface);
   margin-top: 56px;
   padding-block: 56px;
-}
-.graphics .track {
-  grid-auto-columns: calc((100% - 90px) / 4);
+  overflow: hidden;
 }
 .gfx {
   aspect-ratio: 421/504;
   border-radius: 30px;
   max-width: 100%;
+  height: 100%;
+}
+.coverflow-stage {
+  perspective: 1400px;
+}
+.coverflow {
+  --cf-w: clamp(130px, 34vw, 200px);
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  padding-block: 24px;
+  padding-inline: calc(50% - var(--cf-w) / 2);
+}
+.coverflow::-webkit-scrollbar {
+  display: none;
+}
+.coverflow-item {
+  flex: none;
+  width: var(--cf-w);
+  scroll-snap-align: center;
+  transition:
+    transform 0.15s ease-out,
+    filter 0.15s ease-out;
+  will-change: transform;
 }
 
 /* ---------- Gallery ---------- */
@@ -1690,9 +1714,6 @@ footer .logo {
   .track {
     grid-auto-columns: calc((100% - 15px) / 2);
     gap: 15px;
-  }
-  .graphics .track {
-    grid-auto-columns: 46%;
   }
   .gallery .track {
     grid-auto-columns: 85%;

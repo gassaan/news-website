@@ -7,7 +7,7 @@ import CategoryTile from "@/components/CategoryTile";
 import AdSlot from "@/components/AdSlot";
 import StoryCard from "@/components/StoryCard";
 import GalleryShot from "@/components/GalleryShot";
-import ArticleImage from "@/components/ArticleImage";
+import GraphicsCoverflow from "@/components/GraphicsCoverflow";
 import {
   categories,
   getFeaturedArticles,
@@ -86,12 +86,8 @@ export default function Home() {
           <div className="sec-head">
             <h2>ގުރެފިކްސް</h2>
           </div>
-          <div className="track">
-            {galleryShots.map((shot) => (
-              <ArticleImage key={shot.slug} slug={`gfx-${shot.slug}`} alt="" className="gfx" />
-            ))}
-          </div>
         </div>
+        <GraphicsCoverflow shots={galleryShots} />
       </section>
 
       <section className="wrap gallery" id="gallery">
