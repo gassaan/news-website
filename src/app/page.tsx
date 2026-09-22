@@ -3,6 +3,7 @@ import HeroSlider from "@/components/HeroSlider";
 import NewsTicker from "@/components/NewsTicker";
 import SectionCarousel from "@/components/SectionCarousel";
 import Card from "@/components/Card";
+import CardGrid from "@/components/CardGrid";
 import CategoryTile from "@/components/CategoryTile";
 import AdSlot from "@/components/AdSlot";
 import StoryCard from "@/components/StoryCard";
@@ -33,11 +34,15 @@ export default function Home() {
 
       <NewsTicker headlines={tickerHeadlines} />
 
-      <SectionCarousel id="latest" title="އެންމެ ފަހުގެ ޚަބަރު" moreHref="/category/siyaasee">
-        {latest.map((article) => (
-          <Card key={article.slug} article={article} />
-        ))}
-      </SectionCarousel>
+      <section id="latest" className="wrap">
+        <div className="sec-head">
+          <h2>އެންމެ ފަހުގެ ޚަބަރު</h2>
+          <Link className="more" href="/category/siyaasee">
+            އިތުރު ލިޔުން <span aria-hidden="true">›</span>
+          </Link>
+        </div>
+        <CardGrid articles={latest} />
+      </section>
 
       <section id="cats" className="wrap">
         <div className="cats">
