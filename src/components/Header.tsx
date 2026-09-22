@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { categories } from "@/lib/articles";
 import Logo from "./Logo";
@@ -9,6 +9,18 @@ import ThemeToggle from "./ThemeToggle";
 export default function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const mobileNavRef = useRef<HTMLElement>(null);
+  const mobileNavInnerRef = useRef<HTMLDivElement>(null);
+
+  function toggleMenu() {
+    if (mobileNavRef.current && mobileNavInnerRef.current) {
+      mobileNavRef.current.style.setProperty(
+        "--menu-h",
+        `${mobileNavInnerRef.current.scrollHeight}px`,
+      );
+    }
+    setMenuOpen((v) => !v);
+  }
 
   return (
     <header className="site">
@@ -51,7 +63,7 @@ export default function Header() {
               className="icon-btn menu-btn"
               aria-label="Menu"
               aria-expanded={menuOpen}
-              onClick={() => setMenuOpen((v) => !v)}
+              onClick={toggleMenu}
             >
               <svg
                 className="i-open"
@@ -91,8 +103,12 @@ export default function Header() {
           </label>
         </div>
 
-        <nav className={`mobile-nav ${menuOpen ? "open" : ""}`} aria-label="Mobile">
-          <div className="mobile-nav-inner">
+        <nav
+          className={`mobile-nav ${menuOpen ? "open" : ""}`}
+          aria-label="Mobile"
+          ref={mobileNavRef}
+        >
+          <div className="mobile-nav-inner" ref={mobileNavInnerRef}>
             <label className="m-search" htmlFor="mq">
               <input id="mq" type="search" placeholder="ހޯދާ" />
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
