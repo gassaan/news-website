@@ -1623,9 +1623,21 @@ footer .logo {
   .bar .icon-btn:hover {
     background: var(--mh-field);
   }
-  .mobile-nav.open {
+  .mobile-nav {
     display: flex;
     flex-direction: column;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    padding-block: 0;
+    transition:
+      max-height 0.3s ease,
+      opacity 0.2s ease,
+      padding-block 0.3s ease;
+  }
+  .mobile-nav.open {
+    max-height: 480px;
+    opacity: 1;
     padding-block: 17px 12px;
   }
   .m-search {
