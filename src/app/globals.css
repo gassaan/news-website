@@ -550,23 +550,23 @@ section {
   color: var(--on-band);
   overflow: hidden;
   margin-top: 56px;
-  height: clamp(40px, 5vw, 76px);
+  height: clamp(50px, 6vw, 90px);
   display: flex;
   align-items: center;
 }
 .ticker-row {
   display: flex;
-  gap: 32px;
+  gap: 36px;
   white-space: nowrap;
-  padding-inline-start: 32px;
+  padding-inline-start: 36px;
 }
 .ticker-row span {
   font-family: var(--font-head);
   font-weight: 900;
-  font-size: clamp(14px, 1.6vw, 24px);
+  font-size: clamp(16px, 1.9vw, 28px);
   display: flex;
   align-items: center;
-  gap: 32px;
+  gap: 36px;
 }
 .ticker-row span::after {
   content: "";
