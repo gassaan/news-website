@@ -5,6 +5,7 @@ import CategoryTile from "./CategoryTile";
 import { Category } from "@/lib/articles";
 
 const SPEED_PX_PER_SEC = 28;
+const RESUME_DELAY_MS = 250;
 
 export default function CategoryMarquee({ categories }: { categories: Category[] }) {
   const trackRef = useRef<HTMLDivElement>(null);
@@ -18,6 +19,8 @@ export default function CategoryMarquee({ categories }: { categories: Category[]
 
     let raf: number;
     let last: number | null = null;
+    let resumeTimer: ReturnType<typeof setTimeout> | null = null;
+    let programmaticScroll = false;
 
     function tick(now: number) {
       const el = trackRef.current;
@@ -32,34 +35,48 @@ export default function CategoryMarquee({ categories }: { categories: Category[]
         if (posRef.current <= -half) {
           posRef.current += half;
         }
+        programmaticScroll = true;
         el.scrollLeft = posRef.current;
       }
       raf = requestAnimationFrame(tick);
     }
     raf = requestAnimationFrame(tick);
 
-    function pause() {
-      pausedRef.current = true;
-    }
-    function resume() {
-      const el = trackRef.current;
-      if (el) posRef.current = el.scrollLeft;
-      pausedRef.current = false;
+    function scheduleResume() {
+      if (resumeTimer) clearTimeout(resumeTimer);
+      resumeTimer = setTimeout(() => {
+        const el = trackRef.current;
+        if (el) posRef.current = el.scrollLeft;
+        pausedRef.current = false;
+      }, RESUME_DELAY_MS);
     }
 
-    track.addEventListener("pointerdown", pause);
-    track.addEventListener("pointerup", resume);
-    track.addEventListener("pointercancel", resume);
-    track.addEventListener("mouseenter", pause);
-    track.addEventListener("mouseleave", resume);
+    // Any real (non-programmatic) scroll - a drag, or the momentum that
+    // continues after the finger lifts - keeps autoplay paused and pushes
+    // the resume out until motion actually settles, so it never fights
+    // the browser's own scroll and snaps back to a stale position.
+    function onScroll() {
+      if (programmaticScroll) {
+        programmaticScroll = false;
+        return;
+      }
+      pausedRef.current = true;
+      scheduleResume();
+    }
+
+    function onPointerDown() {
+      pausedRef.current = true;
+      if (resumeTimer) clearTimeout(resumeTimer);
+    }
+
+    track.addEventListener("pointerdown", onPointerDown);
+    track.addEventListener("scroll", onScroll, { passive: true });
 
     return () => {
       cancelAnimationFrame(raf);
-      track.removeEventListener("pointerdown", pause);
-      track.removeEventListener("pointerup", resume);
-      track.removeEventListener("pointercancel", resume);
-      track.removeEventListener("mouseenter", pause);
-      track.removeEventListener("mouseleave", resume);
+      if (resumeTimer) clearTimeout(resumeTimer);
+      track.removeEventListener("pointerdown", onPointerDown);
+      track.removeEventListener("scroll", onScroll);
     };
   }, []);
 
