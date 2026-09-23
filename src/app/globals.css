@@ -1882,6 +1882,17 @@ footer .logo {
     inset: 3px;
     border-radius: 21px;
   }
+  .story .rating {
+    top: 10px;
+    right: 10px;
+    gap: 3px;
+    padding: 3px 8px;
+    font-size: 11px;
+  }
+  .story .rating svg {
+    width: 11px;
+    height: 11px;
+  }
   .shot figcaption {
     padding: 0 20px 18px;
   }
