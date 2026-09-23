@@ -50,6 +50,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="bg-ground text-text font-body flex min-h-full flex-col font-bold">
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+        <div style={{ background: "red", color: "white", textAlign: "center", padding: "16px", fontSize: "20px", fontWeight: "bold" }}>
+          TEST BANNER - IGNORE
+        </div>
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />
