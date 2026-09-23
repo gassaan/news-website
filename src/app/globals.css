@@ -666,7 +666,7 @@ section {
 .story {
   border-radius: 50px;
   background: var(--story);
-  padding: 6px 6px 26px;
+  padding: 6px;
   aspect-ratio: 400/550;
   max-width: 100%;
   display: block;
@@ -1857,7 +1857,7 @@ footer .logo {
   }
   .story {
     border-radius: 24px;
-    padding: 3px 3px 13px;
+    padding: 3px;
   }
   .story .ph {
     border-radius: 21px;
