@@ -62,10 +62,6 @@ export default async function ArticlePage({
           <ArticleImage slug={article.slug} alt={article.title} className="lead-img" />
           <figcaption>
             <span className="cap">
-              <svg width="24" height="22" viewBox="0 0 24 22" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round">
-                <path d="M2 7.5A2.5 2.5 0 0 1 4.5 5h2.2l1.6-2.5h7.4L17.3 5h2.2A2.5 2.5 0 0 1 22 7.5v10a2.5 2.5 0 0 1-2.5 2.5h-15A2.5 2.5 0 0 1 2 17.5z" />
-                <circle cx="12" cy="12" r="4" />
-              </svg>
               <span>{article.excerpt}</span>
             </span>
             <span className="views">

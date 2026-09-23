@@ -937,13 +937,14 @@ section {
   align-items: center;
   gap: 12px;
   min-width: 0;
+  font-family: var(--font-reading);
+  font-weight: 400;
 }
 .lead .cap span {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.lead .cap svg,
 .lead .views svg {
   flex: none;
 }
