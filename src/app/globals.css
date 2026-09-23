@@ -1451,6 +1451,9 @@ section {
   font-size: clamp(15px, 1.6vw, 24px);
   white-space: nowrap;
 }
+.story-rating {
+  height: clamp(64px, 5.8vw, 80px);
+}
 .stat .num {
   font-family: var(--font-latin);
   font-weight: 500;
@@ -1813,6 +1816,9 @@ footer .logo {
   }
   .lead {
     margin-inline: 0;
+  }
+  .story-rating {
+    height: 52px;
   }
   .author {
     height: 52px;
