@@ -25,6 +25,7 @@
   --nav-line: #270e61;
   --nav-ink: #a882ff;
   --body-ink: #fafafa;
+  --art-ink: #d2c6ee;
   --foot-bg: #150735;
   --foot-ink: #ffffff;
   --foot-accent: #a882ff;
@@ -64,6 +65,7 @@
     --nav-line: #3e2180;
     --nav-ink: #e1d5ff;
     --body-ink: #3e2180;
+    --art-ink: #050016;
     --foot-bg: #3e2180;
     --foot-ink: #ffffff;
     --foot-accent: #a882ff;
@@ -102,6 +104,7 @@
   --nav-line: #3e2180;
   --nav-ink: #e1d5ff;
   --body-ink: #3e2180;
+  --art-ink: #050016;
   --foot-bg: #3e2180;
   --foot-ink: #ffffff;
   --foot-accent: #a882ff;
@@ -139,6 +142,7 @@
   --nav-line: #270e61;
   --nav-ink: #a882ff;
   --body-ink: #fafafa;
+  --art-ink: #d2c6ee;
   --foot-bg: #150735;
   --foot-ink: #ffffff;
   --foot-accent: #a882ff;
@@ -1011,7 +1015,7 @@ section {
   font-weight: 400;
   font-size: var(--fs);
   line-height: 2.6;
-  color: var(--body-ink);
+  color: var(--art-ink);
   margin-top: clamp(28px, 4vw, 56px);
   column-count: 2;
   column-gap: 90px;
