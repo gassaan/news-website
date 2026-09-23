@@ -78,12 +78,10 @@ export default function Home() {
             އިތުރު ލިޔުން <span aria-hidden="true">›</span>
           </Link>
         </div>
-        <div className="carousel">
-          <div className="track">
-            {stories.map((story) => (
-              <StoryCard key={story.slug} article={story} />
-            ))}
-          </div>
+        <div className="cat-grid">
+          {stories.slice(0, 6).map((story) => (
+            <StoryCard key={story.slug} article={story} />
+          ))}
         </div>
       </section>
 
