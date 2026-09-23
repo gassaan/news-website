@@ -647,8 +647,8 @@ section {
   max-width: 100%;
 }
 .card h3 {
-  font-family: var(--font-head);
-  font-weight: 900;
+  font-family: var(--font-body);
+  font-weight: 700;
   font-size: clamp(20px, 2.2vw, 32px);
   line-height: 1.7;
   margin: 28px 24px 0;
