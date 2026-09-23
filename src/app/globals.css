@@ -971,8 +971,8 @@ section {
   background: var(--surface);
   border: 1px solid var(--line);
   color: var(--accent);
-  font-family: var(--font-head);
-  font-weight: 900;
+  font-family: var(--font-reading);
+  font-weight: 400;
   font-size: clamp(17px, 1.7vw, 24px);
 }
 .avatar {
