@@ -906,6 +906,8 @@ section {
 }
 .dateline {
   margin: 0;
+  font-family: var(--font-reading);
+  font-weight: 400;
   color: var(--accent);
   font-size: clamp(14px, 1.3vw, 18px);
   font-variant-numeric: tabular-nums;
