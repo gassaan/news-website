@@ -21,42 +21,54 @@ export default async function StoryEpisodeListPage({
   }
 
   return (
-    <div className="wrap author-page">
-      <div className="mb-8 flex flex-col items-center gap-4 text-center">
-        <ArticleImage slug={story.slug} alt={story.title} className="story-poster" />
-        <h1 className="story-title">{story.title}</h1>
-
-        <div className="flex flex-wrap items-center justify-center gap-3">
-          <Link href={`/author/${getAuthorSlug(story.author)}`} className="author">
-            <ArticleImage
-              slug={`author-${getAuthorSlug(story.author)}`}
-              src={getAuthorPhoto(getAuthorSlug(story.author))}
-              alt={story.author}
-              className="avatar"
-            />
-            <span>{story.author}</span>
+    <>
+      <header className="story-hero">
+        <ArticleImage slug={story.slug} alt="" className="story-hero-img" />
+        <div className="story-hero-text">
+          <Link href="/stories" className="story-hero-chip">
+            ވާހަކަ
           </Link>
-          <StoryRatingBadge slug={story.slug} episodeCount={story.episodes.length} />
+          <h1>{story.title}</h1>
+          <p className="story-hero-eps">
+            <span className="num">{story.episodes.length}</span> ބައި
+          </p>
+        </div>
+      </header>
+
+      <div className="wrap story-page">
+        <div className="mb-8 flex flex-col items-center gap-4 text-center">
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <Link href={`/author/${getAuthorSlug(story.author)}`} className="author">
+              <ArticleImage
+                slug={`author-${getAuthorSlug(story.author)}`}
+                src={getAuthorPhoto(getAuthorSlug(story.author))}
+                alt={story.author}
+                className="avatar"
+              />
+              <span>{story.author}</span>
+            </Link>
+            <StoryRatingBadge slug={story.slug} episodeCount={story.episodes.length} />
+          </div>
+
+          <p className="bio" style={{ margin: 0, maxWidth: "60ch" }}>
+            {story.excerpt}
+          </p>
         </div>
 
-        <p className="bio" style={{ margin: 0, maxWidth: "60ch" }}>
-          {story.excerpt}
-        </p>
+        <div className="episode-list">
+          {story.episodes.map((episode, index) => (
+            <Link key={index} href={`/story/${slug}/${index + 1}`} className="episode-row">
+              <span>{episode.title}</span>
+              <span className="ep-meta">
+                <EpisodeRatingLabel slug={slug} episode={index + 1} />
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+                  <path d="M15 6l-6 6 6 6" />
+                </svg>
+              </span>
+            </Link>
+          ))}
+        </div>
       </div>
-
-      <div className="episode-list">
-        {story.episodes.map((episode, index) => (
-          <Link key={index} href={`/story/${slug}/${index + 1}`} className="episode-row">
-            <span>{episode.title}</span>
-            <span className="ep-meta">
-              <EpisodeRatingLabel slug={slug} episode={index + 1} />
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
-                <path d="M15 6l-6 6 6 6" />
-              </svg>
-            </span>
-          </Link>
-        ))}
-      </div>
-    </div>
+    </>
   );
 }
