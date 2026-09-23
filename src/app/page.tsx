@@ -1,8 +1,6 @@
 import Link from "next/link";
 import HeroSlider from "@/components/HeroSlider";
 import NewsTicker from "@/components/NewsTicker";
-import SectionCarousel from "@/components/SectionCarousel";
-import Card from "@/components/Card";
 import CardGrid from "@/components/CardGrid";
 import CategoryMarquee from "@/components/CategoryMarquee";
 import AdSlot from "@/components/AdSlot";
@@ -61,11 +59,15 @@ export default function Home() {
         <CardGrid articles={popular} />
       </section>
 
-      <SectionCarousel id="reports" title="ރިޕޯޓް" moreHref="/category/report">
-        {reports.map((article) => (
-          <Card key={article.slug} article={article} />
-        ))}
-      </SectionCarousel>
+      <section id="reports" className="wrap">
+        <div className="sec-head">
+          <h2>ރިޕޯޓް</h2>
+          <Link className="more" href="/category/report">
+            އިތުރު ލިޔުން <span aria-hidden="true">›</span>
+          </Link>
+        </div>
+        <CardGrid articles={reports.slice(0, 6)} />
+      </section>
 
       <AdSlot />
 
