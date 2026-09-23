@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getAuthorSlug, stories } from "@/lib/articles";
+import { getAuthorPhoto } from "@/lib/authorPhotos";
 import ArticleImage from "@/components/ArticleImage";
 import EpisodeRatingLabel from "@/components/EpisodeRatingLabel";
 import StoryRatingBadge from "@/components/StoryRatingBadge";
@@ -27,7 +28,12 @@ export default async function StoryEpisodeListPage({
 
         <div className="flex flex-wrap items-center justify-center gap-3">
           <Link href={`/author/${getAuthorSlug(story.author)}`} className="author">
-            <ArticleImage slug={`author-${getAuthorSlug(story.author)}`} alt={story.author} className="avatar" />
+            <ArticleImage
+              slug={`author-${getAuthorSlug(story.author)}`}
+              src={getAuthorPhoto(getAuthorSlug(story.author))}
+              alt={story.author}
+              className="avatar"
+            />
             <span>{story.author}</span>
           </Link>
           <StoryRatingBadge slug={story.slug} episodeCount={story.episodes.length} />

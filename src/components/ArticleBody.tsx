@@ -3,6 +3,7 @@
 import { Fragment, useState } from "react";
 import Link from "next/link";
 import { getAuthorSlug } from "@/lib/articles";
+import { getAuthorPhoto } from "@/lib/authorPhotos";
 import ArticleImage from "./ArticleImage";
 
 export default function ArticleBody({
@@ -21,7 +22,7 @@ export default function ArticleBody({
     <>
       <div className="art-tools">
         <Link href={`/author/${authorSlug}`} className="author">
-          <ArticleImage slug={`author-${authorSlug}`} alt={author} className="avatar" />
+          <ArticleImage slug={`author-${authorSlug}`} src={getAuthorPhoto(authorSlug)} alt={author} className="avatar" />
           <span>{author}</span>
         </Link>
         <div className="zoom">

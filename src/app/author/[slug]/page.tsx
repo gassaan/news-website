@@ -3,6 +3,7 @@ import ArticleImage from "@/components/ArticleImage";
 import CardGrid from "@/components/CardGrid";
 import AdSlot from "@/components/AdSlot";
 import { authors, getArticlesByAuthor, getAuthor } from "@/lib/articles";
+import { getAuthorPhoto } from "@/lib/authorPhotos";
 
 export function generateStaticParams() {
   return authors.map((author) => ({ slug: author.slug }));
@@ -26,7 +27,7 @@ export default async function AuthorPage({
       <div className="wrap author-page">
         <header className="profile">
           <div className="who">
-            <ArticleImage slug={`author-${slug}`} alt={author.name} className="big-avatar" />
+            <ArticleImage slug={`author-${slug}`} src={getAuthorPhoto(slug)} alt={author.name} className="big-avatar" />
             <div>
               <h1>{author.name}</h1>
               <p>{author.role}</p>
