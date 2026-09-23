@@ -899,7 +899,7 @@ section {
   font-weight: 900;
   color: var(--text);
   font-size: clamp(32px, 5vw, 72px);
-  line-height: 1.55;
+  line-height: 1.75;
   margin: clamp(18px, 2.4vw, 32px) 0 clamp(8px, 1vw, 14px);
   max-width: 22ch;
   text-wrap: balance;
