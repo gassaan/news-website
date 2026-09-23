@@ -1007,8 +1007,8 @@ section {
 }
 .art-body {
   --fs: clamp(18px, 1.7vw, 24px);
-  font-family: var(--font-reading);
-  font-weight: 400;
+  font-family: var(--font-body);
+  font-weight: 700;
   font-size: var(--fs);
   line-height: 2.6;
   color: var(--body-ink);
