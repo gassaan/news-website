@@ -679,7 +679,8 @@ section {
   transform: translateY(-4px);
 }
 .story .ph {
-  height: 100%;
+  position: absolute;
+  inset: 6px;
   border-radius: 44px;
 }
 .story .rating {
@@ -1860,6 +1861,7 @@ footer .logo {
     padding: 3px;
   }
   .story .ph {
+    inset: 3px;
     border-radius: 21px;
   }
   .shot figcaption {
