@@ -48,6 +48,7 @@ export default function Footer() {
     <footer>
       <div className="wrap">
         <div className="foot-card">
+          <BackToTop />
           <Link href="/" aria-label="Hulhangu home" className="logo">
             <Logo className="h-12" />
           </Link>
@@ -137,8 +138,6 @@ export default function Footer() {
         <p className="copyright">
           © {new Date().getFullYear()} Hulhangu · All rights reserved
         </p>
-
-        <BackToTop />
       </div>
     </footer>
   );
