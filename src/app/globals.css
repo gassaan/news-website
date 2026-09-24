@@ -2319,19 +2319,21 @@ footer .logo {
 }
 
 /* ---------- Story episode list (extends the design system) ---------- */
-/* The poster fills the first screen below the header, including the area behind
-   Safari's floating bottom bar (large viewport); scroll to reach the episodes. */
+/* The poster fills the whole first screen: it starts behind the sticky header
+   (pulled up by the header's 77px) and reaches behind Safari's floating bottom
+   bar (large viewport height). Scroll to reach the description and episodes. */
 .story-hero {
   position: relative;
-  height: calc(100vh - 77px);
-  height: calc(100lvh - 77px);
+  margin-top: -77px;
+  height: 100vh;
+  height: 100lvh;
   min-height: 460px;
   overflow: hidden;
   isolation: isolate;
 }
 .story-hero-img {
   position: absolute;
-  inset: 0;
+  inset: 77px 0 0; /* starts below the header that overlaps the hero */
 }
 .story-hero-img::after {
   display: none;
