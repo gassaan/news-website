@@ -26,6 +26,7 @@
   --nav-ink: #a882ff;
   --body-ink: #fafafa;
   --art-ink: #d2c6ee;
+  --cat-shade: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), #000);
   --foot-bg: #150735;
   --foot-ink: #ffffff;
   --foot-accent: #a882ff;
@@ -66,6 +67,7 @@
     --nav-ink: #e1d5ff;
     --body-ink: #3e2180;
     --art-ink: #050016;
+    --cat-shade: linear-gradient(to bottom, rgba(62, 33, 128, 0.1), rgba(62, 33, 128, 0.9));
     --foot-bg: #3e2180;
     --foot-ink: #ffffff;
     --foot-accent: #a882ff;
@@ -105,6 +107,7 @@
   --nav-ink: #e1d5ff;
   --body-ink: #3e2180;
   --art-ink: #050016;
+  --cat-shade: linear-gradient(to bottom, rgba(62, 33, 128, 0.1), rgba(62, 33, 128, 0.9));
   --foot-bg: #3e2180;
   --foot-ink: #ffffff;
   --foot-accent: #a882ff;
@@ -143,6 +146,7 @@
   --nav-ink: #a882ff;
   --body-ink: #fafafa;
   --art-ink: #d2c6ee;
+  --cat-shade: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), #000);
   --foot-bg: #150735;
   --foot-ink: #ffffff;
   --foot-accent: #a882ff;
@@ -742,7 +746,8 @@ section {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), #000);
+  /* Shade behind the white title: black in dark mode, deep purple in light mode. */
+  background: var(--cat-shade);
   z-index: 1;
 }
 .cat span {
