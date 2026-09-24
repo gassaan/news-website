@@ -2319,11 +2319,12 @@ footer .logo {
 }
 
 /* ---------- Story episode list (extends the design system) ---------- */
-/* The poster fills the first screen below the header; scroll to reach the episodes. */
+/* The poster fills the first screen below the header, including the area behind
+   Safari's floating bottom bar (large viewport); scroll to reach the episodes. */
 .story-hero {
   position: relative;
   height: calc(100vh - 77px);
-  height: calc(100svh - 77px);
+  height: calc(100lvh - 77px);
   min-height: 460px;
   overflow: hidden;
   isolation: isolate;
@@ -2349,6 +2350,8 @@ footer .logo {
   position: absolute;
   z-index: 2;
   inset: auto 20px clamp(18px, 3vw, 40px);
+  /* Lift the text above the browser's bottom bar (lvh - svh is that bar's height). */
+  bottom: calc(100lvh - 100svh + clamp(18px, 3vw, 40px));
   display: flex;
   flex-direction: column;
   align-items: center;
