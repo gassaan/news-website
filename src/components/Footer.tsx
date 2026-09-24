@@ -14,76 +14,48 @@ const SOCIAL_LINKS = [
   },
 ];
 
-// Links stay "#" until the pages are written.
-const PAGE_LINKS = [
-  "ގުޅުއްވާ",
-  "އެޑިޓޯރިއަލް ސިޔާސަތު",
-  "ސިއްރުކަމުގެ ސިޔާސަތު",
-  "ޝަރުތުތައް",
-];
-
 export default function Footer() {
   return (
     <footer>
-      <div className="foot-dots" aria-hidden="true" />
-      <div className="wrap foot-in">
+      <div className="wrap">
         <Link href="/" aria-label="Hulhangu home" className="logo">
-          <Logo className="h-[52px]" />
+          <Logo className="h-10" />
         </Link>
+        <p className="brand-name">Hulhangu</p>
 
-        <nav className="flinks" aria-label="Footer">
-          {PAGE_LINKS.map((label) => (
-            <a key={label} href="#">
-              {label}
-            </a>
-          ))}
-        </nav>
+        <div className="flinks">
+          <a href="#">Contact Us</a>
+          <a href="#">Terms &amp; Condition</a>
+          <a href="#">Code of Conduct</a>
+          <a href="#">Privacy Policy</a>
+        </div>
 
         <div className="social" dir="ltr">
           {SOCIAL_LINKS.map((s) => (
-            <a key={s.label} href={s.href} aria-label={`Hulhangu on ${s.label}`}>
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                aria-hidden="true"
-              >
+            <a key={s.label} href={s.href} aria-label={s.label}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
                 <path d={s.path} />
               </svg>
             </a>
           ))}
-          <a href="#" aria-label="Hulhangu on Instagram">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              aria-hidden="true"
-            >
+          <a href="#" aria-label="Instagram">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <rect x="3" y="3" width="18" height="18" rx="5" />
               <circle cx="12" cy="12" r="4" />
               <circle cx="17.5" cy="6.5" r="1" fill="currentColor" />
             </svg>
           </a>
-          <a href="#" aria-label="Hulhangu on Facebook">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              aria-hidden="true"
-            >
+          <a href="#" aria-label="Facebook">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
               <path d="M14 8.5V6.8c0-.8.5-1 .9-1h2.4V2h-3.3C10.3 2 9.6 4.7 9.6 6.5v2H7.3v3.9h2.3V22H14v-9.6h3l.4-3.9H14z" />
             </svg>
           </a>
         </div>
 
-
         <p className="copyright">
-          © {new Date().getFullYear()} Hulhangu · All rights reserved
+          Copyright © Hulhangu {new Date().getFullYear()}
+          <span className="d-only">.</span>
+          <span className="m-only"> |</span> All Rights Reserved.
         </p>
       </div>
     </footer>
