@@ -1183,23 +1183,32 @@ export function getSampleComments(): Comment[] {
   return sampleComments;
 }
 
-// ---------- Gallery ----------
+// ---------- Graphics ----------
 
-export type GalleryShot = {
+export type Graphic = {
   slug: string;
   title: string;
   date: string;
 };
 
-export const galleryShots: GalleryShot[] = [
-  { slug: "gallery-1", title: "މަޖިލީސް އިންތިހާބު", date: "2026-03-23" },
-  { slug: "gallery-2", title: "މަޖިލީސް އިންތިހާބު", date: "2026-03-23" },
-  { slug: "gallery-3", title: "މަޖިލީސް އިންތިހާބު", date: "2026-03-23" },
-  { slug: "gallery-4", title: "މަޖިލީސް އިންތިހާބު", date: "2026-03-23" },
+// Infographics are portrait (421 x 504); images are placeholders until real ones are added.
+export const GRAPHIC_RATIO = 421 / 504;
+
+export const graphics: Graphic[] = [
+  { slug: "gfx-1", title: "ބަޖެޓް 2027", date: "2026-09-22" },
+  { slug: "gfx-2", title: "ރާއްޖޭގެ އާބާދީ", date: "2026-09-19" },
+  { slug: "gfx-3", title: "ފަތުރުވެރިންގެ އަދަދު", date: "2026-09-16" },
+  { slug: "gfx-4", title: "މަޖިލީސް އިންތިހާބުގެ ނަތީޖާ", date: "2026-09-12" },
+  { slug: "gfx-5", title: "ތަކެތީގެ އަގު", date: "2026-09-08" },
+  { slug: "gfx-6", title: "މޫސުމުގެ ހާލަތު", date: "2026-09-04" },
+  { slug: "gfx-7", title: "ސިއްހީ ހިދުމަތް", date: "2026-08-29" },
+  { slug: "gfx-8", title: "ތައުލީމު", date: "2026-08-24" },
+  { slug: "gfx-9", title: "ދަތުރުފަތުރު", date: "2026-08-18" },
+  { slug: "gfx-10", title: "ކަނޑުގެ ފެން", date: "2026-08-12" },
 ];
 
-export function getGalleryShots(): GalleryShot[] {
-  return galleryShots;
+export function getGraphics(): Graphic[] {
+  return graphics;
 }
 
 // ---------- Photo albums ----------

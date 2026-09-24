@@ -1,16 +1,19 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import ArticleImage from "./ArticleImage";
-import { GalleryShot } from "@/lib/articles";
+import Lightbox from "./Lightbox";
+import { GRAPHIC_RATIO, Graphic } from "@/lib/articles";
 
 const MAX_ROTATE = 18;
 const MAX_SCALE_DROP = 0.12;
 const MAX_TRANSLATE_Z = 6;
 const MAX_DIM = 0.35;
 
-export default function GraphicsCoverflow({ shots }: { shots: GalleryShot[] }) {
+export default function GraphicsCoverflow({ graphics }: { graphics: Graphic[] }) {
   const trackRef = useRef<HTMLDivElement>(null);
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     const track = trackRef.current;
@@ -55,12 +58,34 @@ export default function GraphicsCoverflow({ shots }: { shots: GalleryShot[] }) {
   return (
     <div className="coverflow-stage">
       <div className="coverflow" ref={trackRef}>
-        {shots.map((shot) => (
-          <div className="coverflow-item" key={shot.slug}>
-            <ArticleImage slug={`gfx-${shot.slug}`} alt="" className="gfx" />
-          </div>
+        {graphics.map((graphic, i) => (
+          <button
+            type="button"
+            className="coverflow-item"
+            key={graphic.slug}
+            aria-label={graphic.title}
+            onClick={(e) => {
+              triggerRef.current = e.currentTarget;
+              setOpenIndex(i);
+            }}
+          >
+            <ArticleImage slug={graphic.slug} alt="" className="gfx" />
+          </button>
         ))}
       </div>
+      {openIndex !== null && (
+        <Lightbox
+          photos={graphics.map((g) => g.slug)}
+          title="ގުރެފިކްސް"
+          titles={graphics.map((g) => g.title)}
+          startIndex={openIndex}
+          ratio={GRAPHIC_RATIO}
+          onClose={() => {
+            setOpenIndex(null);
+            triggerRef.current?.focus();
+          }}
+        />
+      )}
     </div>
   );
 }

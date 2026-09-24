@@ -10,7 +10,7 @@ import GraphicsCoverflow from "@/components/GraphicsCoverflow";
 import {
   categories,
   getFeaturedArticles,
-  getGalleryShots,
+  getGraphics,
   getPhotoAlbums,
   getLatestArticles,
   getPopularArticles,
@@ -25,7 +25,6 @@ export default function Home() {
   const latest = getLatestArticles(6);
   const popular = getPopularArticles(6);
   const tickerHeadlines = latest.slice(0, 4).map((a) => a.title);
-  const galleryShots = getGalleryShots();
   const visibleCategories = categories.filter((c) => c.slug !== "report");
 
   return (
@@ -90,9 +89,12 @@ export default function Home() {
         <div className="wrap">
           <div className="sec-head">
             <h2>ގުރެފިކްސް</h2>
+            <Link className="more" href="/graphics">
+              އިތުރު ގުރެފިކްސް <span aria-hidden="true">›</span>
+            </Link>
           </div>
         </div>
-        <GraphicsCoverflow shots={galleryShots} />
+        <GraphicsCoverflow graphics={getGraphics()} />
       </section>
 
       <section className="wrap gallery" id="gallery">

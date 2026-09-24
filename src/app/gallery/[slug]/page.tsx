@@ -3,7 +3,7 @@ import Link from "next/link";
 import AlbumCard from "@/components/AlbumCard";
 import AlbumViewer from "@/components/AlbumViewer";
 import PhotoCount from "@/components/PhotoCount";
-import { formatDhivehiDate, getPhotoAlbum, getPhotoAlbums } from "@/lib/articles";
+import { albumPhotoSlug, formatDhivehiDate, getPhotoAlbum, getPhotoAlbums } from "@/lib/articles";
 
 export function generateStaticParams() {
   return getPhotoAlbums().map((album) => ({ slug: album.slug }));
@@ -43,7 +43,10 @@ export default async function AlbumPage({ params }: PageProps<"/gallery/[slug]">
         </p>
       </header>
 
-      <AlbumViewer albumSlug={album.slug} title={album.title} count={album.photoCount} />
+      <AlbumViewer
+        photos={Array.from({ length: album.photoCount }, (_, i) => albumPhotoSlug(album.slug, i))}
+        title={album.title}
+      />
 
       <section className="album-others">
         <div className="sec-head">
