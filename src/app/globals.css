@@ -1891,15 +1891,18 @@ section {
 /* ---------- Footer ---------- */
 footer {
   --logo: var(--text);
-  margin-top: 80px;
-  padding-block: 0 28px;
+  margin-top: 64px;
+  padding-block: 0 24px;
   text-align: center;
 }
 .foot-card {
-  position: relative;
-  max-width: 880px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  max-width: 560px;
   margin-inline: auto;
-  padding: clamp(26px, 3.4vw, 44px) clamp(18px, 3vw, 40px) clamp(22px, 2.6vw, 34px);
+  padding: 28px 20px;
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 50px;
@@ -1908,49 +1911,12 @@ footer {
 footer .logo {
   display: inline-block;
 }
-.foot-tag {
-  margin: 8px 0 14px;
-  color: var(--art-ink);
-  font-family: var(--font-reading);
-  font-weight: 400;
-  font-size: clamp(15px, 1.4vw, 18px);
-  line-height: 2;
-}
-.foot-cats {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px;
-}
-.foot-cats a {
-  display: inline-flex;
-  align-items: center;
-  height: 40px;
-  padding-inline: 18px;
-  border-radius: 50px;
-  background: var(--ground);
-  border: 1px solid var(--line);
-  color: var(--accent);
-  font-size: 14px;
-  transition: background 0.15s;
-}
-.foot-cats a:hover {
-  background: var(--line);
-}
-.foot-label {
-  margin: 14px 0 10px;
-  color: var(--art-ink);
-  font-family: var(--font-reading);
-  font-weight: 400;
-  font-size: 14px;
-}
 .foot-tip {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  height: 48px;
-  margin-bottom: 18px;
-  padding-inline: 24px;
+  gap: 8px;
+  height: 44px;
+  padding-inline: 22px;
   border-radius: 50px;
   background: var(--accent);
   color: var(--ground);
@@ -1960,19 +1926,14 @@ footer .logo {
 .foot-tip:hover {
   opacity: 0.88;
 }
-.foot-rule {
-  height: 1px;
-  margin: 22px 4px;
-  background: var(--line);
-}
 .social {
   display: flex;
   justify-content: center;
   gap: 10px;
 }
 .social a {
-  width: 52px;
-  height: 52px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   display: grid;
   place-items: center;
@@ -1988,57 +1949,29 @@ footer .logo {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 4px 22px;
-  max-width: 880px;
-  margin: 24px auto 18px;
+  align-items: center;
+  gap: 0 18px;
+  margin: 16px 0 4px;
   font-family: var(--font-reading);
   font-weight: 400;
-  font-size: clamp(14px, 1.3vw, 16px);
+  font-size: 14px;
 }
 .flinks a {
   display: inline-flex;
   align-items: center;
-  min-height: 44px;
-  line-height: 1.5;
+  min-height: 36px;
   color: var(--accent);
 }
 .flinks a:hover {
   color: var(--text);
-}
-.foot-publisher {
-  margin: 0 0 6px;
-  color: var(--art-ink);
-  font-family: var(--font-latin);
-  font-weight: 400;
-  font-size: clamp(12px, 1.1vw, 14px);
-  line-height: 1.6;
-  direction: ltr;
 }
 .copyright {
   margin: 0;
   color: var(--accent);
   font-family: var(--font-latin);
   font-weight: 400;
-  font-size: clamp(12px, 1.1vw, 14px);
+  font-size: 12px;
   direction: ltr;
-}
-.to-top {
-  position: absolute;
-  top: 22px;
-  inset-inline-end: 22px;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  background: var(--ground);
-  border: 1px solid var(--line);
-  color: var(--accent);
-  cursor: pointer;
-  transition: background 0.15s;
-}
-.to-top:hover {
-  background: var(--line);
 }
 
 /* ---------- Responsive ---------- */
@@ -2249,72 +2182,6 @@ footer .logo {
   }
   .foot-card {
     border-radius: 24px;
-  }
-  /* Phones: the whole footer fits on one screen at the bottom of the page. */
-  footer {
-    margin-top: 48px;
-    padding-bottom: 14px;
-  }
-  .foot-card {
-    padding: 16px 14px 16px;
-  }
-  .foot-card .logo > span {
-    height: 34px;
-  }
-  .foot-tag {
-    margin: 0 0 4px;
-    font-size: 13px;
-    line-height: 1.8;
-  }
-  .foot-label {
-    margin: 6px 0 6px;
-    font-size: 12px;
-    line-height: 1.5;
-  }
-  .foot-cats {
-    gap: 6px;
-  }
-  .foot-cats a {
-    height: 32px;
-    padding-inline: 11px;
-    font-size: 13px;
-  }
-  .foot-rule {
-    margin: 14px 4px 12px;
-  }
-  .foot-tip {
-    height: 40px;
-    margin-bottom: 10px;
-    padding-inline: 18px;
-    font-size: 14px;
-  }
-  .social {
-    gap: 8px;
-  }
-  .social a {
-    width: 42px;
-    height: 42px;
-  }
-  .to-top {
-    top: 14px;
-    inset-inline-end: 14px;
-    width: 38px;
-    height: 38px;
-  }
-  .flinks {
-    gap: 0 14px;
-    margin: 10px 0 6px;
-    font-size: 13px;
-  }
-  .flinks a {
-    min-height: 30px;
-  }
-  .foot-publisher,
-  .copyright {
-    font-size: 11px;
-  }
-  .foot-publisher {
-    margin-bottom: 2px;
   }
   .author {
     height: 52px;
