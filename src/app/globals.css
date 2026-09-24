@@ -2417,6 +2417,36 @@ footer .logo {
   position: relative;
   padding-top: clamp(20px, 3vw, 40px);
 }
+#episodes {
+  scroll-margin-top: 100px;
+}
+/* Bouncing arrow under the capsules: tap to jump to the episodes. */
+.story-hero-down {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-top: 14px;
+  border-radius: 50%;
+  color: #e1d5ff;
+  animation: story-down 1.8s ease-in-out infinite;
+}
+@keyframes story-down {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(8px);
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .story-hero-down {
+    animation: none;
+  }
+}
 .episode-list {
   display: flex;
   flex-direction: column;

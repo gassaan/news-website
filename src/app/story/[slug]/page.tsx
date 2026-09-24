@@ -45,18 +45,17 @@ export default async function StoryEpisodeListPage({
             </Link>
             <StoryRatingBadge slug={story.slug} episodeCount={story.episodes.length} />
           </div>
+          <a href="#episodes" className="story-hero-down" aria-label="ބައިތައް">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </a>
         </div>
       </header>
       <div className="story-blend" aria-hidden="true" />
 
       <div className="wrap story-page">
-        <div className="mb-8 flex flex-col items-center text-center">
-          <p className="bio" style={{ margin: 0, maxWidth: "60ch" }}>
-            {story.excerpt}
-          </p>
-        </div>
-
-        <div className="episode-list">
+        <div className="episode-list" id="episodes">
           {story.episodes.map((episode, index) => (
             <Link key={index} href={`/story/${slug}/${index + 1}`} className="episode-row">
               <span>{episode.title}</span>
