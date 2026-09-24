@@ -1892,8 +1892,10 @@ section {
 footer {
   background: var(--foot-bg);
   color: var(--foot-ink);
-  margin-top: 80px;
-  padding-block: 48px 24px;
+  margin-top: 64px;
+  padding-block: 44px 22px;
+  border-top: 1px solid var(--foot-rule);
+  border-radius: 32px 32px 0 0;
   text-align: center;
   font-family: var(--font-latin);
   font-weight: 400;
@@ -1914,35 +1916,46 @@ footer .logo {
   font-size: 15px;
   direction: ltr;
 }
+.flinks a {
+  color: rgba(255, 255, 255, 0.88);
+  transition: color 0.15s;
+}
 .flinks a:hover {
   color: var(--foot-accent);
 }
 .social {
   display: flex;
   justify-content: center;
-  gap: 14px;
+  gap: 12px;
   margin-top: 28px;
 }
 .social a {
-  width: 50px;
-  height: 50px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
   background: var(--foot-accent);
   color: var(--foot-bg);
   display: grid;
   place-items: center;
+  box-shadow: 0 6px 18px rgba(168, 130, 255, 0.25);
   transition: transform 0.15s;
 }
 .social a:hover {
   transform: translateY(-3px);
 }
 .copyright {
-  border-top: 1px solid var(--foot-rule);
-  margin-top: 36px;
-  padding-top: 20px;
+  margin-top: 32px;
   color: var(--foot-copy);
-  font-size: 15px;
+  font-size: 13px;
   direction: ltr;
+}
+/* Divider that fades out at both ends. */
+.copyright::before {
+  content: "";
+  display: block;
+  height: 1px;
+  margin-bottom: 18px;
+  background: linear-gradient(90deg, transparent, var(--foot-rule) 20%, var(--foot-rule) 80%, transparent);
 }
 
 /* ---------- Responsive ---------- */
@@ -2148,15 +2161,22 @@ footer .logo {
   footer .logo {
     margin-bottom: 6px;
   }
+  footer {
+    border-radius: 24px 24px 0 0;
+  }
   .brand-name {
     display: block;
-    margin: 0 0 22px;
-    font-size: 13px;
+    margin: 4px 0 24px;
+    color: var(--foot-accent);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
   }
   .flinks {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 18px 12px;
+    gap: 16px 12px;
     max-width: 340px;
     margin-inline: auto;
     font-size: 14px;
