@@ -2319,9 +2319,12 @@ footer .logo {
 }
 
 /* ---------- Story episode list (extends the design system) ---------- */
+/* The poster fills the first screen below the header; scroll to reach the episodes. */
 .story-hero {
   position: relative;
-  height: min(135vw, 620px);
+  height: calc(100vh - 77px);
+  height: calc(100svh - 77px);
+  min-height: 460px;
   overflow: hidden;
   isolation: isolate;
 }
@@ -2378,6 +2381,22 @@ footer .logo {
   font-family: var(--font-reading);
   font-weight: 400;
   font-size: 14px;
+}
+.story-hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 18px;
+}
+/* Author and rating capsules sit on the photo, so they use glass instead of theme colours. */
+.story-hero .author,
+.story-hero .stat {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(225, 213, 255, 0.25);
+  color: #ffffff;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
 }
 .story-page {
   padding-top: clamp(20px, 3vw, 40px);

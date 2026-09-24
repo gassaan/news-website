@@ -33,12 +33,7 @@ export default async function StoryEpisodeListPage({
           <p className="story-hero-eps">
             <span className="num">{story.episodes.length}</span> ބައި
           </p>
-        </div>
-      </header>
-
-      <div className="wrap story-page">
-        <div className="mb-8 flex flex-col items-center gap-4 text-center">
-          <div className="flex flex-wrap items-center justify-center gap-3">
+          <div className="story-hero-meta">
             <Link href={`/author/${getAuthorSlug(story.author)}`} className="author">
               <ArticleImage
                 slug={`author-${getAuthorSlug(story.author)}`}
@@ -50,7 +45,11 @@ export default async function StoryEpisodeListPage({
             </Link>
             <StoryRatingBadge slug={story.slug} episodeCount={story.episodes.length} />
           </div>
+        </div>
+      </header>
 
+      <div className="wrap story-page">
+        <div className="mb-8 flex flex-col items-center text-center">
           <p className="bio" style={{ margin: 0, maxWidth: "60ch" }}>
             {story.excerpt}
           </p>
