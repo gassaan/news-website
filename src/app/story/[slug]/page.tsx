@@ -47,6 +47,7 @@ export default async function StoryEpisodeListPage({
           </div>
         </div>
       </header>
+      <div className="story-blend" aria-hidden="true" />
 
       <div className="wrap story-page">
         <div className="mb-8 flex flex-col items-center text-center">

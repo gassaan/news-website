@@ -2403,7 +2403,14 @@ footer .logo {
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 }
+/* Soft fade from the dark poster into the page colour (invisible in dark mode). */
+.story-blend {
+  height: 160px;
+  margin-bottom: -30px;
+  background: linear-gradient(to bottom, #080018, var(--ground));
+}
 .story-page {
+  position: relative;
   padding-top: clamp(20px, 3vw, 40px);
 }
 .episode-list {
