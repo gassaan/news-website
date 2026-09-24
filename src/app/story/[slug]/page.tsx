@@ -52,7 +52,6 @@ export default async function StoryEpisodeListPage({
           </a>
         </div>
       </header>
-      <div className="story-blend" aria-hidden="true" />
 
       <div className="wrap story-page">
         <div className="episode-list" id="episodes">

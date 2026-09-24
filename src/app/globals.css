@@ -2328,6 +2328,9 @@ footer .logo {
   height: 100vh;
   height: 100lvh;
   min-height: 460px;
+  /* Bottom strip that fades into the page colour. On iPhone it is the area under
+     Safari's floating bar (lvh - svh), so it is hidden when the page loads. */
+  --fade: max(64px, 100lvh - 100svh);
   overflow: hidden;
   isolation: isolate;
 }
@@ -2349,6 +2352,7 @@ footer .logo {
   z-index: 1;
   pointer-events: none;
   background:
+    linear-gradient(to top, var(--ground), transparent var(--fade)),
     linear-gradient(to top, rgba(8, 0, 24, 0.96) 0%, rgba(8, 0, 24, 0.7) 26%, rgba(8, 0, 24, 0) 58%),
     radial-gradient(120% 70% at 50% 35%, rgba(8, 0, 24, 0) 40%, rgba(8, 0, 24, 0.55) 80%);
 }
@@ -2356,8 +2360,8 @@ footer .logo {
   position: absolute;
   z-index: 2;
   inset: auto 20px clamp(18px, 3vw, 40px);
-  /* Lift the text above the browser's bottom bar (lvh - svh is that bar's height). */
-  bottom: calc(100lvh - 100svh + clamp(18px, 3vw, 40px));
+  /* Keep the text above the fade strip (and so above Safari's bottom bar). */
+  bottom: calc(var(--fade) + 8px);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -2406,12 +2410,6 @@ footer .logo {
   color: #ffffff;
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
-}
-/* Soft fade from the dark poster into the page colour (invisible in dark mode). */
-.story-blend {
-  height: 160px;
-  margin-bottom: -30px;
-  background: linear-gradient(to bottom, #080018, var(--ground));
 }
 .story-page {
   position: relative;
