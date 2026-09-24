@@ -60,10 +60,3 @@ export function getBaselineAverage(slug: string, episodeCount: number): number {
   return sum / episodeCount;
 }
 
-export function countUserRatings(slug: string, episodeCount: number): number {
-  let count = 0;
-  for (let episode = 1; episode <= episodeCount; episode++) {
-    if (getUserRating(slug, episode) !== null) count++;
-  }
-  return count;
-}
