@@ -1890,82 +1890,84 @@ section {
 
 /* ---------- Footer ---------- */
 footer {
-  margin-top: 64px;
-  padding-block: 0 24px;
+  --logo: var(--text);
+  position: relative;
+  overflow: hidden;
+  margin-top: 40px;
   text-align: center;
 }
-.foot-card {
+/* Dot field that fades in and out behind the footer. */
+.foot-dots {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+      circle,
+      color-mix(in srgb, var(--accent) 45%, transparent) 1.3px,
+      transparent 1.8px
+    )
+    0 0 / 14px 14px;
+  -webkit-mask: linear-gradient(180deg, transparent, #000 35%, #000 60%, transparent);
+  mask: linear-gradient(180deg, transparent, #000 35%, #000 60%, transparent);
+  pointer-events: none;
+}
+.foot-in {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  max-width: 880px;
-  margin-inline: auto;
-  padding: 40px 20px 26px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 24px;
+  padding-block: 44px 26px;
 }
-/* The logo sits white on an accent tile, like an app icon. */
-.foot-mark {
-  --logo: #ffffff;
-  width: 76px;
-  height: 76px;
-  display: grid;
-  place-items: center;
-  border-radius: 20px;
-  background: var(--accent);
+footer .logo {
+  display: inline-block;
 }
 .flinks {
-  display: flex;
+  display: inline-flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 0 22px;
-  margin: 22px 0 10px;
+  gap: 0 16px;
+  margin: 18px 0 16px;
+  padding: 4px 16px;
+  border-radius: 16px;
+  background: var(--ground);
   font-family: var(--font-reading);
   font-weight: 400;
-  font-size: 15px;
+  font-size: 14px;
 }
 .flinks a {
   display: inline-flex;
   align-items: center;
-  min-height: 40px;
+  min-height: 36px;
   color: var(--art-ink);
-  opacity: 0.75;
-  transition: opacity 0.15s;
+  transition: color 0.15s;
 }
 .flinks a:hover {
-  opacity: 1;
+  color: var(--accent);
 }
 .social {
-  display: flex;
-  justify-content: center;
-  gap: 14px;
+  display: inline-flex;
+  gap: 6px;
+  padding: 2px 12px;
+  border-radius: 40px;
+  background: var(--ground);
+  border: 1px solid var(--line);
 }
 .social a {
   width: 44px;
   height: 44px;
   display: grid;
   place-items: center;
-  color: var(--art-ink);
-  opacity: 0.75;
+  color: var(--accent);
   transition: opacity 0.15s;
 }
 .social a:hover {
-  opacity: 1;
-}
-.foot-rule {
-  align-self: stretch;
-  height: 1px;
-  margin: 18px 0 20px;
-  background: var(--line);
+  opacity: 0.75;
 }
 .copyright {
-  margin: 0;
-  color: var(--art-ink);
-  opacity: 0.6;
+  margin: 14px 0 0;
+  color: var(--accent);
   font-family: var(--font-latin);
   font-weight: 400;
-  font-size: 13px;
+  font-size: 12px;
   direction: ltr;
 }
 
