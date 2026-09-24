@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import Link from "next/link";
 import Logo from "./Logo";
+import { categories } from "@/lib/articles";
 
 const SOCIAL_LINKS = [
   {
@@ -15,40 +16,71 @@ const SOCIAL_LINKS = [
   },
 ];
 
-const PAGE_LINKS = ["ގުޅުއްވާ", "ސިއްރުކަމުގެ ސިޔާސަތު", "ޝަރުތުތައް", "ސުލޫކީ މިންގަނޑު"];
+const PAGE_LINKS = [
+  "ގުޅުއްވާ",
+  "ސިއްރުކަމުގެ ސިޔާސަތު",
+  "ޝަރުތުތައް",
+  "ސުލޫކީ މިންގަނޑު",
+];
 
 export default function Footer() {
   return (
     <footer>
-      <span className="foot-ghost" aria-hidden="true">
-        <Logo className="h-full" />
-      </span>
-      <div className="wrap foot-inner">
-        <Link href="/" aria-label="Hulhangu home" className="logo">
-          <Logo className="h-14" />
-        </Link>
-        <p className="foot-tag">ޚަބަރު، ވާހަކަ އަދި ފޮޓޯ</p>
+      <div className="wrap">
+        <div className="foot-card">
+          <Link href="/" aria-label="Hulhangu home" className="logo">
+            <Logo className="h-12" />
+          </Link>
+          <p className="foot-tag">ޚަބަރު، ވާހަކަ އަދި ފޮޓޯ</p>
 
-        <div className="social" dir="ltr">
-          {SOCIAL_LINKS.map((s) => (
-            <a key={s.label} href={s.href} aria-label={s.label}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d={s.path} />
+          <nav className="foot-cats" aria-label="ކެޓެގަރީ">
+            {categories.map((c) => (
+              <Link key={c.slug} href={`/category/${c.slug}`}>
+                {c.name}
+              </Link>
+            ))}
+          </nav>
+
+          <div className="foot-rule" />
+
+          <div className="social" dir="ltr">
+            {SOCIAL_LINKS.map((s) => (
+              <a key={s.label} href={s.href} aria-label={s.label}>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d={s.path} />
+                </svg>
+              </a>
+            ))}
+            <a href="#" aria-label="Instagram">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <rect x="3" y="3" width="18" height="18" rx="5" />
+                <circle cx="12" cy="12" r="4" />
+                <circle cx="17.5" cy="6.5" r="1" fill="currentColor" />
               </svg>
             </a>
-          ))}
-          <a href="#" aria-label="Instagram">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect x="3" y="3" width="18" height="18" rx="5" />
-              <circle cx="12" cy="12" r="4" />
-              <circle cx="17.5" cy="6.5" r="1" fill="currentColor" />
-            </svg>
-          </a>
-          <a href="#" aria-label="Facebook">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M14 8.5V6.8c0-.8.5-1 .9-1h2.4V2h-3.3C10.3 2 9.6 4.7 9.6 6.5v2H7.3v3.9h2.3V22H14v-9.6h3l.4-3.9H14z" />
-            </svg>
-          </a>
+            <a href="#" aria-label="Facebook">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M14 8.5V6.8c0-.8.5-1 .9-1h2.4V2h-3.3C10.3 2 9.6 4.7 9.6 6.5v2H7.3v3.9h2.3V22H14v-9.6h3l.4-3.9H14z" />
+              </svg>
+            </a>
+          </div>
         </div>
 
         <nav className="flinks" aria-label="Footer">
@@ -60,7 +92,9 @@ export default function Footer() {
           ))}
         </nav>
 
-        <p className="copyright">© {new Date().getFullYear()} Hulhangu · All rights reserved</p>
+        <p className="copyright">
+          © {new Date().getFullYear()} Hulhangu · All rights reserved
+        </p>
       </div>
     </footer>
   );
