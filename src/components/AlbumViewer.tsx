@@ -38,7 +38,7 @@ export default function AlbumViewer({ albumSlug, title, count }: { albumSlug: st
     const track = trackRef.current;
     if (!track) return;
 
-    track.children[startIndex]?.scrollIntoView({ behavior: "instant", inline: "center", block: "nearest" });
+    track.children[startIndex]?.scrollIntoView({ behavior: "auto", inline: "center", block: "nearest" });
     closeRef.current?.focus();
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
