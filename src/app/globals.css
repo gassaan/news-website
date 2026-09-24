@@ -1913,20 +1913,34 @@ footer .logo {
 .m-only {
   display: none;
 }
+/* Links sit in a box split by thin lines (the 1px gaps show the rule colour). */
 .flinks {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 12px 36px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  max-width: 760px;
+  margin-inline: auto;
+  background: var(--foot-rule);
+  border: 1px solid var(--foot-rule);
+  border-radius: 18px;
+  overflow: hidden;
   font-size: 15px;
   direction: ltr;
 }
 .flinks a {
+  display: grid;
+  place-items: center;
+  min-height: 52px;
+  padding-inline: 10px;
+  background: var(--foot-bg);
   color: rgba(255, 255, 255, 0.88);
-  transition: color 0.15s;
+  transition:
+    color 0.15s,
+    background 0.15s;
 }
 .flinks a:hover {
   color: var(--foot-accent);
+  background: color-mix(in srgb, var(--foot-accent) 10%, var(--foot-bg));
 }
 .social {
   display: flex;
@@ -1938,15 +1952,17 @@ footer .logo {
   width: 46px;
   height: 46px;
   border-radius: 50%;
-  background: var(--foot-accent);
-  color: var(--foot-bg);
+  border: 1.5px solid var(--foot-accent);
+  color: var(--foot-accent);
   display: grid;
   place-items: center;
-  box-shadow: 0 6px 18px rgba(168, 130, 255, 0.25);
-  transition: transform 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 .social a:hover {
-  transform: translateY(-3px);
+  background: var(--foot-accent);
+  color: var(--foot-bg);
 }
 .copyright {
   margin-top: 32px;
@@ -2181,7 +2197,6 @@ footer .logo {
   .flinks {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 16px 12px;
     max-width: 340px;
     margin-inline: auto;
     font-size: 14px;
