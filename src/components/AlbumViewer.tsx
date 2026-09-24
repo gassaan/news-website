@@ -4,9 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import { albumPhotoSlug } from "@/lib/articles";
 import ArticleImage from "./ArticleImage";
 
-// Placeholder photos have no natural size, so vary tile shapes for a masonry look.
-const TILE_RATIOS = ["4 / 5", "1 / 1", "3 / 4", "4 / 3", "1 / 1", "5 / 4"];
-
 export default function AlbumViewer({ albumSlug, title, count }: { albumSlug: string; title: string; count: number }) {
   const photos = Array.from({ length: count }, (_, i) => albumPhotoSlug(albumSlug, i));
   const [startIndex, setStartIndex] = useState<number | null>(null);
@@ -86,7 +83,6 @@ export default function AlbumViewer({ albumSlug, title, count }: { albumSlug: st
             key={photo}
             type="button"
             className="photo-tile"
-            style={{ aspectRatio: TILE_RATIOS[i % TILE_RATIOS.length] }}
             aria-label={`ފޮޓޯ ${i + 1}`}
             onClick={(e) => open(i, e.currentTarget)}
           >
@@ -102,8 +98,8 @@ export default function AlbumViewer({ albumSlug, title, count }: { albumSlug: st
               {current + 1} / {count}
             </span>
             <p className="lb-title">{title}</p>
-            <button type="button" ref={closeRef} className="lb-btn" aria-label="ބަންދުކުރޭ" onClick={close}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <button type="button" ref={closeRef} className="round-btn" aria-label="ބަންދުކުރޭ" onClick={close}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
                 <path d="M6 6l12 12M18 6L6 18" />
               </svg>
             </button>
@@ -119,23 +115,23 @@ export default function AlbumViewer({ albumSlug, title, count }: { albumSlug: st
 
           <button
             type="button"
-            className="lb-btn lb-prev"
+            className="round-btn lb-prev"
             aria-label="ކުރީގެ ފޮޓޯ"
             disabled={current === 0}
             onClick={() => go(current - 1)}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9 6l6 6-6 6" />
             </svg>
           </button>
           <button
             type="button"
-            className="lb-btn lb-next"
+            className="round-btn lb-next"
             aria-label="ދެން އޮތް ފޮޓޯ"
             disabled={current === count - 1}
             onClick={() => go(current + 1)}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <path d="M15 6l-6 6 6 6" />
             </svg>
           </button>

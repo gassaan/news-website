@@ -5,11 +5,8 @@ import ArticleImage from "@/components/ArticleImage";
 import PhotoCount from "@/components/PhotoCount";
 import { albumPhotoSlug, formatDhivehiDate, getPhotoAlbums } from "@/lib/articles";
 
-const MOSAIC_TILES = 4;
-
 export default function GalleryPage() {
   const [featured, ...rest] = getPhotoAlbums();
-  const extra = featured.photoCount - MOSAIC_TILES;
 
   return (
     <>
@@ -23,39 +20,34 @@ export default function GalleryPage() {
           <h1 className="page-title">ފޮޓޯ ގެލެރީ</h1>
         </div>
 
-        <Link href={`/gallery/${featured.slug}`} className="album-feature">
-          <div className="album-mosaic">
-            {Array.from({ length: MOSAIC_TILES }, (_, i) => (
-              <div key={i} className="mosaic-tile">
-                <ArticleImage slug={albumPhotoSlug(featured.slug, i)} alt="" />
-                {i === MOSAIC_TILES - 1 && extra > 0 && (
-                  <span className="album-more num" dir="ltr">
-                    +{extra}
-                  </span>
-                )}
-              </div>
-            ))}
-          </div>
-          <div className="album-feature-text">
-            <span className="album-new">އެންމެ އާ ގެލެރީ</span>
+        <Link href={`/gallery/${featured.slug}`} className="slide album-slide">
+          <div className="copy">
+            <span className="cat-pill">އެންމެ އާ ގެލެރީ</span>
             <h2>{featured.title}</h2>
-            <p className="album-meta">
-              <time dateTime={featured.date}>{formatDhivehiDate(featured.date)}</time>
-              <PhotoCount count={featured.photoCount} className="photo-count-inline" />
-              <span>ފޮޓޯ: {featured.photographer}</span>
+            <p>
+              {formatDhivehiDate(featured.date)} · {featured.photoCount} ފޮޓޯ
+              <br />
+              ފޮޓޯ: {featured.photographer}
             </p>
           </div>
+          <div className="album-media">
+            <ArticleImage slug={albumPhotoSlug(featured.slug, 0)} alt="" />
+            <PhotoCount count={featured.photoCount} />
+          </div>
         </Link>
+      </div>
 
-        <div className="sec-head gallery-sec-head">
+      <section className="wrap">
+        <div className="sec-head">
           <h2>ހުރިހާ ގެލެރީތައް</h2>
         </div>
-        <div className="album-grid">
+        <div className="cat-grid">
           {rest.map((album) => (
             <AlbumCard key={album.slug} album={album} />
           ))}
         </div>
-      </div>
+      </section>
+
       <AdSlot />
     </>
   );
