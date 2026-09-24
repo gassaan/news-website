@@ -5,13 +5,15 @@ import PhotoCount from "./PhotoCount";
 
 export default function AlbumCard({ album }: { album: PhotoAlbum }) {
   return (
-    <Link href={`/gallery/${album.slug}`} className="card">
-      <div className="album-media">
-        <ArticleImage slug={albumPhotoSlug(album.slug, 0)} alt="" />
-        <PhotoCount count={album.photoCount} />
+    <Link href={`/gallery/${album.slug}`} className="album-card">
+      <div className="album-stack">
+        <div className="album-cover">
+          <ArticleImage slug={albumPhotoSlug(album.slug, 0)} alt="" />
+          <PhotoCount count={album.photoCount} />
+        </div>
       </div>
       <h3>{album.title}</h3>
-      <div className="meta">{formatDhivehiDate(album.date)}</div>
+      <time dateTime={album.date}>{formatDhivehiDate(album.date)}</time>
     </Link>
   );
 }

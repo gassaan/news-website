@@ -1220,7 +1220,9 @@ export const photoAlbums: PhotoAlbum[] = [
   { slug: "album-rain", title: "ބޮޑު ވާރޭ", date: "2026-08-30", photographer: "އަހުމަދު ޝިފާޒް", photoCount: 8 },
   { slug: "album-reef", title: "ކަނޑުގެ ދިރުން", date: "2026-08-18", photographer: "މުހަންމަދު ރިޔާޟް", photoCount: 11 },
   { slug: "album-beach", title: "ހުޅުމާލޭގެ ބީޗް", date: "2026-08-09", photographer: "އައިޝަތު ނަޝާ", photoCount: 7 },
+  { slug: "album-science", title: "ސައިންސް ފެއާ", date: "2026-07-30", photographer: "އަހުމަދު ޝިފާޒް", photoCount: 9 },
   { slug: "album-july26", title: "ޖުލައި 26ގެ ހަފްލާ", date: "2026-07-26", photographer: "އައިޝަތު ނަޝާ", photoCount: 12 },
+  { slug: "album-night", title: "މާލޭގެ ރޭގަނޑު", date: "2026-07-18", photographer: "މުހަންމަދު ރިޔާޟް", photoCount: 10 },
 ];
 
 export function getPhotoAlbums(): PhotoAlbum[] {
