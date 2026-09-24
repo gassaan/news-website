@@ -1202,3 +1202,38 @@ export function getGalleryShots(): GalleryShot[] {
   return galleryShots;
 }
 
+// ---------- Photo albums ----------
+
+export type PhotoAlbum = {
+  slug: string;
+  title: string;
+  date: string;
+  photographer: string;
+  photoCount: number;
+};
+
+// Photos are placeholders until real images are added.
+export const photoAlbums: PhotoAlbum[] = [
+  { slug: "album-majlis", title: "މަޖިލީސް އިންތިހާބު", date: "2026-09-20", photographer: "އަހުމަދު ޝިފާޒް", photoCount: 14 },
+  { slug: "album-football", title: "ފުޓުބޯޅަ ފައިނަލް", date: "2026-09-14", photographer: "މުހަންމަދު ރިޔާޟް", photoCount: 10 },
+  { slug: "album-market", title: "ލޯކަލް މާރުކޭޓު", date: "2026-09-08", photographer: "އައިޝަތު ނަޝާ", photoCount: 9 },
+  { slug: "album-rain", title: "ބޮޑު ވާރޭ", date: "2026-08-30", photographer: "އަހުމަދު ޝިފާޒް", photoCount: 8 },
+  { slug: "album-reef", title: "ކަނޑުގެ ދިރުން", date: "2026-08-18", photographer: "މުހަންމަދު ރިޔާޟް", photoCount: 11 },
+  { slug: "album-beach", title: "ހުޅުމާލޭގެ ބީޗް", date: "2026-08-09", photographer: "އައިޝަތު ނަޝާ", photoCount: 7 },
+  { slug: "album-science", title: "ސައިންސް ފެއާ", date: "2026-07-30", photographer: "އަހުމަދު ޝިފާޒް", photoCount: 9 },
+  { slug: "album-july26", title: "ޖުލައި 26ގެ ހަފްލާ", date: "2026-07-26", photographer: "އައިޝަތު ނަޝާ", photoCount: 12 },
+  { slug: "album-night", title: "މާލޭގެ ރޭގަނޑު", date: "2026-07-18", photographer: "މުހަންމަދު ރިޔާޟް", photoCount: 10 },
+];
+
+export function getPhotoAlbums(): PhotoAlbum[] {
+  return photoAlbums;
+}
+
+export function getPhotoAlbum(slug: string): PhotoAlbum | undefined {
+  return photoAlbums.find((a) => a.slug === slug);
+}
+
+export function albumPhotoSlug(albumSlug: string, index: number): string {
+  return `${albumSlug}-${index + 1}`;
+}
+

@@ -34,6 +34,7 @@ export default function Header() {
             <Link href="/#latest">ފަހުގެ ޚަބަރު</Link>
             <Link href="/#popular">އެންމެ މަގުބޫލް</Link>
             <Link href="/polls">ޕޯލްސް</Link>
+            <Link href="/gallery">ގެލެރީ</Link>
             <Link href={`/category/${categories[0].slug}`}>
               ކެޓެގަރީ
               <svg width="14" height="8" viewBox="0 0 14 8" fill="none" stroke="currentColor" strokeWidth="1.6">
@@ -124,6 +125,9 @@ export default function Header() {
             </Link>
             <Link href="/polls" onClick={() => setMenuOpen(false)}>
               ޕޯލްސް
+            </Link>
+            <Link href="/gallery" onClick={() => setMenuOpen(false)}>
+              ގެލެރީ
             </Link>
             <Link href={`/category/${categories[0].slug}`} onClick={() => setMenuOpen(false)}>
               ކެޓެގަރީ

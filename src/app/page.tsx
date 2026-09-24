@@ -11,6 +11,7 @@ import {
   categories,
   getFeaturedArticles,
   getGalleryShots,
+  getPhotoAlbums,
   getLatestArticles,
   getPopularArticles,
   reports,
@@ -97,11 +98,14 @@ export default function Home() {
       <section className="wrap gallery" id="gallery">
         <div className="sec-head">
           <h2>ފޮޓޯ ގެލެރީ</h2>
+          <Link className="more" href="/gallery">
+            ހުރިހާ ގެލެރީ <span aria-hidden="true">›</span>
+          </Link>
         </div>
         <div className="carousel">
           <div className="track">
-            {galleryShots.map((shot) => (
-              <GalleryShot key={shot.slug} shot={shot} />
+            {getPhotoAlbums().slice(0, 4).map((album) => (
+              <GalleryShot key={album.slug} album={album} />
             ))}
           </div>
         </div>
