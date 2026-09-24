@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getAuthorSlug, stories } from "@/lib/articles";
 import { getAuthorPhoto } from "@/lib/authorPhotos";
-import { getStoryPoster } from "@/lib/storyPosters";
+import { getStoryPoster, getStoryPosterStyle } from "@/lib/storyPosters";
 import ArticleImage from "@/components/ArticleImage";
 import EpisodeRatingLabel from "@/components/EpisodeRatingLabel";
 import StoryRatingBadge from "@/components/StoryRatingBadge";
@@ -23,7 +23,7 @@ export default async function StoryEpisodeListPage({
 
   return (
     <>
-      <header className="story-hero">
+      <header className="story-hero" style={getStoryPosterStyle(story.slug)}>
         <ArticleImage slug={story.slug} src={getStoryPoster(story.slug)} alt="" className="story-hero-img" />
         <div className="story-hero-text">
           <Link href="/stories" className="story-hero-chip">

@@ -2338,6 +2338,10 @@ footer .logo {
 .story-hero-img::after {
   display: none;
 }
+.story-hero-img img,
+.story .ph img {
+  object-position: var(--poster-pos, 50% 50%);
+}
 .story-hero::after {
   content: "";
   position: absolute;
