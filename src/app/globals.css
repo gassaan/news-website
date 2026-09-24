@@ -1890,7 +1890,6 @@ section {
 
 /* ---------- Footer ---------- */
 footer {
-  --logo: var(--text);
   margin-top: 64px;
   padding-block: 0 24px;
   text-align: center;
@@ -1899,78 +1898,74 @@ footer {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 18px;
-  max-width: 560px;
+  max-width: 880px;
   margin-inline: auto;
-  padding: 28px 20px;
+  padding: 40px 20px 26px;
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: 50px;
-  box-shadow: var(--card-shadow);
+  border-radius: 24px;
 }
-footer .logo {
-  display: inline-block;
-}
-.foot-tip {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  height: 44px;
-  padding-inline: 22px;
-  border-radius: 50px;
-  background: var(--accent);
-  color: var(--ground);
-  font-size: 15px;
-  transition: opacity 0.15s;
-}
-.foot-tip:hover {
-  opacity: 0.88;
-}
-.social {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-}
-.social a {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
+/* The logo sits white on an accent tile, like an app icon. */
+.foot-mark {
+  --logo: #ffffff;
+  width: 76px;
+  height: 76px;
   display: grid;
   place-items: center;
-  background: var(--ground);
-  border: 1px solid var(--line);
-  color: var(--accent);
-  transition: background 0.15s;
-}
-.social a:hover {
-  background: var(--line);
+  border-radius: 20px;
+  background: var(--accent);
 }
 .flinks {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  align-items: center;
-  gap: 0 18px;
-  margin: 16px 0 4px;
+  gap: 0 22px;
+  margin: 22px 0 10px;
   font-family: var(--font-reading);
   font-weight: 400;
-  font-size: 14px;
+  font-size: 15px;
 }
 .flinks a {
   display: inline-flex;
   align-items: center;
-  min-height: 36px;
-  color: var(--accent);
+  min-height: 40px;
+  color: var(--art-ink);
+  opacity: 0.75;
+  transition: opacity 0.15s;
 }
 .flinks a:hover {
-  color: var(--text);
+  opacity: 1;
+}
+.social {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+}
+.social a {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  color: var(--art-ink);
+  opacity: 0.75;
+  transition: opacity 0.15s;
+}
+.social a:hover {
+  opacity: 1;
+}
+.foot-rule {
+  align-self: stretch;
+  height: 1px;
+  margin: 18px 0 20px;
+  background: var(--line);
 }
 .copyright {
   margin: 0;
-  color: var(--accent);
+  color: var(--art-ink);
+  opacity: 0.6;
   font-family: var(--font-latin);
   font-weight: 400;
-  font-size: 12px;
+  font-size: 13px;
   direction: ltr;
 }
 
@@ -2179,9 +2174,6 @@ footer .logo {
   }
   .story-rating {
     height: 52px;
-  }
-  .foot-card {
-    border-radius: 24px;
   }
   .author {
     height: 52px;

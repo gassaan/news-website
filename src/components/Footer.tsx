@@ -14,13 +14,13 @@ const SOCIAL_LINKS = [
   },
 ];
 
-// Trust pages: links stay "#" until the pages are written.
+// Links stay "#" until the pages are written.
 const PAGE_LINKS = [
-  "އަހަރެމެންނާ ބެހޭ",
+  "ޝަރުތުތައް",
+  "ސިއްރުކަމުގެ ސިޔާސަތު",
+  "ސުލޫކީ މިންގަނޑު",
   "އެޑިޓޯރިއަލް ސިޔާސަތު",
   "ގުޅުއްވާ",
-  "އިޝްތިހާރު",
-  "ސިއްރުކަމުގެ ސިޔާސަތު",
 ];
 
 export default function Footer() {
@@ -28,23 +28,24 @@ export default function Footer() {
     <footer>
       <div className="wrap">
         <div className="foot-card">
-          <Link href="/" aria-label="Hulhangu home" className="logo">
-            <Logo className="h-10" />
+          <Link href="/" aria-label="Hulhangu home" className="foot-mark">
+            <Logo className="h-7" />
           </Link>
 
-          <a href="#" className="foot-tip">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.6-5.4A8.4 8.4 0 1 1 21 11.5z" />
-            </svg>
-            ޚަބަރެއް ފޮނުއްވާ
-          </a>
+          <nav className="flinks" aria-label="Footer">
+            {PAGE_LINKS.map((label) => (
+              <a key={label} href="#">
+                {label}
+              </a>
+            ))}
+          </nav>
 
           <div className="social" dir="ltr">
             {SOCIAL_LINKS.map((s) => (
               <a key={s.label} href={s.href} aria-label={`Hulhangu on ${s.label}`}>
                 <svg
-                  width="20"
-                  height="20"
+                  width="24"
+                  height="24"
                   viewBox="0 0 24 24"
                   fill="currentColor"
                   aria-hidden="true"
@@ -55,8 +56,8 @@ export default function Footer() {
             ))}
             <a href="#" aria-label="Hulhangu on Instagram">
               <svg
-                width="20"
-                height="20"
+                width="24"
+                height="24"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -70,8 +71,8 @@ export default function Footer() {
             </a>
             <a href="#" aria-label="Hulhangu on Facebook">
               <svg
-                width="20"
-                height="20"
+                width="24"
+                height="24"
                 viewBox="0 0 24 24"
                 fill="currentColor"
                 aria-hidden="true"
@@ -80,17 +81,13 @@ export default function Footer() {
               </svg>
             </a>
           </div>
+
+          <div className="foot-rule" />
+
+          <p className="copyright">
+            © {new Date().getFullYear()} Hulhangu · All rights reserved
+          </p>
         </div>
-
-        <nav className="flinks" aria-label="Footer">
-          {PAGE_LINKS.map((label) => (
-            <a key={label} href="#">
-              {label}
-            </a>
-          ))}
-        </nav>
-
-        <p className="copyright">© {new Date().getFullYear()} Hulhangu</p>
       </div>
     </footer>
   );
