@@ -1,6 +1,6 @@
-import { Fragment } from "react";
 import Link from "next/link";
 import Logo from "./Logo";
+import BackToTop from "./BackToTop";
 import { categories } from "@/lib/articles";
 
 const SOCIAL_LINKS = [
@@ -16,11 +16,31 @@ const SOCIAL_LINKS = [
   },
 ];
 
+const SECTIONS = [
+  { href: "/#latest", label: "ފަހުގެ ޚަބަރު" },
+  { href: "/#popular", label: "އެންމެ މަގުބޫލް" },
+  { href: "/category/report", label: "ރިޕޯޓް" },
+  { href: "/stories", label: "ވާހަކަ" },
+  { href: "/gallery", label: "ފޮޓޯ ގެލެރީ" },
+  { href: "/graphics", label: "ގުރެފިކްސް" },
+  { href: "/polls", label: "ޕޯލްސް" },
+];
+
+// "Reports" is already a section, so it is left out of the category pills.
+const CATEGORIES = categories.filter((c) => c.slug !== "report");
+
+// Trust pages: links stay "#" until the pages are written.
 const PAGE_LINKS = [
+  "އަހަރެމެންނާ ބެހޭ",
+  "އަހަރެމެންގެ ޓީމު",
+  "އެޑިޓޯރިއަލް ސިޔާސަތު",
+  "ގޯހެއް ރިޕޯޓުކުރައްވާ",
+  "ޕޯލްތަކާ ބެހޭ",
+  "ވާހަކަތަކާ ބެހޭ",
   "ގުޅުއްވާ",
+  "އިޝްތިހާރު ކުރައްވާ",
   "ސިއްރުކަމުގެ ސިޔާސަތު",
   "ޝަރުތުތައް",
-  "ސުލޫކީ މިންގަނޑު",
 ];
 
 export default function Footer() {
@@ -33,8 +53,18 @@ export default function Footer() {
           </Link>
           <p className="foot-tag">ޚަބަރު، ވާހަކަ އަދި ފޮޓޯ</p>
 
+          <p className="foot-label">ސެކްޝަންތައް</p>
+          <nav className="foot-cats" aria-label="ސެކްޝަންތައް">
+            {SECTIONS.map((s) => (
+              <Link key={s.href} href={s.href}>
+                {s.label}
+              </Link>
+            ))}
+          </nav>
+
+          <p className="foot-label">ކެޓެގަރީ</p>
           <nav className="foot-cats" aria-label="ކެޓެގަރީ">
-            {categories.map((c) => (
+            {CATEGORIES.map((c) => (
               <Link key={c.slug} href={`/category/${c.slug}`}>
                 {c.name}
               </Link>
@@ -43,20 +73,28 @@ export default function Footer() {
 
           <div className="foot-rule" />
 
+          <a href="#" className="foot-tip">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.6-5.4A8.4 8.4 0 1 1 21 11.5z" />
+            </svg>
+            ހުޅަނގަށް ޚަބަރެއް ފޮނުއްވާ
+          </a>
+
           <div className="social" dir="ltr">
             {SOCIAL_LINKS.map((s) => (
-              <a key={s.label} href={s.href} aria-label={s.label}>
+              <a key={s.label} href={s.href} aria-label={`Hulhangu on ${s.label}`}>
                 <svg
                   width="20"
                   height="20"
                   viewBox="0 0 24 24"
                   fill="currentColor"
+                  aria-hidden="true"
                 >
                   <path d={s.path} />
                 </svg>
               </a>
             ))}
-            <a href="#" aria-label="Instagram">
+            <a href="#" aria-label="Hulhangu on Instagram">
               <svg
                 width="20"
                 height="20"
@@ -64,18 +102,20 @@ export default function Footer() {
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
+                aria-hidden="true"
               >
                 <rect x="3" y="3" width="18" height="18" rx="5" />
                 <circle cx="12" cy="12" r="4" />
                 <circle cx="17.5" cy="6.5" r="1" fill="currentColor" />
               </svg>
             </a>
-            <a href="#" aria-label="Facebook">
+            <a href="#" aria-label="Hulhangu on Facebook">
               <svg
                 width="20"
                 height="20"
                 viewBox="0 0 24 24"
                 fill="currentColor"
+                aria-hidden="true"
               >
                 <path d="M14 8.5V6.8c0-.8.5-1 .9-1h2.4V2h-3.3C10.3 2 9.6 4.7 9.6 6.5v2H7.3v3.9h2.3V22H14v-9.6h3l.4-3.9H14z" />
               </svg>
@@ -84,17 +124,21 @@ export default function Footer() {
         </div>
 
         <nav className="flinks" aria-label="Footer">
-          {PAGE_LINKS.map((label, i) => (
-            <Fragment key={label}>
-              {i > 0 && <span aria-hidden="true">•</span>}
-              <a href="#">{label}</a>
-            </Fragment>
+          {PAGE_LINKS.map((label) => (
+            <a key={label} href="#">
+              {label}
+            </a>
           ))}
         </nav>
 
+        <p className="foot-publisher">
+          Published by Hulhangu · Registered with the Maldives Media and Broadcasting Commission
+        </p>
         <p className="copyright">
           © {new Date().getFullYear()} Hulhangu · All rights reserved
         </p>
+
+        <BackToTop />
       </div>
     </footer>
   );

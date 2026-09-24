@@ -1908,7 +1908,7 @@ footer .logo {
   display: inline-block;
 }
 .foot-tag {
-  margin: 8px 0 18px;
+  margin: 8px 0 14px;
   color: var(--art-ink);
   font-family: var(--font-reading);
   font-weight: 400;
@@ -1935,6 +1935,29 @@ footer .logo {
 }
 .foot-cats a:hover {
   background: var(--line);
+}
+.foot-label {
+  margin: 14px 0 10px;
+  color: var(--art-ink);
+  font-family: var(--font-reading);
+  font-weight: 400;
+  font-size: 14px;
+}
+.foot-tip {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 48px;
+  margin-bottom: 18px;
+  padding-inline: 24px;
+  border-radius: 50px;
+  background: var(--accent);
+  color: var(--ground);
+  font-size: 15px;
+  transition: opacity 0.15s;
+}
+.foot-tip:hover {
+  opacity: 0.88;
 }
 .foot-rule {
   height: 1px;
@@ -1964,20 +1987,31 @@ footer .logo {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 6px 12px;
-  margin: 22px 0 10px;
+  gap: 4px 22px;
+  max-width: 880px;
+  margin: 24px auto 18px;
   font-family: var(--font-reading);
   font-weight: 400;
-  font-size: clamp(14px, 1.3vw, 17px);
+  font-size: clamp(14px, 1.3vw, 16px);
 }
 .flinks a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  line-height: 1.5;
   color: var(--accent);
 }
 .flinks a:hover {
   color: var(--text);
 }
-.flinks span {
-  color: var(--muted);
+.foot-publisher {
+  margin: 0 0 6px;
+  color: var(--art-ink);
+  font-family: var(--font-latin);
+  font-weight: 400;
+  font-size: clamp(12px, 1.1vw, 14px);
+  line-height: 1.6;
+  direction: ltr;
 }
 .copyright {
   margin: 0;
@@ -1986,6 +2020,22 @@ footer .logo {
   font-weight: 400;
   font-size: clamp(12px, 1.1vw, 14px);
   direction: ltr;
+}
+.to-top {
+  width: 52px;
+  height: 52px;
+  margin: 22px auto 0;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--accent);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.to-top:hover {
+  background: var(--line);
 }
 
 /* ---------- Responsive ---------- */
@@ -2196,6 +2246,13 @@ footer .logo {
   }
   .foot-card {
     border-radius: 24px;
+  }
+  .flinks {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 16px;
+    padding-inline: 8px;
+    text-align: start;
   }
   .author {
     height: 52px;
