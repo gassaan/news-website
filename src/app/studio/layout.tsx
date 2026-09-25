@@ -13,11 +13,18 @@ const thaana = localFont({
   display: "swap",
 });
 
+// After a reload of a deeper dashboard address, 404.html sends the browser here and saves
+// the address; put it back before the Studio starts so it opens the same page.
+const RESTORE_ADDRESS = `(function(){try{var r=sessionStorage.getItem("studio-redirect");if(r){sessionStorage.removeItem("studio-redirect");history.replaceState(null,"",r);}}catch(e){}})();`;
+
 // Own root layout: the dashboard itself runs without the site header and footer.
 export default function StudioLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={thaana.variable}>
-      <body style={{ margin: 0 }}>{children}</body>
+      <body style={{ margin: 0 }}>
+        <script dangerouslySetInnerHTML={{ __html: RESTORE_ADDRESS }} />
+        {children}
+      </body>
     </html>
   );
 }
