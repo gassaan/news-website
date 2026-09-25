@@ -1,5 +1,5 @@
 import { defineType, defineField } from "sanity";
-import { CATEGORY_OPTIONS, bodyField, dateTimeField, photoField, slugField, titleField } from "./fields";
+import { CATEGORY_OPTIONS, bodyField, dateTimeField, formatWhen, photoField, slugField, titleField } from "./fields";
 
 export const article = defineType({
   name: "article",
@@ -34,5 +34,8 @@ export const article = defineType({
     }),
   ],
   orderings: [{ title: "އެންމެ އާ", name: "newest", by: [{ field: "publishedAt", direction: "desc" }] }],
-  preview: { select: { title: "title", subtitle: "publishedAt", media: "image" } },
+  preview: {
+    select: { title: "title", date: "publishedAt", media: "image" },
+    prepare: ({ title, date, media }) => ({ title, subtitle: formatWhen(date), media }),
+  },
 });
