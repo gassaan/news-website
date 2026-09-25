@@ -23,10 +23,13 @@ button {
 }
 
 /* Lists (articles, stories, …) also run right-to-left: picture and title on the right. */
-[data-testid="document-list-pane"] [data-testid="pane-content"] {
+[data-testid="document-list-pane"] {
   direction: rtl;
 }
 /* Clear space between an item's title and its date line. */
 [data-testid="default-preview__header"] {
   gap: 10px !important;
+}
+[data-testid="default-preview__header"] > :last-child {
+  padding-top: 4px;
 }
