@@ -24,6 +24,17 @@ export const slugField = () =>
     validation: (r) => r.required(),
   });
 
+// Publish date and time; defaults to now. Shown on the site in Maldives time.
+export const dateTimeField = (name = "publishedAt", title = "ތާރީޚާއި ގަޑި") =>
+  defineField({
+    name,
+    title,
+    type: "datetime",
+    initialValue: () => new Date().toISOString(),
+    options: { timeStep: 5 },
+    validation: (r) => r.required(),
+  });
+
 export const dateField = (name = "publishedAt", title = "ތާރީޚް") =>
   defineField({
     name,

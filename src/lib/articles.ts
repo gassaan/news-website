@@ -21,6 +21,8 @@ export type Article = {
   category: string;
   author: string;
   publishedAt: string;
+  // "HH:MM" Maldives time, from the dashboard. Sample articles use pseudoTime().
+  time?: string;
   featured?: boolean;
   episodes?: Episode[];
 };
@@ -996,8 +998,9 @@ export function getFeaturedArticles(): Article[] {
 }
 
 export function getLatestArticles(limit = 6): Article[] {
+  const when = (a: Article) => `${a.publishedAt} ${a.time ?? ""}`;
   return [...articles]
-    .sort((a, b) => (a.publishedAt < b.publishedAt ? 1 : -1))
+    .sort((a, b) => (when(a) < when(b) ? 1 : -1))
     .slice(0, limit);
 }
 

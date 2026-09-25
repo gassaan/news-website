@@ -54,7 +54,7 @@ export default async function ArticlePage({
           <h1 className="headline">{article.title}</h1>
           <p className="dateline">
             {formatDhivehiDate(article.publishedAt)} <span aria-hidden="true">-</span>{" "}
-            {pseudoTime(article.slug)}
+            {article.time ?? pseudoTime(article.slug)}
           </p>
         </header>
 

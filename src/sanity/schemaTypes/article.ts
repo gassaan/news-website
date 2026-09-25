@@ -1,5 +1,5 @@
 import { defineType, defineField } from "sanity";
-import { CATEGORY_OPTIONS, bodyField, dateField, photoField, slugField, titleField } from "./fields";
+import { CATEGORY_OPTIONS, bodyField, dateTimeField, photoField, slugField, titleField } from "./fields";
 
 export const article = defineType({
   name: "article",
@@ -22,7 +22,7 @@ export const article = defineType({
       to: [{ type: "author" }],
       validation: (r) => r.required(),
     }),
-    dateField(),
+    dateTimeField(),
     photoField("image", "މައި ފޮޓޯ", true),
     defineField({ name: "excerpt", title: "ކުރު ޚުލާސާ", type: "text", rows: 3 }),
     bodyField(),

@@ -1,5 +1,5 @@
 import { defineType, defineField, defineArrayMember } from "sanity";
-import { bodyField, dateField, photoField, slugField, titleField } from "./fields";
+import { bodyField, dateTimeField, photoField, slugField, titleField } from "./fields";
 
 export const story = defineType({
   name: "story",
@@ -15,7 +15,7 @@ export const story = defineType({
       to: [{ type: "author" }],
       validation: (r) => r.required(),
     }),
-    dateField(),
+    dateTimeField(),
     photoField("poster", "ޕޯސްޓަރު", true),
     defineField({ name: "excerpt", title: "ކުރު ޚުލާސާ", type: "text", rows: 3 }),
     defineField({
