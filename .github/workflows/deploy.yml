@@ -4,6 +4,12 @@ on:
   push:
     branches: ["main"]
   workflow_dispatch:
+  # A Sanity webhook can trigger an instant rebuild when content is published.
+  repository_dispatch:
+    types: [sanity-publish]
+  # Otherwise check the dashboard every 10 minutes and rebuild only if content changed.
+  schedule:
+    - cron: "*/10 * * * *"
 
 permissions:
   contents: read
@@ -15,7 +21,34 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.compare.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: compare
+        run: |
+          if [ "${{ github.event_name }}" != "schedule" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          PID=$(node -p "require('./src/sanity/project.json').projectId")
+          DS=$(node -p "require('./src/sanity/project.json').dataset")
+          if [ -z "$PID" ]; then
+            echo "No Sanity project yet"; echo "changed=false" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          # Same stamp format as scripts/fetch-cms.mjs writes to cms-stamp.txt.
+          NEW=$(curl -fsS -G "https://$PID.apicdn.sanity.io/v2025-02-19/data/query/$DS" \
+            --data-urlencode "perspective=published" \
+            --data-urlencode 'query={"latest": *[] | order(_updatedAt desc)[0]._updatedAt, "count": count(*[])}' \
+            | node -e 'let d="";process.stdin.on("data",c=>d+=c).on("end",()=>{const r=JSON.parse(d).result;console.log(`${r.latest??""}|${r.count}`)})')
+          OLD=$(curl -fsS "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/cms-stamp.txt" || true)
+          echo "dashboard: $NEW  site: $OLD"
+          if [ "$NEW" != "$OLD" ]; then echo "changed=true" >> "$GITHUB_OUTPUT"; else echo "changed=false" >> "$GITHUB_OUTPUT"; fi
+
   build:
+    needs: check
+    if: needs.check.outputs.changed == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

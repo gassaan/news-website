@@ -4,14 +4,19 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node scripts/fetch-cms.mjs && next build",
     "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
+    "@sanity/client": "^8.7.0",
+    "@sanity/image-url": "^2.1.1",
     "next": "16.3.1",
+    "next-sanity": "^13.3.4",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "sanity": "^6.16.0",
+    "styled-components": "^6.5.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

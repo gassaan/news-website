@@ -1,3 +1,4 @@
+import { cmsImage } from "./cmsImages";
 import fathimathAdam from "@/assets/authors/fathimath-adam.jpg";
 import mariyamManike from "@/assets/authors/mariyam-manike.jpg";
 import muhammadAli from "@/assets/authors/muhammad-ali.jpg";
@@ -9,5 +10,5 @@ const PHOTOS: Record<string, string> = {
 };
 
 export function getAuthorPhoto(slug: string): string | undefined {
-  return PHOTOS[slug];
+  return cmsImage(`author-${slug}`)?.src ?? PHOTOS[slug];
 }

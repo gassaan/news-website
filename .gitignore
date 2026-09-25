@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Written by scripts/fetch-cms.mjs during builds
+public/cms-stamp.txt

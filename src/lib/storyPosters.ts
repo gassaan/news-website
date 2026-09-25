@@ -1,3 +1,4 @@
+import { cmsImage } from "./cmsImages";
 import vaahaka3 from "@/assets/stories/vaahaka-3.jpg";
 import vaahaka6 from "@/assets/stories/vaahaka-6.jpg";
 
@@ -12,10 +13,10 @@ const FOCUS: Record<string, string> = {
 };
 
 export function getStoryPoster(slug: string): string | undefined {
-  return POSTERS[slug];
+  return cmsImage(slug)?.src ?? POSTERS[slug];
 }
 
 export function getStoryPosterStyle(slug: string): React.CSSProperties | undefined {
-  const focus = FOCUS[slug];
+  const focus = cmsImage(slug)?.pos ?? FOCUS[slug];
   return focus ? ({ "--poster-pos": focus } as React.CSSProperties) : undefined;
 }

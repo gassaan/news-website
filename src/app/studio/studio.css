@@ -1,0 +1,11 @@
+/* Text boxes follow the language typed: Thaana lines run right-to-left, English left-to-right. */
+input[type="text"],
+input:not([type]),
+textarea {
+  unicode-bidi: plaintext;
+  text-align: start;
+}
+textarea {
+  font-size: 17px !important;
+  line-height: 1.9 !important;
+}

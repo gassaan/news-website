@@ -8,21 +8,21 @@ import "./globals.css";
 const THEME_INIT_SCRIPT = `(function(){try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark"){document.documentElement.setAttribute("data-theme",t);}}catch(e){}})();`;
 
 const democratsAkBlack = localFont({
-  src: "../fonts/Democrats-AK-Black.ttf",
+  src: "../../fonts/Democrats-AK-Black.ttf",
   weight: "900",
   variable: "--font-democrats-ak",
   display: "swap",
 });
 
 const democratsAkuruBold = localFont({
-  src: "../fonts/Democrats-Akuru-Bold.ttf",
+  src: "../../fonts/Democrats-Akuru-Bold.ttf",
   weight: "700",
   variable: "--font-akuru-bold",
   display: "swap",
 });
 
 const democratsAkuruRegular = localFont({
-  src: "../fonts/Democrats-Akuru-Regular.ttf",
+  src: "../../fonts/Democrats-Akuru-Regular.ttf",
   weight: "400",
   variable: "--font-akuru-regular",
   display: "swap",

@@ -1,3 +1,8 @@
+import cmsData from "@/content/cms.json";
+import { pseudoHue } from "./hue";
+
+export { pseudoHue };
+
 export type Category = {
   slug: string;
   name: string;
@@ -44,6 +49,19 @@ export type Comment = {
   replies?: Comment[];
 };
 
+// Content published in the Sanity dashboard, downloaded before each build by
+// scripts/fetch-cms.mjs. Any list that is empty there falls back to the samples below.
+type CmsData = Partial<{
+  articles: Article[];
+  stories: Article[];
+  reports: Article[];
+  authors: Author[];
+  polls: Poll[];
+  graphics: Graphic[];
+  photoAlbums: PhotoAlbum[];
+}>;
+const cms = cmsData as CmsData;
+
 export const categories: Category[] = [
   { slug: "siyaasee", name: "ސިޔާސީ" },
   { slug: "viyafaari", name: "ވިޔަފާރި" },
@@ -53,7 +71,7 @@ export const categories: Category[] = [
   { slug: "report", name: "ރިޕޯޓު" },
 ];
 
-export const articles: Article[] = [
+const SAMPLE_ARTICLES: Article[] = [
   {
     slug: "sample-article-1",
     title: "މާލޭގައި އާ މަޝްރޫޢުތަކެއް ފެށިއްޖެ",
@@ -622,8 +640,9 @@ export const articles: Article[] = [
     publishedAt: "2026-07-25",
   },
 ];
+export const articles: Article[] = cms.articles?.length ? cms.articles : SAMPLE_ARTICLES;
 
-export const stories: Article[] = [
+const SAMPLE_STORIES: Article[] = [
   {
     slug: "vaahaka-1",
     title: "ހަނދުވަރު ރެއެއްގެ ހަނދާން",
@@ -865,8 +884,9 @@ export const stories: Article[] = [
     publishedAt: "2026-08-29",
   },
 ];
+export const stories: Article[] = cms.stories?.length ? cms.stories : SAMPLE_STORIES;
 
-export const reports: Article[] = [
+const SAMPLE_REPORTS: Article[] = [
   {
     slug: "report-1",
     title: "ރާއްޖޭގެ ފަތުރުވެރިކަމުގެ ސިނާއަތުގެ މުސްތަޤްބަލް",
@@ -956,6 +976,7 @@ export const reports: Article[] = [
     publishedAt: "2026-09-04",
   },
 ];
+export const reports: Article[] = cms.reports?.length ? cms.reports : SAMPLE_REPORTS;
 
 export function getCategory(slug: string): Category | undefined {
   return categories.find((c) => c.slug === slug);
@@ -970,7 +991,8 @@ export function getArticlesByCategory(categorySlug: string): Article[] {
 }
 
 export function getFeaturedArticles(): Article[] {
-  return articles.filter((a) => a.featured);
+  const featured = articles.filter((a) => a.featured);
+  return featured.length ? featured : getLatestArticles(5);
 }
 
 export function getLatestArticles(limit = 6): Article[] {
@@ -1031,15 +1053,6 @@ export function pseudoRating(slug: string): string {
   return rating.toFixed(1);
 }
 
-// Deterministic hue (0-359) used to seed the .ph gradient placeholder for a
-// given slug, so the same item always gets the same placeholder colour.
-export function pseudoHue(slug: string): number {
-  let hash = 0;
-  for (const char of slug) {
-    hash = (hash * 53 + char.charCodeAt(0)) % 100000;
-  }
-  return hash % 360;
-}
 
 // Deterministic HH:MM used until real publish times exist.
 export function pseudoTime(slug: string): string {
@@ -1054,7 +1067,7 @@ export function pseudoTime(slug: string): string {
 
 // ---------- Authors ----------
 
-export const authors: Author[] = [
+const SAMPLE_AUTHORS: Author[] = [
   {
     slug: "khabaru-team",
     name: "މުހަންމަދު އަލީ",
@@ -1074,6 +1087,7 @@ export const authors: Author[] = [
     bio: "ރިޕޯޓު ޓީމަކީ ފުން ދިރާސާތަކާއެކު، މުހިންމު މައުޟޫޢުތަކުގެ މައްޗަށް ތަފްޞީލީ ރިޕޯޓުތައް ތައްޔާރުކުރާ ޓީމެކެވެ.",
   },
 ];
+export const authors: Author[] = cms.authors?.length ? cms.authors : SAMPLE_AUTHORS;
 
 const AUTHOR_SLUG_BY_NAME: Record<string, string> = Object.fromEntries(
   authors.map((a) => [a.name, a.slug]),
@@ -1095,7 +1109,7 @@ export function getArticlesByAuthor(slug: string): Article[] {
 
 // ---------- Polls ----------
 
-export const polls: Poll[] = [
+const SAMPLE_POLLS: Poll[] = [
   {
     id: "poll-1",
     question: "ޓެކްސީ ޚިދުމަތުގެ އެންމެ ބޮޑު މައްސަލައަކީ ކޮބާ؟",
@@ -1137,6 +1151,7 @@ export const polls: Poll[] = [
     votes: [48, 30, 22],
   },
 ];
+export const polls: Poll[] = cms.polls?.length ? cms.polls : SAMPLE_POLLS;
 
 export function getPolls(): Poll[] {
   return polls;
@@ -1194,7 +1209,7 @@ export type Graphic = {
 // Infographics are portrait (421 x 504); images are placeholders until real ones are added.
 export const GRAPHIC_RATIO = 421 / 504;
 
-export const graphics: Graphic[] = [
+const SAMPLE_GRAPHICS: Graphic[] = [
   { slug: "gfx-1", title: "ބަޖެޓް 2027", date: "2026-09-22" },
   { slug: "gfx-2", title: "ރާއްޖޭގެ އާބާދީ", date: "2026-09-19" },
   { slug: "gfx-3", title: "ފަތުރުވެރިންގެ އަދަދު", date: "2026-09-16" },
@@ -1206,6 +1221,7 @@ export const graphics: Graphic[] = [
   { slug: "gfx-9", title: "ދަތުރުފަތުރު", date: "2026-08-18" },
   { slug: "gfx-10", title: "ކަނޑުގެ ފެން", date: "2026-08-12" },
 ];
+export const graphics: Graphic[] = cms.graphics?.length ? cms.graphics : SAMPLE_GRAPHICS;
 
 export function getGraphics(): Graphic[] {
   return graphics;
@@ -1222,7 +1238,7 @@ export type PhotoAlbum = {
 };
 
 // Photos are placeholders until real images are added.
-export const photoAlbums: PhotoAlbum[] = [
+const SAMPLE_PHOTO_ALBUMS: PhotoAlbum[] = [
   { slug: "album-majlis", title: "މަޖިލީސް އިންތިހާބު", date: "2026-09-20", photographer: "އަހުމަދު ޝިފާޒް", photoCount: 14 },
   { slug: "album-football", title: "ފުޓުބޯޅަ ފައިނަލް", date: "2026-09-14", photographer: "މުހަންމަދު ރިޔާޟް", photoCount: 10 },
   { slug: "album-market", title: "ލޯކަލް މާރުކޭޓު", date: "2026-09-08", photographer: "އައިޝަތު ނަޝާ", photoCount: 9 },
@@ -1233,6 +1249,7 @@ export const photoAlbums: PhotoAlbum[] = [
   { slug: "album-july26", title: "ޖުލައި 26ގެ ހަފްލާ", date: "2026-07-26", photographer: "އައިޝަތު ނަޝާ", photoCount: 12 },
   { slug: "album-night", title: "މާލޭގެ ރޭގަނޑު", date: "2026-07-18", photographer: "މުހަންމަދު ރިޔާޟް", photoCount: 10 },
 ];
+export const photoAlbums: PhotoAlbum[] = cms.photoAlbums?.length ? cms.photoAlbums : SAMPLE_PHOTO_ALBUMS;
 
 export function getPhotoAlbums(): PhotoAlbum[] {
   return photoAlbums;

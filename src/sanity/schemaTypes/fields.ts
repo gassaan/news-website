@@ -1,0 +1,55 @@
+import { defineField } from "sanity";
+
+// Category list mirrors the site's fixed categories (src/lib/articles.ts).
+export const CATEGORY_OPTIONS = [
+  { title: "ސިޔާސީ", value: "siyaasee" },
+  { title: "ވިޔަފާރި", value: "viyafaari" },
+  { title: "ކުޅިވަރު", value: "kulhivaru" },
+  { title: "ދުނިޔެ", value: "dhuniye" },
+  { title: "ދިރިއުޅުން", value: "life" },
+  { title: "ރިޕޯޓު", value: "report" },
+];
+
+export const titleField = (title = "ސުރުޚީ") =>
+  defineField({ name: "title", title, type: "string", validation: (r) => r.required() });
+
+// Web address part, filled from the title with one click ("Generate").
+export const slugField = () =>
+  defineField({
+    name: "slug",
+    title: "ލިންކް (Slug)",
+    type: "slug",
+    description: "ސައިޓުގެ ލިންކުގައި ބޭނުންކުރާ އިނގިރޭސި ނަން. މިސާލު: majlis-vote-2026",
+    options: { source: "title", maxLength: 80 },
+    validation: (r) => r.required(),
+  });
+
+export const dateField = (name = "publishedAt", title = "ތާރީޚް") =>
+  defineField({
+    name,
+    title,
+    type: "date",
+    initialValue: () => new Date().toISOString().slice(0, 10),
+    validation: (r) => r.required(),
+  });
+
+export const photoField = (name = "image", title = "ފޮޓޯ", required = false) =>
+  defineField({
+    name,
+    title,
+    type: "image",
+    description: "ފޮޓޯ އަޕްލޯޑް ކުރުމަށްފަހު، މުހިންމު ބައި ބާއްވަން ބޭނުންވާ ތަނަށް ތިކި ޖައްސަވާ.",
+    options: { hotspot: true },
+    validation: required ? (r) => r.required() : undefined,
+  });
+
+// Plain text box: one line (Enter) = one paragraph on the site.
+export const bodyField = (name = "body", title = "ލިޔުން") =>
+  defineField({
+    name,
+    title,
+    type: "text",
+    rows: 16,
+    description: "ކޮންމެ ޕެރެގްރާފަކަށްފަހު Enter ފިއްތަވާ.",
+    validation: (r) => r.required(),
+  });
