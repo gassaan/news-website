@@ -23,8 +23,13 @@ button {
 }
 
 /* Lists (articles, stories, …) also run right-to-left: picture and title on the right. */
-[data-testid="document-list-pane"] {
+[data-testid="document-list-pane"],
+[data-testid="structure-tool-list-pane"] {
   direction: rtl;
+}
+/* Menu arrows point left, the way right-to-left lists open. */
+[data-testid="structure-tool-list-pane"] [data-sanity-icon="chevron-right"] {
+  transform: scaleX(-1);
 }
 /* Clear space between an item's title and its date line. */
 [data-testid="default-preview__header"] {
