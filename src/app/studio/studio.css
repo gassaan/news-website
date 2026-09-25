@@ -1,11 +1,16 @@
-/* Text boxes follow the language typed: Thaana lines run right-to-left, English left-to-right. */
-input[type="text"],
-input:not([type]),
-textarea {
-  unicode-bidi: plaintext;
-  text-align: start;
+/* The editing form runs right-to-left like Dhivehi: labels, boxes and typing start on the right.
+   Menus, lists and buttons around it keep Sanity's normal layout. */
+[data-testid="form-view"] {
+  direction: rtl;
 }
-textarea {
-  font-size: 17px !important;
-  line-height: 1.9 !important;
+[data-testid="form-view"] input[type="text"],
+[data-testid="form-view"] input:not([type]),
+[data-testid="form-view"] textarea {
+  direction: rtl;
+  text-align: right;
+  font-family: var(--font-akuru), system-ui, sans-serif !important;
+}
+[data-testid="form-view"] textarea {
+  font-size: 18px !important;
+  line-height: 2 !important;
 }
