@@ -1,3 +1,11 @@
+/* Whole dashboard: English letters use Sanity's Inter, Thaana falls through to the site's font. */
+[data-ui],
+input,
+textarea,
+button {
+  font-family: Inter, var(--font-thaana), -apple-system, BlinkMacSystemFont, sans-serif !important;
+}
+
 /* The editing form runs right-to-left like Dhivehi: labels, boxes and typing start on the right.
    Menus, lists and buttons around it keep Sanity's normal layout. */
 [data-testid="form-view"] {
@@ -8,7 +16,6 @@
 [data-testid="form-view"] textarea {
   direction: rtl;
   text-align: right;
-  font-family: var(--font-akuru), system-ui, sans-serif !important;
 }
 [data-testid="form-view"] textarea {
   font-size: 18px !important;
