@@ -11,7 +11,10 @@ function write(cms, images, stamp) {
   mkdirSync(out("src/content"), { recursive: true });
   writeFileSync(out("src/content/cms.json"), JSON.stringify(cms, null, 1) + "\n");
   writeFileSync(out("src/content/cms-images.json"), JSON.stringify(images, null, 1) + "\n");
-  if (stamp) writeFileSync(out("public/cms-stamp.txt"), stamp + "\n");
+  if (stamp) {
+    mkdirSync(out("public"), { recursive: true });
+    writeFileSync(out("public/cms-stamp.txt"), stamp + "\n");
+  }
 }
 
 if (!projectId || process.env.SKIP_CMS === "1") {
