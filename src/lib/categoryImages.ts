@@ -1,5 +1,6 @@
 import dhuniye from "@/assets/categories/dhuniye.jpg";
 import kulhivaru from "@/assets/categories/kulhivaru.jpg";
+import life from "@/assets/categories/life.jpg";
 import siyaasee from "@/assets/categories/siyaasee.jpg";
 import viyafaari from "@/assets/categories/viyafaari.jpg";
 
@@ -8,6 +9,7 @@ const IMAGES: Record<string, string> = {
   viyafaari: viyafaari.src,
   kulhivaru: kulhivaru.src,
   dhuniye: dhuniye.src,
+  life: life.src,
 };
 
 export function getCategoryImage(slug: string): string | undefined {
