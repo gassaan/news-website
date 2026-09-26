@@ -28,6 +28,13 @@ const democratsAkuruRegular = localFont({
   display: "swap",
 });
 
+const mvMagRound = localFont({
+  src: "../../fonts/MV-MAG-Round-Bold.otf",
+  weight: "700",
+  variable: "--font-mag-round",
+  display: "swap",
+});
+
 const inter = Inter({
   subsets: ["latin"],
   weight: ["400", "500"],
@@ -46,7 +53,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="dv"
       dir="rtl"
       suppressHydrationWarning
-      className={`${democratsAkBlack.variable} ${democratsAkuruBold.variable} ${democratsAkuruRegular.variable} ${inter.variable} h-full antialiased`}
+      className={`${democratsAkBlack.variable} ${democratsAkuruBold.variable} ${democratsAkuruRegular.variable} ${mvMagRound.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="bg-ground text-text font-body flex min-h-full flex-col font-bold">
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
