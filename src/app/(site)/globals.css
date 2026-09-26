@@ -746,6 +746,10 @@ section {
 .cat .ph::after {
   display: none;
 }
+/* A real photo stays sharp; only the colour placeholder is blurred. */
+.cat .ph:has(img) {
+  filter: none;
+}
 .cat::before {
   content: "";
   position: absolute;
