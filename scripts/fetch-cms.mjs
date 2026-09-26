@@ -68,6 +68,13 @@ function mvDateTime(publishedAt, createdAt) {
   return { date: dateOnly ? publishedAt : iso.slice(0, 10), time: iso.slice(11, 16) };
 }
 
+// Safety net for web addresses: anything other than a-z, 0-9 becomes "-" (e.g. "report/1000" -> "report-1000").
+const cleanSlug = (slug) =>
+  String(slug ?? "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+for (const list of [r.authors, r.articles, r.stories, r.graphics, r.albums]) {
+  for (const item of list) item.slug = cleanSlug(item.slug);
+}
+
 const paragraphs = (text) =>
   (text ?? "").split(/\n+/).map((p) => p.trim()).filter(Boolean);
 

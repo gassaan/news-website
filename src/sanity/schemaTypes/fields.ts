@@ -1,4 +1,5 @@
 import { defineField } from "sanity";
+import speakingurl from "speakingurl";
 
 // Category list mirrors the site's fixed categories (src/lib/articles.ts).
 export const CATEGORY_OPTIONS = [
@@ -14,17 +15,32 @@ export const titleField = (title = "ސުރުޚީ") =>
   defineField({ name: "title", title, type: "string", validation: (r) => r.required() });
 
 // Web address part, filled from the title with one click ("Generate").
+// Only a-z, 0-9 and "-" are allowed: a "/" would point to a page that doesn't exist.
+// Thaana titles are spelled out in Latin letters first (as Sanity does by default).
+const toSlug = (input: string) =>
+  speakingurl(input, { truncate: 80, symbols: true })
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80);
+
 export const slugField = () =>
   defineField({
     name: "slug",
     title: "ލިންކް (Slug)",
     type: "slug",
-    description: "ސައިޓުގެ ލިންކުގައި ބޭނުންކުރާ އިނގިރޭސި ނަން. މިސާލު: majlis-vote-2026",
-    options: { source: "title", maxLength: 80 },
-    validation: (r) => r.required(),
+    description: "ސައިޓުގެ ލިންކުގައި ބޭނުންކުރާ އިނގިރޭސި ނަން. އިނގިރޭސި އަކުރު، ނަމްބަރު އަދި - އެކަނި. މިސާލު: majlis-vote-2026",
+    options: { source: "title", maxLength: 80, slugify: toSlug },
+    validation: (r) =>
+      r.required().custom((value?: { current?: string }) => {
+        const current = value?.current ?? "";
+        return /^[a-z0-9]+(-[a-z0-9]+)*$/.test(current)
+          ? true
+          : "އިނގިރޭސި ކުދި އަކުރު، ނަމްބަރު އަދި - އެކަނި ބޭނުންކުރައްވާ (/ ނުވަތަ ހުސްޖާގަ ނުލާ). މިސާލު: report-1000";
+      }),
   });
 
-// Publish date and time; defaults to now. Shown on the site in Maldives time.
 export const dateTimeField = (name = "publishedAt", title = "ތާރީޚާއި ގަޑި") =>
   defineField({
     name,
