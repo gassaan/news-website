@@ -1231,9 +1231,9 @@ section {
   background: var(--line);
 }
 .headline {
-  /* Page titles (articles, story episodes, galleries) use MV MAG Round Bold. */
+  /* Page titles (articles, story episodes, galleries) use MV MAG Round Extra Bold. */
   font-family: var(--font-mag-round), var(--font-head);
-  font-weight: 700;
+  font-weight: 800;
   color: var(--text);
   font-size: clamp(32px, 5vw, 72px);
   line-height: 1.75;

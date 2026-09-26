@@ -29,8 +29,8 @@ const democratsAkuruRegular = localFont({
 });
 
 const mvMagRound = localFont({
-  src: "../../fonts/MV-MAG-Round-Bold.otf",
-  weight: "700",
+  src: "../../fonts/MV-MAG-Round-XBold.otf",
+  weight: "800",
   variable: "--font-mag-round",
   display: "swap",
 });
