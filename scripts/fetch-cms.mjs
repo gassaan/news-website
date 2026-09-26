@@ -38,7 +38,7 @@ const QUERY = `{
 }`;
 
 const url =
-  `https://${projectId}.apicdn.sanity.io/v2025-02-19/data/query/${dataset}` +
+  `https://${projectId}.api.sanity.io/v2025-02-19/data/query/${dataset}` +
   `?perspective=published&query=${encodeURIComponent(QUERY)}`;
 
 const res = await fetch(url);
