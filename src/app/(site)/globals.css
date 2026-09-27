@@ -1394,7 +1394,10 @@ section {
 /* Article: photo on top, the headline card slides up over its bottom edge. */
 .lead-hero {
   --sheet-overlap: clamp(44px, 6vw, 90px);
-  position: relative;
+  /* The photo stays put under the header while the dark card scrolls up over it. */
+  position: sticky;
+  top: calc(env(safe-area-inset-top, 0px) + 76px);
+  z-index: 0;
   margin-top: 0;
 }
 .lead-hero figcaption {
@@ -1437,6 +1440,14 @@ section {
   background: var(--ground);
   border-radius: 36px 36px 0 0;
   box-shadow: 0 -22px 30px -18px rgba(8, 0, 24, 0.45);
+}
+/* Everything after the card covers the photo too. */
+.art-sheet ~ * {
+  position: relative;
+  z-index: 2;
+  background: var(--ground);
+  /* Keep inner top margins inside the painted background (no see-through gap). */
+  display: flow-root;
 }
 /* Small handle, like a sheet pulled up on a phone. */
 .art-sheet::before {
