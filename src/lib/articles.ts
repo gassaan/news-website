@@ -1209,8 +1209,8 @@ export type Graphic = {
   date: string;
 };
 
-// Infographics are portrait (421 x 504); images are placeholders until real ones are added.
-export const GRAPHIC_RATIO = 421 / 504;
+// Graphics from the dashboard are square.
+export const GRAPHIC_RATIO = 1;
 
 const SAMPLE_GRAPHICS: Graphic[] = [
   { slug: "gfx-1", title: "ބަޖެޓް 2027", date: "2026-09-22" },
