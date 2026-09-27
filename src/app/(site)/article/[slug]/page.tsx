@@ -45,20 +45,7 @@ export default async function ArticlePage({
       <AdSlot className="art-top-ad" />
 
       <article className="story-page">
-        <header className="wrap art-head">
-          {category && (
-            <Link className="cat-pill" href={`/category/${category.slug}`}>
-              {category.name}
-            </Link>
-          )}
-          <h1 className="headline">{article.title}</h1>
-          <p className="dateline">
-            {formatDhivehiDate(article.publishedAt)} <span aria-hidden="true">-</span>{" "}
-            {article.time ?? pseudoTime(article.slug)}
-          </p>
-        </header>
-
-        <figure className="lead">
+        <figure className="lead lead-hero">
           <ArticleImage slug={article.slug} alt={article.title} className="lead-img" />
           <figcaption>
             <span className="cap">
@@ -73,6 +60,20 @@ export default async function ArticlePage({
             </span>
           </figcaption>
         </figure>
+
+        {/* Photo first; the headline card slides up over its bottom edge. */}
+        <header className="wrap art-head art-sheet">
+          {category && (
+            <Link className="cat-pill" href={`/category/${category.slug}`}>
+              {category.name}
+            </Link>
+          )}
+          <h1 className="headline">{article.title}</h1>
+          <p className="dateline">
+            {formatDhivehiDate(article.publishedAt)} <span aria-hidden="true">-</span>{" "}
+            {article.time ?? pseudoTime(article.slug)}
+          </p>
+        </header>
 
         <div className="wrap">
           <ArticleBody slug={article.slug} paragraphs={article.body} author={article.author} />

@@ -38,6 +38,7 @@
   --cap-bg: #150735;
   --cap-ink: #a882ff;
   --chip-on: #a882ff;
+  --head-grad-end: #a882ff;
   color-scheme: dark;
 }
 
@@ -80,6 +81,7 @@
     --cap-bg: #3e2180;
     --cap-ink: #e1d5ff;
     --chip-on: #3e2180;
+    --head-grad-end: #7958c5;
     color-scheme: light;
   }
 }
@@ -121,6 +123,7 @@
   --cap-bg: #3e2180;
   --cap-ink: #e1d5ff;
   --chip-on: #3e2180;
+  --head-grad-end: #7958c5;
   color-scheme: light;
 }
 
@@ -161,6 +164,7 @@
   --cap-bg: #150735;
   --cap-ink: #a882ff;
   --chip-on: #a882ff;
+  --head-grad-end: #a882ff;
   color-scheme: dark;
 }
 
@@ -1386,6 +1390,69 @@ section {
   align-items: center;
   gap: 10px;
   flex: none;
+}
+/* Article: photo on top, the headline card slides up over its bottom edge. */
+.lead-hero {
+  --sheet-overlap: clamp(44px, 6vw, 90px);
+  position: relative;
+  margin-top: 0;
+}
+.lead-hero figcaption {
+  position: absolute;
+  inset-inline: 12px;
+  bottom: calc(var(--sheet-overlap) + 12px);
+  background: none;
+  border: 0;
+  padding: 0;
+  color: #e1d5ff;
+  font-size: 13px;
+  pointer-events: none;
+}
+.lead-hero .cap,
+.lead-hero .views {
+  background: rgba(8, 0, 24, 0.6);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border-radius: 99px;
+  padding: 6px 14px;
+}
+.lead-hero .cap {
+  max-width: 68%;
+}
+.lead-hero .views {
+  gap: 6px;
+}
+.lead-hero .views svg {
+  width: 20px;
+  height: 14px;
+}
+.lead-hero .cap:has(span:empty) {
+  display: none;
+}
+.art-sheet {
+  position: relative;
+  z-index: 2;
+  margin-top: calc(-1 * clamp(44px, 6vw, 90px));
+  padding-top: 16px;
+  background: var(--ground);
+  border-radius: 36px 36px 0 0;
+  box-shadow: 0 -22px 30px -18px rgba(8, 0, 24, 0.45);
+}
+/* Small handle, like a sheet pulled up on a phone. */
+.art-sheet::before {
+  content: "";
+  width: 44px;
+  height: 5px;
+  border-radius: 5px;
+  background: var(--line);
+  margin-bottom: clamp(16px, 2vw, 26px);
+}
+/* Headline letters fade from the text colour into purple. */
+.art-head .headline {
+  background: linear-gradient(180deg, var(--text) 30%, var(--head-grad-end) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 .num {
   font-family: var(--font-latin);
