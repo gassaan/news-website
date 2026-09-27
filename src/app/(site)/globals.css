@@ -809,6 +809,25 @@ section {
   max-width: 100%;
   height: 100%;
 }
+/* Light mode: the band takes the header purple, fading darker, with light text. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) .graphics {
+    --accent: #e1d5ff;
+    --accent-dim: #a882ff;
+    --text: #ffffff;
+    --surface: #291359;
+    --line: #5b3aa3;
+    background: linear-gradient(180deg, #3e2180 0%, #291359 100%);
+  }
+}
+:root[data-theme="light"] .graphics {
+  --accent: #e1d5ff;
+  --accent-dim: #a882ff;
+  --text: #ffffff;
+  --surface: #291359;
+  --line: #5b3aa3;
+  background: linear-gradient(180deg, #3e2180 0%, #291359 100%);
+}
 .graphics .sec-head {
   /* Stay tappable above the coverflow's glow room. */
   position: relative;
