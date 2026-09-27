@@ -1438,7 +1438,9 @@ section {
   margin-top: calc(-1 * clamp(44px, 6vw, 90px));
   padding-top: 16px;
   background: var(--ground);
-  border-radius: 36px 36px 0 0;
+  /* Same rounded top and thin edge line as the footer. */
+  border-top: 1px solid var(--foot-rule);
+  border-radius: 32px 32px 0 0;
   box-shadow: 0 -22px 30px -18px rgba(8, 0, 24, 0.45);
 }
 /* Everything after the card covers the photo too. */
