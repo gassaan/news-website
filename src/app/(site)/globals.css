@@ -729,7 +729,7 @@ section {
   display: flex;
   align-items: center;
   gap: 4px;
-  /* Dark pill with a glowing purple edge and a white star; same in both themes. */
+  /* Dark pill with a glowing purple edge and a gold star; same in both themes. */
   background: rgba(8, 0, 24, 0.7);
   -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
@@ -745,8 +745,8 @@ section {
   font-size: 13px;
 }
 .story .rating svg {
-  fill: #ffffff;
-  filter: drop-shadow(0 0 4px #ffffff);
+  fill: #f2b632;
+  filter: drop-shadow(0 0 4px rgba(242, 182, 50, 0.8));
 }
 
 /* ---------- Categories ---------- */
