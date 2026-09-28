@@ -1448,6 +1448,10 @@ section {
 .art-sheet .art-head {
   padding-top: 0;
 }
+/* A little breathing room between the headline and the date. */
+.art-sheet .headline {
+  margin-bottom: clamp(18px, 2vw, 28px);
+}
 /* Small handle, like a sheet pulled up on a phone. */
 .art-sheet .art-head::before {
   content: "";
