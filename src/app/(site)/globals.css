@@ -335,9 +335,19 @@ a {
 }
 
 /* ---------- Header ---------- */
+/* The header is pinned (fixed) rather than sticky: iPhone Safari only extends
+   a fixed header's colour into its floating address bar. The body makes room for it. */
+body {
+  padding-top: calc(77px + env(safe-area-inset-top, 0px));
+}
+html {
+  scroll-padding-top: 90px;
+}
 header.site {
-  position: sticky;
+  position: fixed;
   top: env(safe-area-inset-top, 0px);
+  left: 0;
+  right: 0;
   z-index: 20;
   background: var(--nav-bg);
   border-bottom: 1px solid var(--nav-line);

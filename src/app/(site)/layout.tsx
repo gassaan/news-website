@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { Inter } from "next/font/google";
 import Header from "@/components/Header";
@@ -34,6 +34,14 @@ const inter = Inter({
   variable: "--font-inter",
   display: "swap",
 });
+
+// Browser bar colour matches the header.
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#150735" },
+    { media: "(prefers-color-scheme: light)", color: "#3e2180" },
+  ],
+};
 
 export const metadata: Metadata = {
   title: "Hulhangu",
