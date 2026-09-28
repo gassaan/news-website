@@ -1442,17 +1442,14 @@ section {
   border-top: 1px solid var(--foot-rule);
   border-radius: 32px 32px 0 0;
   box-shadow: 0 -22px 30px -18px rgba(8, 0, 24, 0.45);
-}
-/* Everything after the card covers the photo too. */
-.art-sheet ~ * {
-  position: relative;
-  z-index: 2;
-  background: var(--ground);
-  /* Keep inner top margins inside the painted background (no see-through gap). */
+  /* Keep inner margins inside the painted background (no see-through gaps). */
   display: flow-root;
 }
+.art-sheet .art-head {
+  padding-top: 0;
+}
 /* Small handle, like a sheet pulled up on a phone. */
-.art-sheet::before {
+.art-sheet .art-head::before {
   content: "";
   width: 44px;
   height: 5px;
@@ -1524,7 +1521,7 @@ section {
   transform: scale(0.95);
 }
 .art-body {
-  --fs: clamp(18px, 1.7vw, 24px);
+  --fs: clamp(20px, 1.85vw, 26px);
   font-family: var(--font-reading);
   font-weight: 400;
   font-size: var(--fs);

@@ -61,23 +61,25 @@ export default async function ArticlePage({
           </figcaption>
         </figure>
 
-        {/* Photo first; the headline card slides up over its bottom edge. */}
-        <header className="wrap art-head art-sheet">
-          {category && (
-            <Link className="cat-pill" href={`/category/${category.slug}`}>
-              {category.name}
-            </Link>
-          )}
-          <h1 className="headline">{article.title}</h1>
-          <p className="dateline">
-            {formatDhivehiDate(article.publishedAt)} <span aria-hidden="true">-</span>{" "}
-            {article.time ?? pseudoTime(article.slug)}
-          </p>
-        </header>
+        {/* Photo first; the headline card and article slide up over it as one block. */}
+        <div className="art-sheet">
+          <header className="wrap art-head">
+            {category && (
+              <Link className="cat-pill" href={`/category/${category.slug}`}>
+                {category.name}
+              </Link>
+            )}
+            <h1 className="headline">{article.title}</h1>
+            <p className="dateline">
+              {formatDhivehiDate(article.publishedAt)} <span aria-hidden="true">-</span>{" "}
+              {article.time ?? pseudoTime(article.slug)}
+            </p>
+          </header>
 
-        <div className="wrap">
-          <ArticleBody slug={article.slug} paragraphs={article.body} author={article.author} />
-          <ArticleActions title={article.title} />
+          <div className="wrap">
+            <ArticleBody slug={article.slug} paragraphs={article.body} author={article.author} />
+            <ArticleActions title={article.title} />
+          </div>
         </div>
       </article>
 
