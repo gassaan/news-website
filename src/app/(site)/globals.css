@@ -1793,6 +1793,170 @@ section {
   outline: none;
   border-color: var(--accent);
 }
+/* ---------- Contact Us page ---------- */
+.contact-page {
+  padding-top: clamp(28px, 5vw, 80px);
+}
+.contact-intro {
+  margin: 0 0 clamp(20px, 3vw, 36px);
+  font-family: var(--font-reading);
+  font-size: clamp(17px, 1.6vw, 22px);
+  line-height: 2;
+  color: var(--art-ink);
+}
+.contact-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+}
+.contact-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  padding: 12px 14px;
+  box-shadow: var(--card-shadow);
+  transition:
+    border-color 0.15s,
+    transform 0.15s;
+}
+a.contact-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+.ci-icon {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--accent);
+}
+.ci-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.ci-text small {
+  font-size: 13px;
+  color: var(--accent);
+}
+.ci-text b {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: clamp(15px, 1.4vw, 18px);
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+.ci-text b[dir="ltr"] {
+  font-family: var(--font-latin);
+  font-weight: 500;
+  text-align: right;
+}
+.contact-form {
+  margin-top: clamp(24px, 4vw, 48px);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 40px;
+  padding: clamp(22px, 3vw, 40px) clamp(18px, 2.4vw, 28px);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: var(--card-shadow);
+}
+.contact-form h2 {
+  font-family: var(--font-head);
+  font-weight: 900;
+  color: var(--text);
+  font-size: clamp(22px, 2.2vw, 32px);
+  margin: 0 6px 4px;
+}
+.contact-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.contact-form label span {
+  font-size: 14px;
+  color: var(--accent);
+  margin-inline: 12px;
+}
+.contact-form input,
+.contact-form textarea {
+  width: 100%;
+  background: var(--panel-in);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  padding: 14px 20px;
+  color: var(--text);
+  font: inherit;
+  font-size: clamp(15px, 1.4vw, 19px);
+  direction: rtl;
+  resize: vertical;
+}
+.contact-form input {
+  border-radius: 30px;
+  height: 54px;
+}
+.contact-form textarea {
+  min-height: 170px;
+}
+.contact-form input::placeholder,
+.contact-form textarea::placeholder {
+  color: var(--accent-dim);
+}
+.contact-form input:focus,
+.contact-form textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.topics button {
+  border: 1px solid var(--line);
+  background: var(--panel-in);
+  color: var(--accent);
+  border-radius: 99px;
+  padding: 7px 14px;
+  font-size: 14px;
+}
+.topics button.on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--panel);
+}
+.send-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+.btn-wa {
+  min-width: clamp(120px, 11vw, 150px);
+  height: clamp(52px, 4.4vw, 62px);
+  padding-inline: 24px;
+  border-radius: 50px;
+  background: #25d366;
+  color: #06331a;
+  font-size: clamp(16px, 1.5vw, 22px);
+}
+.btn-wa:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.contact-soon {
+  margin-top: 24px;
+  text-align: center;
+  color: var(--accent);
+}
 .sr {
   position: absolute;
   width: 1px;

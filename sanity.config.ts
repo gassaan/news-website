@@ -18,8 +18,8 @@ export default defineConfig({
       structure: (S) =>
         S.list()
           .title("Hulhangu")
-          .items(
-            [
+          .items([
+            ...[
               ["article", "publishedAt"],
               ["story", "publishedAt"],
               ["author", "title"],
@@ -33,7 +33,13 @@ export default defineConfig({
                 ]),
               ),
             ),
-          ),
+            S.divider(),
+            // A single document: the details on the Contact Us page.
+            S.listItem()
+              .title("ގުޅުއްވުމަށް")
+              .id("contactInfo")
+              .child(S.document().schemaType("contactInfo").documentId("contactInfo")),
+          ]),
     }),
   ],
   schema: { types: schemaTypes },

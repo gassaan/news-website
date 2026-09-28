@@ -34,6 +34,7 @@ const QUERY = `{
   "graphics": *[_type == "graphic" && defined(slug.current)] | order(date desc) { "slug": slug.current, title, date, "image": image ${img} },
   "albums": *[_type == "photoAlbum" && defined(slug.current)] | order(date desc) {
     "slug": slug.current, title, date, photographer, "photos": photos[] ${img} },
+  "contact": *[_type == "contactInfo"][0] { intro, email, phone, whatsapp, address, hours },
   "stamp": { "latest": *[] | order(_updatedAt desc)[0]._updatedAt, "count": count(*[]) }
 }`;
 
@@ -154,7 +155,9 @@ if (r.albums.length) {
   });
 }
 
+if (r.contact) cms.contact = r.contact;
+
 write(cms, images, `${r.stamp.latest ?? ""}|${r.stamp.count}`);
 console.log(
-  `[cms] Loaded from Sanity: ${Object.entries(cms).map(([k, v]) => `${v.length} ${k}`).join(", ") || "nothing yet (sample content stays)"}.`,
+  `[cms] Loaded from Sanity: ${Object.entries(cms).map(([k, v]) => (Array.isArray(v) ? `${v.length} ${k}` : k)).join(", ") || "nothing yet (sample content stays)"}.`,
 );

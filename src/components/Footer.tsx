@@ -24,7 +24,7 @@ export default function Footer() {
         <p className="brand-name">Hulhangu</p>
 
         <div className="flinks">
-          <a href="#">Contact Us</a>
+          <Link href="/contact">Contact Us</Link>
           <a href="#">Terms &amp; Conditions</a>
           <a href="#">Code of Conduct</a>
           <a href="#">Privacy Policy</a>
