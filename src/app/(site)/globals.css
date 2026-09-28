@@ -729,13 +729,24 @@ section {
   display: flex;
   align-items: center;
   gap: 4px;
-  background: #fff;
-  color: #1d0c46;
+  /* Dark pill with a glowing gold edge and star; same in both themes. */
+  background: rgba(8, 0, 24, 0.7);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  border: 1px solid #f2b632;
+  box-shadow:
+    0 0 14px rgba(242, 182, 50, 0.55),
+    inset 0 0 8px rgba(242, 182, 50, 0.25);
+  color: #ffffff;
   border-radius: 50px;
   padding: 5px 12px;
   font-family: var(--font-latin);
-  font-weight: 500;
+  font-weight: 600;
   font-size: 13px;
+}
+.story .rating svg {
+  fill: #ffd66b;
+  filter: drop-shadow(0 0 4px #ffd66b);
 }
 
 /* ---------- Categories ---------- */
