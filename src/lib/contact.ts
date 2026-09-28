@@ -14,13 +14,16 @@ const DEFAULT_INTRO =
 
 // Filled in the dashboard under "ގުޅުއްވުމަށް"; anything left empty is hidden on the page.
 export function getContactInfo(): ContactInfo {
-  const c = ((cmsData as { contact?: Partial<ContactInfo> }).contact ?? {}) as Partial<ContactInfo>;
+  // Fields left empty in the dashboard come through as null.
+  const c = ((cmsData as unknown as { contact?: { [K in keyof ContactInfo]?: string | null } }).contact ?? {});
   const clean = (v?: string | null) => (v ?? "").trim();
+  const wa = clean(c.whatsapp).replace(/[^\d]/g, "");
   return {
     intro: clean(c.intro) || DEFAULT_INTRO,
     email: clean(c.email),
     phone: clean(c.phone),
-    whatsapp: clean(c.whatsapp).replace(/[^\d]/g, ""),
+    // A local 7-digit Maldives number gets the 960 country code WhatsApp needs.
+    whatsapp: wa.length === 7 ? `960${wa}` : wa,
     address: clean(c.address),
     hours: clean(c.hours),
   };
