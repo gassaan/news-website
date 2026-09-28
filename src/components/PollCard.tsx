@@ -3,8 +3,6 @@
 import { useState } from "react";
 import { Poll } from "@/lib/articles";
 import ArticleImage from "./ArticleImage";
-import PollArt from "./PollArt";
-import { cmsImage } from "@/lib/cmsImages";
 
 export default function PollCard({ poll }: { poll: Poll }) {
   const [votes, setVotes] = useState(poll.votes);
@@ -25,11 +23,7 @@ export default function PollCard({ poll }: { poll: Poll }) {
 
   return (
     <form className={`poll ${done ? "done" : ""}`} onSubmit={submit}>
-      {cmsImage(poll.id) ? (
-        <ArticleImage slug={poll.id} alt="" className="poll-img" />
-      ) : (
-        <PollArt id={poll.id} />
-      )}
+      <ArticleImage slug={poll.id} alt="" className="poll-img" />
       <div className="poll-body">
         <h2>{poll.question}</h2>
         {poll.options.map((text, i) => {

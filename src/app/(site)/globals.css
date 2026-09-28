@@ -1619,55 +1619,6 @@ section {
   min-height: 300px;
   max-width: 100%;
 }
-/* Poll without a photo: the atolls as glowing dots on a night sea. */
-.poll-art {
-  position: relative;
-  overflow: hidden;
-  display: grid;
-  place-items: center;
-  background: radial-gradient(90% 80% at 50% 45%, #22307a, #0c0a2e 70%);
-}
-.poll-art svg {
-  position: absolute;
-  inset: 14px;
-  width: calc(100% - 28px);
-  height: calc(100% - 28px);
-}
-.poll-art svg.h {
-  display: none;
-}
-.poll-art circle {
-  fill: #7fd6ff;
-  opacity: 0.7;
-}
-.poll-art circle.glow {
-  fill: #ffffff;
-  opacity: 1;
-  filter: drop-shadow(0 0 3px #7fd6ff);
-  animation: atoll-twinkle 4s ease-in-out infinite;
-}
-@keyframes atoll-twinkle {
-  50% {
-    opacity: 0.35;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .poll-art circle.glow {
-    animation: none;
-  }
-}
-.poll-art-tag {
-  position: absolute;
-  bottom: 14px;
-  right: 14px;
-  background: rgba(8, 0, 24, 0.6);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
-  color: #fff;
-  font-size: 14px;
-  padding: 5px 16px;
-  border-radius: 99px;
-}
 .poll-body {
   display: flex;
   flex-direction: column;
@@ -2392,16 +2343,6 @@ footer .logo {
   .poll-img {
     min-height: 0;
     aspect-ratio: 320/185;
-  }
-  /* A little more height on phones for the sideways atoll chain. */
-  .poll-art {
-    aspect-ratio: 4/3;
-  }
-  .poll-art svg.v {
-    display: none;
-  }
-  .poll-art svg.h {
-    display: block;
   }
   #related .track {
     grid-auto-flow: row;
