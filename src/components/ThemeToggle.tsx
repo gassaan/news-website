@@ -41,9 +41,10 @@ export default function ThemeToggle({ className = "" }: { className?: string }) 
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
-        strokeWidth="2"
+        strokeWidth="1.48"
         strokeLinejoin="round"
       >
+        {/* 1.48 at 26px shows as 1.6px on screen, the same as the menu icon. */}
         <path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z" />
       </svg>
     </button>
