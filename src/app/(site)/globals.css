@@ -1980,19 +1980,16 @@ a.contact-card:hover {
   padding: clamp(16px, 2vw, 26px);
   box-shadow: var(--card-shadow);
 }
-.policy-num {
+.policy-icon {
   flex: none;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   display: grid;
   place-items: center;
   border-radius: 50%;
   background: var(--surface);
   border: 1px solid var(--line);
   color: var(--accent);
-  font-family: var(--font-latin);
-  font-weight: 600;
-  font-size: 15px;
 }
 .policy-section h2 {
   margin: 4px 0 8px;
@@ -2945,6 +2942,3 @@ footer .logo {
   font-weight: 500;
   font-size: 14px;
 }
-
-
-
