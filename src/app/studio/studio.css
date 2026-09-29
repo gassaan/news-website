@@ -7,17 +7,37 @@ button {
 }
 
 /* The editing form runs right-to-left like Dhivehi: labels, boxes and typing start on the right.
-   Menus, lists and buttons around it keep Sanity's normal layout. */
-[data-testid="form-view"] {
+   Menus, lists and buttons around it keep Sanity's normal layout. Items inside a list (such as
+   the sections of the Privacy Policy) open in a pop-up editor, which gets the same treatment. */
+[data-testid="form-view"],
+[data-testid="edit-portal-dialog"],
+[data-testid="popover-dialog"],
+[data-testid="popover-edit-dialog"],
+[data-testid="default-edit-object-dialog"],
+[data-testid="nested-object-dialog"] {
   direction: rtl;
 }
-[data-testid="form-view"] input[type="text"],
-[data-testid="form-view"] input:not([type]),
-[data-testid="form-view"] textarea {
+:is(
+    [data-testid="form-view"],
+    [data-testid="edit-portal-dialog"],
+    [data-testid="popover-dialog"],
+    [data-testid="popover-edit-dialog"],
+    [data-testid="default-edit-object-dialog"],
+    [data-testid="nested-object-dialog"]
+  )
+  :is(input[type="text"], input:not([type]), textarea) {
   direction: rtl;
   text-align: right;
 }
-[data-testid="form-view"] textarea {
+:is(
+    [data-testid="form-view"],
+    [data-testid="edit-portal-dialog"],
+    [data-testid="popover-dialog"],
+    [data-testid="popover-edit-dialog"],
+    [data-testid="default-edit-object-dialog"],
+    [data-testid="nested-object-dialog"]
+  )
+  textarea {
   font-size: 18px !important;
   line-height: 2 !important;
 }
