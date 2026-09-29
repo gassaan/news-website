@@ -35,6 +35,7 @@ const QUERY = `{
   "albums": *[_type == "photoAlbum" && defined(slug.current)] | order(date desc) {
     "slug": slug.current, title, date, photographer, "photos": photos[] ${img} },
   "contact": *[_type == "contactInfo"][0] { intro, email, phone, whatsapp, address, hours },
+  "privacy": *[_type == "privacyPolicy"][0] { intro, sections[] { heading, body }, _updatedAt },
   "stamp": { "latest": *[] | order(_updatedAt desc)[0]._updatedAt, "count": count(*[]) }
 }`;
 
@@ -156,6 +157,7 @@ if (r.albums.length) {
 }
 
 if (r.contact) cms.contact = r.contact;
+if (r.privacy) cms.privacy = r.privacy;
 
 write(cms, images, `${r.stamp.latest ?? ""}|${r.stamp.count}`);
 console.log(

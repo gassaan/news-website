@@ -1957,6 +1957,78 @@ a.contact-card:hover {
   text-align: center;
   color: var(--accent);
 }
+/* ---------- Privacy Policy page ---------- */
+.policy-page {
+  padding-top: clamp(28px, 5vw, 80px);
+}
+.policy-updated {
+  margin: -8px 0 18px;
+  font-size: 14px;
+  color: var(--accent);
+}
+.policy-sections {
+  display: grid;
+  gap: 12px;
+}
+.policy-section {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  padding: clamp(16px, 2vw, 26px);
+  box-shadow: var(--card-shadow);
+}
+.policy-num {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--accent);
+  font-family: var(--font-latin);
+  font-weight: 600;
+  font-size: 15px;
+}
+.policy-section h2 {
+  margin: 4px 0 8px;
+  font-family: var(--font-head);
+  font-size: clamp(18px, 1.7vw, 24px);
+  line-height: 1.5;
+  color: var(--text);
+}
+.policy-section p {
+  margin: 0 0 10px;
+  font-family: var(--font-reading);
+  font-size: clamp(16px, 1.4vw, 20px);
+  line-height: 2;
+  color: var(--art-ink);
+}
+.policy-section p:last-child {
+  margin-bottom: 0;
+}
+.policy-contact {
+  margin-top: clamp(24px, 3vw, 40px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  color: var(--accent);
+}
+.policy-contact p {
+  margin: 0;
+}
+.policy-contact .btn-solid {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
 .sr {
   position: absolute;
   width: 1px;

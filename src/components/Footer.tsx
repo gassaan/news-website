@@ -27,7 +27,7 @@ export default function Footer() {
           <Link href="/contact">Contact Us</Link>
           <a href="#">Terms &amp; Conditions</a>
           <a href="#">Code of Conduct</a>
-          <a href="#">Privacy Policy</a>
+          <Link href="/privacy">Privacy Policy</Link>
         </div>
 
         <div className="social" dir="ltr">

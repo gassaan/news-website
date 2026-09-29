@@ -39,6 +39,10 @@ export default defineConfig({
               .title("ގުޅުއްވުމަށް")
               .id("contactInfo")
               .child(S.document().schemaType("contactInfo").documentId("contactInfo")),
+            S.listItem()
+              .title("ޕްރައިވެސީ ޕޮލިސީ")
+              .id("privacyPolicy")
+              .child(S.document().schemaType("privacyPolicy").documentId("privacyPolicy")),
           ]),
     }),
   ],
