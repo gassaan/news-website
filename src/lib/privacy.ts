@@ -1,7 +1,4 @@
-import cmsData from "@/content/cms.json";
-
-export type PolicySection = { heading: string; paragraphs: string[] };
-export type PrivacyPolicy = { intro: string; sections: PolicySection[]; updated: string };
+import { readPolicy, type Policy, type PolicySection } from "./policy";
 
 // Shown until the policy is filled in the dashboard under "ޕްރައިވެސީ ޕޮލިސީ".
 const DEFAULT_UPDATED = "2026-09-29";
@@ -55,31 +52,6 @@ const DEFAULT_SECTIONS: PolicySection[] = [
   },
 ];
 
-type CmsPolicy = {
-  intro?: string | null;
-  sections?: { heading?: string | null; body?: string | null }[] | null;
-  _updatedAt?: string | null;
-};
-
-export function getPrivacyPolicy(): PrivacyPolicy {
-  const p = (cmsData as unknown as { privacy?: CmsPolicy }).privacy;
-  const sections = (p?.sections ?? [])
-    .map((s) => ({
-      heading: (s.heading ?? "").trim(),
-      // A blank line in the dashboard text starts a new paragraph.
-      paragraphs: (s.body ?? "")
-        .split(/\n\s*\n/)
-        .map((t) => t.trim())
-        .filter(Boolean),
-    }))
-    .filter((s) => s.heading || s.paragraphs.length);
-
-  if (!sections.length) {
-    return { intro: (p?.intro ?? "").trim() || DEFAULT_INTRO, sections: DEFAULT_SECTIONS, updated: DEFAULT_UPDATED };
-  }
-  return {
-    intro: (p?.intro ?? "").trim(),
-    sections,
-    updated: p?._updatedAt?.slice(0, 10) ?? DEFAULT_UPDATED,
-  };
+export function getPrivacyPolicy(): Policy {
+  return readPolicy("privacy", { intro: DEFAULT_INTRO, sections: DEFAULT_SECTIONS, updated: DEFAULT_UPDATED });
 }

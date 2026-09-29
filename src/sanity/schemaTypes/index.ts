@@ -2,7 +2,7 @@ import { article } from "./article";
 import { author } from "./author";
 import { contactInfo } from "./contactInfo";
 import { graphic, photoAlbum, poll } from "./media";
-import { privacyPolicy } from "./privacyPolicy";
+import { privacyPolicy, termsOfUse } from "./policyPages";
 import { story } from "./story";
 
-export const schemaTypes = [article, story, author, photoAlbum, graphic, poll, contactInfo, privacyPolicy];
+export const schemaTypes = [article, story, author, photoAlbum, graphic, poll, contactInfo, privacyPolicy, termsOfUse];

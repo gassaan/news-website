@@ -43,6 +43,10 @@ export default defineConfig({
               .title("ޕްރައިވެސީ ޕޮލިސީ")
               .id("privacyPolicy")
               .child(S.document().schemaType("privacyPolicy").documentId("privacyPolicy")),
+            S.listItem()
+              .title("ބޭނުންކުރުމުގެ ޝަރުތުތައް")
+              .id("termsOfUse")
+              .child(S.document().schemaType("termsOfUse").documentId("termsOfUse")),
           ]),
     }),
   ],

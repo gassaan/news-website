@@ -25,7 +25,7 @@ export default function Footer() {
 
         <div className="flinks">
           <Link href="/contact">Contact Us</Link>
-          <a href="#">Terms &amp; Conditions</a>
+          <Link href="/terms">Terms &amp; Conditions</Link>
           <a href="#">Code of Conduct</a>
           <Link href="/privacy">Privacy Policy</Link>
         </div>
