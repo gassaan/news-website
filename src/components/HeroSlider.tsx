@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Article } from "@/lib/articles";
 import ArticleImage from "./ArticleImage";
-import { cmsImage } from "@/lib/cmsImages";
 import Link from "next/link";
 
 export default function HeroSlider({ articles }: { articles: Article[] }) {
@@ -49,25 +48,20 @@ export default function HeroSlider({ articles }: { articles: Article[] }) {
   return (
     <div className="wrap hero">
       <div className="hero-track" ref={trackRef}>
-        {articles.map((article) => {
-          const photo = cmsImage(article.slug);
-          return (
-            <article className="slide" key={article.slug}>
-              {/* The story's own photo, blurred, colours the card behind the text. */}
-              {photo && <div className="slide-ambient" aria-hidden="true" style={{ backgroundImage: `url("${photo.src}")` }} />}
-              <div className="copy">
-                <h1>{article.title}</h1>
-                <p>{article.excerpt}</p>
-                <Link className="more hero-more" href={`/article/${article.slug}`}>
-                  ފުރިހަމައަށް ކިޔާލާ <span aria-hidden="true">›</span>
-                </Link>
-              </div>
-              <Link href={`/article/${article.slug}`} aria-label={article.title} tabIndex={-1}>
-                <ArticleImage slug={article.slug} alt="" />
+        {articles.map((article) => (
+          <article className="slide" key={article.slug}>
+            <div className="copy">
+              <h1>{article.title}</h1>
+              <p>{article.excerpt}</p>
+              <Link className="more hero-more" href={`/article/${article.slug}`}>
+                ފުރިހަމައަށް ކިޔާލާ <span aria-hidden="true">›</span>
               </Link>
-            </article>
-          );
-        })}
+            </div>
+            <Link href={`/article/${article.slug}`} aria-label={article.title} tabIndex={-1}>
+              <ArticleImage slug={article.slug} alt="" />
+            </Link>
+          </article>
+        ))}
       </div>
       <div className="dots">
         {articles.map((article, i) => (

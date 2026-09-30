@@ -524,36 +524,19 @@ section {
 .hero-track::-webkit-scrollbar {
   display: none;
 }
-/* Deep purple card in both themes; the story's photo, blurred, glows through behind the text. */
+/* Same colours as the site's news cards, in both themes. */
 .slide {
   scroll-snap-align: center;
-  position: relative;
-  isolation: isolate;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0;
-  background: #120630;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--surface);
+  border: 1px solid var(--line);
   border-radius: 50px;
+  box-shadow: var(--card-shadow);
   overflow: hidden;
   padding: 14px;
   min-height: clamp(420px, 48vw, 704px);
-}
-.slide-ambient {
-  position: absolute;
-  inset: -40px;
-  z-index: -2;
-  background-size: cover;
-  background-position: center;
-  filter: blur(40px) saturate(1.4);
-  opacity: 0.75;
-}
-.slide::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: linear-gradient(to left, rgba(38, 17, 94, 0.35), rgba(14, 4, 40, 0.85) 55%);
 }
 .slide > a {
   display: contents;
@@ -561,7 +544,8 @@ section {
 .slide .ph {
   border-radius: 40px;
   order: -1;
-  box-shadow: 0 18px 36px -12px rgba(0, 0, 0, 0.7);
+  border: 1px solid var(--line);
+  box-shadow: var(--img-shadow);
 }
 .slide .copy {
   padding: clamp(28px, 5vw, 88px) clamp(24px, 4vw, 60px);
@@ -577,10 +561,9 @@ section {
   line-height: 1.4;
   margin: 0;
   text-wrap: balance;
-  color: #fff;
 }
 .slide p {
-  color: #ece4ff;
+  color: var(--body-ink);
   font-size: clamp(16px, 1.6vw, 24px);
   line-height: 2.4;
   margin: 0;
@@ -590,17 +573,9 @@ section {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-/* The site's "more" pill, in see-through glass so it sits on the photo colours. */
+/* The site's "more" pill, as on the section headings. */
 .hero-more {
   align-self: flex-start;
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.25);
-  color: #fff;
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-}
-.hero-more:hover {
-  background: rgba(255, 255, 255, 0.2);
 }
 .dots {
   display: flex;
@@ -2735,9 +2710,6 @@ footer .logo {
     border-radius: 36px;
     min-height: 0;
     padding: 10px;
-  }
-  .slide::after {
-    background: linear-gradient(180deg, rgba(38, 17, 94, 0.35), rgba(14, 4, 40, 0.85) 60%);
   }
   .hero-track {
     border-radius: 36px;
