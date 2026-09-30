@@ -3,6 +3,7 @@ import Link from "next/link";
 import { stories } from "@/lib/articles";
 import ArticleBody from "@/components/ArticleBody";
 import EpisodeRatingWidget from "@/components/EpisodeRatingWidget";
+import { getStoryPoster, getStoryPosterStyle } from "@/lib/storyPosters";
 
 export function generateStaticParams() {
   return stories.flatMap((story) =>
@@ -36,17 +37,26 @@ export default async function StoryEpisodePage({
     episodeNumber > 1 ? `/story/${slug}/${episodeNumber - 1}` : null;
   const nextHref =
     episodeNumber < totalEpisodes ? `/story/${slug}/${episodeNumber + 1}` : null;
+  const poster = getStoryPoster(slug);
 
   return (
     <article className="story-page">
-      <header className="wrap art-head">
-        <Link className="cat-pill" href={`/story/${slug}`}>
-          ވާހަކަ
-        </Link>
-        <h1 className="headline">{story.title}</h1>
-        <p className="dateline">
-          {currentEpisode.title} <span aria-hidden="true">-</span> {episodeNumber}/{totalEpisodes}
-        </p>
+      {/* The story's poster fills the top and fades into the page behind the title. */}
+      <header className="ep-head" style={getStoryPosterStyle(slug)}>
+        {poster && (
+          <div className="ep-cover" aria-hidden="true">
+            <img src={poster} alt="" />
+          </div>
+        )}
+        <div className="wrap art-head">
+          <Link className="cat-pill" href={`/story/${slug}`}>
+            ވާހަކަ
+          </Link>
+          <h1 className="headline">{story.title}</h1>
+          <p className="dateline">
+            {currentEpisode.title} <span aria-hidden="true">-</span> {episodeNumber}/{totalEpisodes}
+          </p>
+        </div>
       </header>
 
       <div className="wrap">
