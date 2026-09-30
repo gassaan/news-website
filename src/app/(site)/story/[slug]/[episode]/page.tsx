@@ -63,23 +63,27 @@ export default async function StoryEpisodePage({
         <ArticleBody slug={`${slug}-${episodeNumber}`} paragraphs={currentEpisode.body} author={story.author} />
         <EpisodeRatingWidget slug={slug} episode={episodeNumber} />
 
-        <div className="mt-10 flex items-center justify-between">
-          {prevHref ? (
-            <Link href={prevHref} className="more">
+        {/* Full-width buttons, easy to reach with a thumb: next on top, previous below. */}
+        <nav className="ep-nav" aria-label="ބައިތައް">
+          {nextHref ? (
+            <Link href={nextHref} className="ep-btn solid">
+              ދެން އޮތް ބައި ކިޔާލާ
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M19 12H5M11 6l-6 6 6 6" />
+              </svg>
+            </Link>
+          ) : (
+            <p className="ep-end">ވާހަކަ ނިމިއްޖެ</p>
+          )}
+          {prevHref && (
+            <Link href={prevHref} className="ep-btn ghost">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M5 12h14M13 6l6 6-6 6" />
+              </svg>
               ކުރީގެ ބައި
             </Link>
-          ) : (
-            <span />
           )}
-
-          {nextHref ? (
-            <Link href={nextHref} className="btn-solid" style={{ alignSelf: "auto" }}>
-              ދެން އޮތް ބައި
-            </Link>
-          ) : (
-            <span className="text-muted text-sm">ވާހަކަ ނިމިއްޖެ</span>
-          )}
-        </div>
+        </nav>
       </div>
     </article>
   );
