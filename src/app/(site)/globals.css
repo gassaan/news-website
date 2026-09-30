@@ -524,23 +524,44 @@ section {
 .hero-track::-webkit-scrollbar {
   display: none;
 }
+/* Deep purple card in both themes; the story's photo, blurred, glows through behind the text. */
 .slide {
   scroll-snap-align: center;
+  position: relative;
+  isolation: isolate;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0;
-  background: var(--surface);
-  border: 1px solid var(--line);
+  background: #120630;
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 50px;
   overflow: hidden;
+  padding: 14px;
   min-height: clamp(420px, 48vw, 704px);
+}
+.slide-ambient {
+  position: absolute;
+  inset: -40px;
+  z-index: -2;
+  background-size: cover;
+  background-position: center;
+  filter: blur(40px) saturate(1.4);
+  opacity: 0.75;
+}
+.slide::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(to left, rgba(38, 17, 94, 0.35), rgba(14, 4, 40, 0.85) 55%);
 }
 .slide > a {
   display: contents;
 }
 .slide .ph {
-  border-radius: 50px;
+  border-radius: 40px;
   order: -1;
+  box-shadow: 0 18px 36px -12px rgba(0, 0, 0, 0.7);
 }
 .slide .copy {
   padding: clamp(28px, 5vw, 88px) clamp(24px, 4vw, 60px);
@@ -556,13 +577,30 @@ section {
   line-height: 1.4;
   margin: 0;
   text-wrap: balance;
+  color: #fff;
 }
 .slide p {
-  color: var(--body-ink);
+  color: #ece4ff;
   font-size: clamp(16px, 1.6vw, 24px);
   line-height: 2.4;
   margin: 0;
   max-width: 34ch;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+/* The site's "more" pill, in see-through glass so it sits on the photo colours. */
+.hero-more {
+  align-self: flex-start;
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #fff;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+.hero-more:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 .dots {
   display: flex;
@@ -2694,23 +2732,32 @@ footer .logo {
   .slide {
     grid-template-columns: 1fr;
     grid-template-rows: auto 1fr;
-    border-radius: 30px;
+    border-radius: 36px;
     min-height: 0;
+    padding: 10px;
+  }
+  .slide::after {
+    background: linear-gradient(180deg, rgba(38, 17, 94, 0.35), rgba(14, 4, 40, 0.85) 60%);
   }
   .hero-track {
-    border-radius: 30px;
+    border-radius: 36px;
   }
   .slide .ph {
     order: -1;
-    aspect-ratio: 388/356;
-    border-radius: 30px;
+    aspect-ratio: 388/320;
+    border-radius: 28px;
   }
   .slide .copy {
-    padding: 22px 24px 30px;
+    padding: 22px 14px 16px;
     gap: 12px;
   }
+  .slide h1 {
+    font-size: 27px;
+    line-height: 1.5;
+  }
   .slide p {
-    line-height: 2.1;
+    font-size: 16px;
+    line-height: 2;
   }
   section {
     padding-block: 40px 0;
