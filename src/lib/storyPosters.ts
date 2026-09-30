@@ -20,3 +20,10 @@ export function getStoryPosterStyle(slug: string): React.CSSProperties | undefin
   const focus = cmsImage(slug)?.pos ?? FOCUS[slug];
   return focus ? ({ "--poster-pos": focus } as React.CSSProperties) : undefined;
 }
+
+// An episode's own photo from the dashboard, or else the story poster.
+export function getEpisodePhoto(slug: string, episode: number): { src?: string; style?: React.CSSProperties } {
+  const own = cmsImage(`${slug}-ep-${episode}`);
+  if (own) return { src: own.src, style: own.pos ? ({ "--poster-pos": own.pos } as React.CSSProperties) : undefined };
+  return { src: getStoryPoster(slug), style: getStoryPosterStyle(slug) };
+}

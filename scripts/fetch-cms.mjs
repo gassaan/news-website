@@ -29,7 +29,7 @@ const QUERY = `{
   "articles": *[_type == "article" && defined(slug.current)] | order(publishedAt desc) {
     "slug": slug.current, title, excerpt, body, category, "author": author->title, publishedAt, _createdAt, featured, "image": image ${img} },
   "stories": *[_type == "story" && defined(slug.current)] | order(publishedAt desc) {
-    "slug": slug.current, title, excerpt, "author": author->title, publishedAt, _createdAt, "poster": poster ${img}, episodes[] { title, body } },
+    "slug": slug.current, title, excerpt, "author": author->title, publishedAt, _createdAt, "poster": poster ${img}, episodes[] { title, body, "image": image ${img} } },
   "polls": *[_type == "poll"] | order(publishedAt desc) { _id, title, options, "image": image ${img} },
   "graphics": *[_type == "graphic" && defined(slug.current)] | order(date desc) { "slug": slug.current, title, date, "image": image ${img} },
   "albums": *[_type == "photoAlbum" && defined(slug.current)] | order(date desc) {
@@ -113,7 +113,10 @@ if (reports.length) cms.reports = reports.map(toArticle);
 if (r.stories.length) {
   cms.stories = r.stories.map((s) => {
     addImage(s.slug, s.poster, 1600);
-    const episodes = (s.episodes ?? []).map((e) => ({ title: e.title, body: paragraphs(e.body) }));
+    const episodes = (s.episodes ?? []).map((e, i) => {
+      addImage(`${s.slug}-ep-${i + 1}`, e.image, 1600);
+      return { title: e.title, body: paragraphs(e.body) };
+    });
     const { date, time } = mvDateTime(s.publishedAt, s._createdAt);
     return {
       slug: s.slug,

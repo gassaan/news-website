@@ -3,7 +3,7 @@ import Link from "next/link";
 import { stories } from "@/lib/articles";
 import ArticleBody from "@/components/ArticleBody";
 import EpisodeRatingWidget from "@/components/EpisodeRatingWidget";
-import { getStoryPoster, getStoryPosterStyle } from "@/lib/storyPosters";
+import { getEpisodePhoto } from "@/lib/storyPosters";
 
 export function generateStaticParams() {
   return stories.flatMap((story) =>
@@ -37,15 +37,15 @@ export default async function StoryEpisodePage({
     episodeNumber > 1 ? `/story/${slug}/${episodeNumber - 1}` : null;
   const nextHref =
     episodeNumber < totalEpisodes ? `/story/${slug}/${episodeNumber + 1}` : null;
-  const poster = getStoryPoster(slug);
+  const cover = getEpisodePhoto(slug, episodeNumber);
 
   return (
     <article className="story-page">
-      {/* The story's poster fills the top and fades into the page behind the title. */}
-      <header className="ep-head" style={getStoryPosterStyle(slug)}>
-        {poster && (
+      {/* The episode's photo (or the story poster) fills the top and fades into the page behind the title. */}
+      <header className="ep-head" style={cover.style}>
+        {cover.src && (
           <div className="ep-cover" aria-hidden="true">
-            <img src={poster} alt="" />
+            <img src={cover.src} alt="" />
           </div>
         )}
         <div className="wrap art-head">

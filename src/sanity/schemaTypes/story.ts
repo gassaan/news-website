@@ -29,8 +29,11 @@ export const story = defineType({
           title: "ބައި",
           fields: [
             defineField({ name: "title", title: "ބައިގެ ނަން", type: "string", validation: (r) => r.required() }),
+            // Optional: shown at the top of this episode. Without it the story poster is used.
+            photoField("image", "ބައިގެ ފޮޓޯ"),
             bodyField(),
           ],
+          preview: { select: { title: "title", media: "image" } },
         }),
       ],
       validation: (r) => r.min(1),
