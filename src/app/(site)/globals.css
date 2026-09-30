@@ -2039,6 +2039,104 @@ a.contact-card:hover {
   align-items: center;
   justify-content: center;
 }
+/* ---------- Episode rating: stars that pop, with a word for each rating ---------- */
+.ep-rate {
+  margin-top: 32px;
+  padding-top: 26px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+.ep-rate-q {
+  margin: 0;
+  color: var(--accent);
+  font-size: 16px;
+}
+.ep-rate-stars {
+  display: flex;
+  gap: 4px;
+}
+.ep-star {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  transition: transform 0.2s;
+}
+.ep-star svg {
+  width: 42px;
+  height: 42px;
+}
+.ep-star path {
+  fill: transparent;
+  stroke: color-mix(in srgb, var(--accent) 55%, transparent);
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+  /* Stars fill one after another, starting from the first. */
+  transition:
+    fill 0.18s calc(var(--i) * 45ms),
+    stroke 0.18s calc(var(--i) * 45ms);
+}
+.ep-star.on path {
+  fill: #f2b632;
+  stroke: #f2b632;
+}
+.ep-star:hover {
+  transform: scale(1.1);
+}
+.ep-star.chosen {
+  transform: scale(1.22);
+  filter: drop-shadow(0 0 10px rgba(242, 182, 50, 0.75));
+  animation: star-pop 0.45s ease-out;
+}
+@keyframes star-pop {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.5) rotate(-8deg);
+  }
+  100% {
+    transform: scale(1.22);
+  }
+}
+.ep-rate-label {
+  margin: 0;
+  min-height: 38px;
+}
+.ep-rate-label span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--text);
+  border-radius: 99px;
+  padding: 6px 18px;
+  font-size: 15px;
+}
+.ep-rate-label svg {
+  width: 18px;
+  height: 18px;
+  fill: #f2b632;
+}
+.ep-rate-hint {
+  margin: 0;
+  font-size: 13px;
+  color: var(--accent);
+  opacity: 0.8;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ep-star.chosen {
+    animation: none;
+  }
+  .ep-star path {
+    transition: none;
+  }
+}
 .sr {
   position: absolute;
   width: 1px;
