@@ -3141,6 +3141,51 @@ footer .logo {
     color: var(--accent);
   }
 }
+/* Light mode: solid title with a soft light glow behind the text so it reads over busy photos. */
+:root[data-theme="light"] .story-hero h1 {
+  background: none;
+  color: var(--text);
+  text-shadow:
+    0 0 3px var(--ground),
+    0 0 14px var(--ground),
+    0 0 28px var(--ground);
+}
+:root[data-theme="light"] .story-hero-eps {
+  color: var(--text);
+  font-weight: 700;
+  text-shadow: 0 0 6px var(--ground), 0 0 12px var(--ground);
+}
+:root[data-theme="light"] .story-hero-text::before {
+  content: "";
+  position: absolute;
+  inset: -40px -20px -20px;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--ground) 72%, transparent), transparent);
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) .story-hero h1 {
+    background: none;
+    color: var(--text);
+    text-shadow:
+      0 0 3px var(--ground),
+      0 0 14px var(--ground),
+      0 0 28px var(--ground);
+  }
+  :root:not([data-theme="dark"]) .story-hero-eps {
+    color: var(--text);
+    font-weight: 700;
+    text-shadow: 0 0 6px var(--ground), 0 0 12px var(--ground);
+  }
+  :root:not([data-theme="dark"]) .story-hero-text::before {
+    content: "";
+    position: absolute;
+    inset: -40px -20px -20px;
+    z-index: -1;
+    pointer-events: none;
+    background: radial-gradient(closest-side, color-mix(in srgb, var(--ground) 72%, transparent), transparent);
+  }
+}
 /* Bouncing arrow under the capsules: tap to jump to the episodes. */
 .story-hero-down {
   display: grid;
