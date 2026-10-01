@@ -3078,6 +3078,69 @@ footer .logo {
 #episodes {
   scroll-margin-top: 100px;
 }
+/* Light mode: the story poster fades into the light page, like the episode page. */
+:root[data-theme="light"] .story-hero::after {
+  background: linear-gradient(
+    180deg,
+    transparent 25%,
+    color-mix(in srgb, var(--ground) 80%, transparent) 62%,
+    var(--ground) 96%
+  );
+}
+:root[data-theme="light"] .story-hero h1 {
+  background: linear-gradient(180deg, var(--text) 30%, var(--head-grad-end) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: none;
+}
+:root[data-theme="light"] .story-hero-chip {
+  background: var(--surface);
+  border-color: var(--line);
+  color: var(--accent);
+}
+:root[data-theme="light"] .story-hero-eps,
+:root[data-theme="light"] .story-hero-down {
+  color: var(--accent);
+}
+:root[data-theme="light"] .story-hero .author,
+:root[data-theme="light"] .story-hero .stat {
+  background: var(--surface);
+  border-color: var(--line);
+  color: var(--accent);
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) .story-hero::after {
+    background: linear-gradient(
+      180deg,
+      transparent 25%,
+      color-mix(in srgb, var(--ground) 80%, transparent) 62%,
+      var(--ground) 96%
+    );
+  }
+  :root:not([data-theme="dark"]) .story-hero h1 {
+    background: linear-gradient(180deg, var(--text) 30%, var(--head-grad-end) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: none;
+  }
+  :root:not([data-theme="dark"]) .story-hero-chip {
+    background: var(--surface);
+    border-color: var(--line);
+    color: var(--accent);
+  }
+  :root:not([data-theme="dark"]) .story-hero-eps,
+  :root:not([data-theme="dark"]) .story-hero-down {
+    color: var(--accent);
+  }
+  :root:not([data-theme="dark"]) .story-hero .author,
+  :root:not([data-theme="dark"]) .story-hero .stat {
+    background: var(--surface);
+    border-color: var(--line);
+    color: var(--accent);
+  }
+}
 /* Bouncing arrow under the capsules: tap to jump to the episodes. */
 .story-hero-down {
   display: grid;
