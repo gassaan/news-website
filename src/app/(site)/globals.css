@@ -3082,9 +3082,9 @@ footer .logo {
 :root[data-theme="light"] .story-hero::after {
   background: linear-gradient(
     180deg,
-    transparent 48%,
-    color-mix(in srgb, var(--ground) 55%, transparent) 72%,
-    var(--ground) 100%
+    transparent 36%,
+    color-mix(in srgb, var(--ground) 70%, transparent) 66%,
+    var(--ground) 98%
   );
 }
 :root[data-theme="light"] .story-hero h1 {
@@ -3113,9 +3113,9 @@ footer .logo {
   :root:not([data-theme="dark"]) .story-hero::after {
     background: linear-gradient(
       180deg,
-      transparent 48%,
-      color-mix(in srgb, var(--ground) 55%, transparent) 72%,
-      var(--ground) 100%
+      transparent 36%,
+      color-mix(in srgb, var(--ground) 70%, transparent) 66%,
+      var(--ground) 98%
     );
   }
   :root:not([data-theme="dark"]) .story-hero h1 {
