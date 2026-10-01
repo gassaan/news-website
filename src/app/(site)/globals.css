@@ -3043,16 +3043,41 @@ footer .logo {
   object-fit: cover;
   object-position: var(--poster-pos, 50% 50%);
 }
+/* A dark fade in both themes, like the story page, so the poster keeps its mood. */
 .ep-cover::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    180deg,
-    transparent 25%,
-    color-mix(in srgb, var(--ground) 80%, transparent) 62%,
-    var(--ground) 96%
-  );
+  background: linear-gradient(180deg, rgba(8, 0, 24, 0) 22%, rgba(8, 0, 24, 0.75) 58%, #080018 94%);
+}
+.ep-head:has(.ep-cover) {
+  background: #080018;
+  overflow: hidden;
+}
+/* In light mode the dark header ends in a rounded edge above the light page. */
+:root[data-theme="light"] .ep-head:has(.ep-cover) {
+  border-radius: 0 0 36px 36px;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) .ep-head:has(.ep-cover) {
+    border-radius: 0 0 36px 36px;
+  }
+}
+.ep-head:has(.ep-cover) .headline {
+  background: linear-gradient(180deg, #ffffff 30%, #a882ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.ep-head:has(.ep-cover) .cat-pill {
+  background: rgba(168, 130, 255, 0.2);
+  border-color: rgba(168, 130, 255, 0.5);
+  color: #e1d5ff;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+.ep-head:has(.ep-cover) .dateline {
+  color: #a882ff;
 }
 .ep-head:has(.ep-cover) .art-head {
   padding-top: clamp(230px, 30vw, 420px);
