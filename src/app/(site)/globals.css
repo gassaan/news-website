@@ -705,6 +705,11 @@ section {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  /* Letters fade from the text colour into purple, like article headlines. */
+  background: linear-gradient(180deg, var(--text) 35%, var(--head-grad-end) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 /* Calendar-style date: big day number, a thin divider, then month over year. */
 .card .meta {
