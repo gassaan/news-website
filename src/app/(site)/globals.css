@@ -712,32 +712,54 @@ section {
   color: transparent;
 }
 /* Calendar-style date: big day number, a thin divider, then month over year. */
-.card .meta {
+.date-stamp {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin: 18px 24px 0;
-  padding-block: 4px 20px;
   color: var(--accent);
   white-space: nowrap;
 }
-.card .meta b {
+.date-stamp b {
   font-family: var(--font-latin);
   font-weight: 700;
   font-size: clamp(19px, 1.7vw, 26px);
   line-height: 1;
 }
-.card .meta i {
+.date-stamp i {
   width: 1px;
   height: 22px;
   background: color-mix(in srgb, var(--accent) 35%, transparent);
 }
-.card .meta > span {
+.date-stamp > span {
   display: flex;
   flex-direction: column;
   font-size: clamp(10px, 0.85vw, 13px);
   line-height: 1.45;
   opacity: 0.85;
+}
+.date-stamp > .stamp-time {
+  font-size: clamp(13px, 1.1vw, 16px);
+  font-weight: 600;
+}
+.card .meta {
+  margin: 18px 24px 0;
+  padding-block: 4px 20px;
+}
+/* Article page: the same date, a touch larger under the headline. */
+.art-date {
+  gap: 10px;
+}
+.art-date b {
+  font-size: clamp(24px, 2.2vw, 32px);
+}
+.art-date i {
+  height: 26px;
+}
+.art-date > span {
+  font-size: clamp(11px, 1vw, 14px);
+}
+.art-date > .stamp-time {
+  font-size: clamp(15px, 1.3vw, 19px);
 }
 
 .story {

@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import {
   articles,
-  formatDhivehiDate,
   getArticle,
   getCategory,
   getPolls,
@@ -14,6 +13,7 @@ import {
 } from "@/lib/articles";
 import ArticleImage from "@/components/ArticleImage";
 import ArticleBody from "@/components/ArticleBody";
+import DateStamp from "@/components/DateStamp";
 import ArticleActions from "@/components/ArticleActions";
 import PollCard from "@/components/PollCard";
 import CommentSection from "@/components/CommentSection";
@@ -70,10 +70,7 @@ export default async function ArticlePage({
               </Link>
             )}
             <h1 className="headline">{article.title}</h1>
-            <p className="dateline">
-              {formatDhivehiDate(article.publishedAt)} <span aria-hidden="true">-</span>{" "}
-              {article.time ?? pseudoTime(article.slug)}
-            </p>
+            <DateStamp className="art-date" date={article.publishedAt} time={article.time ?? pseudoTime(article.slug)} />
           </header>
 
           <div className="wrap">
