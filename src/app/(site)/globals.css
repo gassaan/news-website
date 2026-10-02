@@ -710,7 +710,7 @@ section {
 .card .meta {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   margin: 18px 24px 0;
   padding-block: 4px 20px;
   color: var(--accent);
@@ -719,19 +719,19 @@ section {
 .card .meta b {
   font-family: var(--font-latin);
   font-weight: 700;
-  font-size: clamp(24px, 2.2vw, 32px);
+  font-size: clamp(19px, 1.7vw, 26px);
   line-height: 1;
 }
 .card .meta i {
   width: 1px;
-  height: 28px;
+  height: 22px;
   background: color-mix(in srgb, var(--accent) 35%, transparent);
 }
 .card .meta > span {
   display: flex;
   flex-direction: column;
-  font-size: clamp(12px, 1vw, 15px);
-  line-height: 1.5;
+  font-size: clamp(10px, 0.85vw, 13px);
+  line-height: 1.45;
   opacity: 0.85;
 }
 
