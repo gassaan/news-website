@@ -480,7 +480,6 @@ nav.main a[aria-current] {
 }
 .searchbox label:focus-within {
   border-color: var(--mh-ink);
-  box-shadow: 0 0 0 2px var(--mh-ink);
 }
 /* The browser's own blue clear button clashes with the theme; hide it. */
 .searchbox input::-webkit-search-cancel-button,
@@ -2594,7 +2593,6 @@ a.contact-card:hover {
 }
 .page-search label:focus-within {
   border-color: var(--accent);
-  box-shadow: inset 0 0 0 1px var(--accent);
 }
 .page-search input {
   flex: 1;
@@ -2901,7 +2899,7 @@ footer .logo {
   }
   /* Drawn inside the edge: the menu clips anything outside its width. */
   .m-search:focus-within {
-    box-shadow: inset 0 0 0 2px var(--mh-ink);
+    box-shadow: inset 0 0 0 1px var(--mh-ink);
   }
   .mobile-nav a {
     font-family: var(--font-head);
