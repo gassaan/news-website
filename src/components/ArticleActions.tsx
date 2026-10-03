@@ -26,12 +26,9 @@ export default function ArticleActions({ title }: { title: string }) {
 
   function jumpToComments(e: React.MouseEvent) {
     e.preventDefault();
-    // Unfold the comments first, then scroll once they are on the page.
-    window.dispatchEvent(new Event("comments:open"));
-    setTimeout(() => {
-      document.getElementById("commentForm")?.scrollIntoView({ behavior: "smooth", block: "start" });
-      setTimeout(() => document.getElementById("cName")?.focus({ preventScroll: true }), 400);
-    }, 50);
+    const form = document.getElementById("commentForm");
+    form?.scrollIntoView({ behavior: "smooth", block: "start" });
+    setTimeout(() => document.getElementById("cName")?.focus({ preventScroll: true }), 400);
   }
 
   return (

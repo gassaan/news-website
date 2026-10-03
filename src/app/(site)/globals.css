@@ -1808,10 +1808,10 @@ section {
   opacity: 0.9;
 }
 
-/* Comments start folded: one card-style bar the reader presses to open them. */
+/* Below the form, the comments stay folded behind one bar the reader presses. */
 .comments-toggle {
   width: 100%;
-  margin-top: clamp(48px, 6vw, 90px);
+  margin-top: 18px;
   display: flex;
   align-items: center;
   gap: 14px;
@@ -1894,9 +1894,6 @@ section {
     opacity: 0;
     transform: translateY(-8px);
   }
-}
-.comments-body > .comment-form {
-  margin-top: 18px;
 }
 .comment-form {
   margin-top: clamp(48px, 6vw, 90px);

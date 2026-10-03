@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Comment } from "@/lib/articles";
 
 type VoteState = "like" | "dislike" | null;
@@ -91,17 +91,10 @@ export default function CommentSection({
   const [name, setName] = useState("");
   const [text, setText] = useState("");
   const [moreShown, setMoreShown] = useState(false);
-  // Comments stay folded away until the reader asks to see them.
+  // The form is always shown; the comments below it stay folded until opened.
   const [open, setOpen] = useState(false);
   const nextId = useRef(0);
   const count = comments.reduce((n, c) => n + 1 + (c.replies?.length ?? 0), 0);
-
-  useEffect(() => {
-    const reveal = () => setOpen(true);
-    if (["#comments", "#commentForm"].includes(window.location.hash)) reveal();
-    window.addEventListener("comments:open", reveal);
-    return () => window.removeEventListener("comments:open", reveal);
-  }, []);
 
   function makeId(prefix: string): string {
     nextId.current += 1;
@@ -125,6 +118,7 @@ export default function CommentSection({
     };
     setComments((prev) => [c, ...prev]);
     setText("");
+    setOpen(true);
     // TODO(phase 2): save comment to database
   }
 
@@ -164,6 +158,36 @@ export default function CommentSection({
 
   return (
     <section className="wrap narrow comments-wrap" id="comments">
+      <form className="comment-form" id="commentForm" onSubmit={submitComment}>
+        <h2>ކޮމެންޓް</h2>
+        <label className="sr" htmlFor="cName">
+          ނަން
+        </label>
+        <input
+          id="cName"
+          type="text"
+          placeholder="ނަން"
+          required
+          maxLength={60}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+        <label className="sr" htmlFor="cText">
+          ކޮމެންޓް
+        </label>
+        <textarea
+          id="cText"
+          rows={6}
+          required
+          maxLength={1000}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+        />
+        <button className="btn-solid" type="submit">
+          ފޮނުއްވާ
+        </button>
+      </form>
+
       <button
         type="button"
         className="comments-toggle"
@@ -190,7 +214,7 @@ export default function CommentSection({
           </svg>
         </span>
         <span className="ct-text">
-          <b>ކޮމެންޓް</b>
+          <b>ކޮމެންޓްތައް</b>
           <span>{open ? "ކޮމެންޓްތައް ފޮރުވާ" : "ކޮމެންޓްތައް ބައްލަވާ"}</span>
         </span>
         <span className="ct-count num">{count}</span>
@@ -211,40 +235,6 @@ export default function CommentSection({
       </button>
 
       <div className="comments-body" id="commentsBody" hidden={!open}>
-        <form
-          className="comment-form"
-          id="commentForm"
-          onSubmit={submitComment}
-        >
-          <h2>ކޮމެންޓެއް ލިޔުއްވާ</h2>
-          <label className="sr" htmlFor="cName">
-            ނަން
-          </label>
-          <input
-            id="cName"
-            type="text"
-            placeholder="ނަން"
-            required
-            maxLength={60}
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-          <label className="sr" htmlFor="cText">
-            ކޮމެންޓް
-          </label>
-          <textarea
-            id="cText"
-            rows={6}
-            required
-            maxLength={1000}
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-          />
-          <button className="btn-solid" type="submit">
-            ފޮނުއްވާ
-          </button>
-        </form>
-
         <div className="comment-list" id="commentList">
           {comments.map((c) => (
             <article className="comment" key={c.id}>
