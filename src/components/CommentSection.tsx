@@ -1,13 +1,22 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Comment } from "@/lib/articles";
 
 type VoteState = "like" | "dislike" | null;
 
 function ReplyIcon() {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width="22"
+      height="22"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M9 14 4 9l5-5" />
       <path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11" />
     </svg>
@@ -51,24 +60,48 @@ function VoteButtons({
         onClick={() => setVote(id, vote === "dislike" ? null : "dislike")}
       >
         <span className="vi">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinejoin="round"
+          >
             <path d="M22 13.5A1.5 1.5 0 0 1 20.5 15h-2a1.5 1.5 0 0 1-1.5-1.5v-9A1.5 1.5 0 0 1 18.5 3h2A1.5 1.5 0 0 1 22 4.5zM15 14l-3.6 7a2.4 2.4 0 0 1-4.3-1.9L8.1 15H3.9a2 2 0 0 1-2-2.4l1.5-7.9A2.6 2.6 0 0 1 6 3h9z" />
           </svg>
         </span>
-        <span className="vn">{baseDislikes + (vote === "dislike" ? 1 : 0)}</span>
+        <span className="vn">
+          {baseDislikes + (vote === "dislike" ? 1 : 0)}
+        </span>
       </button>
     </div>
   );
 }
 
-export default function CommentSection({ initialComments }: { initialComments: Comment[] }) {
+export default function CommentSection({
+  initialComments,
+}: {
+  initialComments: Comment[];
+}) {
   const [comments, setComments] = useState(initialComments);
   const [votes, setVotes] = useState<Record<string, VoteState>>({});
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [text, setText] = useState("");
   const [moreShown, setMoreShown] = useState(false);
+  // Comments stay folded away until the reader asks to see them.
+  const [open, setOpen] = useState(false);
   const nextId = useRef(0);
+  const count = comments.reduce((n, c) => n + 1 + (c.replies?.length ?? 0), 0);
+
+  useEffect(() => {
+    const reveal = () => setOpen(true);
+    if (["#comments", "#commentForm"].includes(window.location.hash)) reveal();
+    window.addEventListener("comments:open", reveal);
+    return () => window.removeEventListener("comments:open", reveal);
+  }, []);
 
   function makeId(prefix: string): string {
     nextId.current += 1;
@@ -105,7 +138,9 @@ export default function CommentSection({ initialComments }: { initialComments: C
       dislikes: 0,
     };
     setComments((prev) =>
-      prev.map((c) => (c.id === parentId ? { ...c, replies: [...(c.replies ?? []), r] } : c)),
+      prev.map((c) =>
+        c.id === parentId ? { ...c, replies: [...(c.replies ?? []), r] } : c,
+      ),
     );
     setReplyingTo(null);
     // TODO(phase 2): save reply to database
@@ -129,103 +164,175 @@ export default function CommentSection({ initialComments }: { initialComments: C
 
   return (
     <section className="wrap narrow comments-wrap" id="comments">
-      <form className="comment-form" id="commentForm" onSubmit={submitComment}>
-        <h2>ކޮމެންޓް</h2>
-        <label className="sr" htmlFor="cName">
-          ނަން
-        </label>
-        <input
-          id="cName"
-          type="text"
-          placeholder="ނަން"
-          required
-          maxLength={60}
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <label className="sr" htmlFor="cText">
-          ކޮމެންޓް
-        </label>
-        <textarea
-          id="cText"
-          rows={6}
-          required
-          maxLength={1000}
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-        />
-        <button className="btn-solid" type="submit">
-          ފޮނުއްވާ
-        </button>
-      </form>
-
-      <div className="comment-list" id="commentList">
-        {comments.map((c) => (
-          <article className="comment" key={c.id}>
-            <header>
-              <strong>{c.author}</strong>
-              <time>{c.timeAgo}</time>
-            </header>
-            <p>{c.text}</p>
-            <div className="c-foot">
-              <button
-                type="button"
-                className="reply-btn"
-                aria-label="ޖަވާބު ދޭ"
-                onClick={() => setReplyingTo(replyingTo === c.id ? null : c.id)}
-              >
-                <ReplyIcon />
-              </button>
-              <VoteButtons
-                id={c.id}
-                baseLikes={c.likes}
-                baseDislikes={c.dislikes}
-                vote={votes[c.id] ?? null}
-                setVote={setVote}
-              />
-            </div>
-
-            {replyingTo === c.id && (
-              <ReplyForm onSubmit={(t) => submitReply(c.id, t)} />
-            )}
-
-            {c.replies?.map((r) => (
-              <article className="comment reply" key={r.id}>
-                <header>
-                  <strong>
-                    <span className="reply-tag">
-                      <ReplyIcon />
-                    </span>
-                    {r.author}
-                  </strong>
-                  <time>{r.timeAgo}</time>
-                </header>
-                <p>{r.text}</p>
-                <div className="c-foot">
-                  <button type="button" className="reply-btn" aria-label="ޖަވާބު ދޭ">
-                    <ReplyIcon />
-                  </button>
-                  <VoteButtons
-                    id={r.id}
-                    baseLikes={r.likes}
-                    baseDislikes={r.dislikes}
-                    vote={votes[r.id] ?? null}
-                    setVote={setVote}
-                  />
-                </div>
-              </article>
-            ))}
-          </article>
-        ))}
-      </div>
-
-      <div className="load-wrap">
-        <button type="button" className="more" id="moreComments" hidden={moreShown} onClick={loadMore}>
-          އިތުރު ކޮމެންޓް
-          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
-            <path d="M6.5 1v11M1 6.5h11" />
+      <button
+        type="button"
+        className="comments-toggle"
+        aria-expanded={open}
+        aria-controls="commentsBody"
+        onClick={() => setOpen((o) => !o)}
+      >
+        <span className="ct-icon" aria-hidden="true">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinejoin="round"
+          >
+            <path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.6-5A8.5 8.5 0 1 1 21 11.5z" />
+            <path
+              d="M8.5 11.5h.01M12.5 11.5h.01M16.5 11.5h.01"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+            />
           </svg>
-        </button>
+        </span>
+        <span className="ct-text">
+          <b>ކޮމެންޓް</b>
+          <span>{open ? "ކޮމެންޓްތައް ފޮރުވާ" : "ކޮމެންޓްތައް ބައްލަވާ"}</span>
+        </span>
+        <span className="ct-count num">{count}</span>
+        <span className="ct-chev" aria-hidden="true">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M3.5 6l4.5 4.5L12.5 6" />
+          </svg>
+        </span>
+      </button>
+
+      <div className="comments-body" id="commentsBody" hidden={!open}>
+        <form
+          className="comment-form"
+          id="commentForm"
+          onSubmit={submitComment}
+        >
+          <h2>ކޮމެންޓެއް ލިޔުއްވާ</h2>
+          <label className="sr" htmlFor="cName">
+            ނަން
+          </label>
+          <input
+            id="cName"
+            type="text"
+            placeholder="ނަން"
+            required
+            maxLength={60}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <label className="sr" htmlFor="cText">
+            ކޮމެންޓް
+          </label>
+          <textarea
+            id="cText"
+            rows={6}
+            required
+            maxLength={1000}
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+          />
+          <button className="btn-solid" type="submit">
+            ފޮނުއްވާ
+          </button>
+        </form>
+
+        <div className="comment-list" id="commentList">
+          {comments.map((c) => (
+            <article className="comment" key={c.id}>
+              <header>
+                <strong>{c.author}</strong>
+                <time>{c.timeAgo}</time>
+              </header>
+              <p>{c.text}</p>
+              <div className="c-foot">
+                <button
+                  type="button"
+                  className="reply-btn"
+                  aria-label="ޖަވާބު ދޭ"
+                  onClick={() =>
+                    setReplyingTo(replyingTo === c.id ? null : c.id)
+                  }
+                >
+                  <ReplyIcon />
+                </button>
+                <VoteButtons
+                  id={c.id}
+                  baseLikes={c.likes}
+                  baseDislikes={c.dislikes}
+                  vote={votes[c.id] ?? null}
+                  setVote={setVote}
+                />
+              </div>
+
+              {replyingTo === c.id && (
+                <ReplyForm onSubmit={(t) => submitReply(c.id, t)} />
+              )}
+
+              {c.replies?.map((r) => (
+                <article className="comment reply" key={r.id}>
+                  <header>
+                    <strong>
+                      <span className="reply-tag">
+                        <ReplyIcon />
+                      </span>
+                      {r.author}
+                    </strong>
+                    <time>{r.timeAgo}</time>
+                  </header>
+                  <p>{r.text}</p>
+                  <div className="c-foot">
+                    <button
+                      type="button"
+                      className="reply-btn"
+                      aria-label="ޖަވާބު ދޭ"
+                    >
+                      <ReplyIcon />
+                    </button>
+                    <VoteButtons
+                      id={r.id}
+                      baseLikes={r.likes}
+                      baseDislikes={r.dislikes}
+                      vote={votes[r.id] ?? null}
+                      setVote={setVote}
+                    />
+                  </div>
+                </article>
+              ))}
+            </article>
+          ))}
+        </div>
+
+        <div className="load-wrap">
+          <button
+            type="button"
+            className="more"
+            id="moreComments"
+            hidden={moreShown}
+            onClick={loadMore}
+          >
+            އިތުރު ކޮމެންޓް
+            <svg
+              width="13"
+              height="13"
+              viewBox="0 0 13 13"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+            >
+              <path d="M6.5 1v11M1 6.5h11" />
+            </svg>
+          </button>
+        </div>
       </div>
     </section>
   );
