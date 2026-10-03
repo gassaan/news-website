@@ -2690,7 +2690,7 @@ a.contact-card:hover {
   background: var(--line);
 }
 .chip[aria-selected="true"] {
-  border: 2px solid var(--chip-on);
+  border-color: var(--chip-on);
 }
 .cat-grid {
   display: grid;
