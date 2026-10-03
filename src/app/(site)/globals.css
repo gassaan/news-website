@@ -472,6 +472,22 @@ nav.main a[aria-current] {
 .searchbox input::placeholder {
   color: var(--accent-dim);
 }
+/* Show a clear outline while typing in the search box. */
+.searchbox label {
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+.searchbox label:focus-within {
+  border-color: var(--mh-ink);
+  box-shadow: 0 0 0 2px var(--mh-ink);
+}
+/* The browser's own blue clear button clashes with the theme; hide it. */
+.searchbox input::-webkit-search-cancel-button,
+.m-search input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
 .mobile-nav {
   display: none;
 }
@@ -2799,7 +2815,7 @@ footer .logo {
     background: var(--mh-field);
     border-radius: 112px;
     padding-inline: 28px 18px;
-    color: var(--accent);
+    color: var(--mh-ink);
     margin-bottom: 10px;
     box-shadow: 0 0 17px rgba(43, 43, 139, 0.06);
   }
@@ -2817,6 +2833,12 @@ footer .logo {
   .m-search input::placeholder {
     color: var(--mh-ink);
     opacity: 0.8;
+  }
+  .m-search {
+    transition: box-shadow 0.15s;
+  }
+  .m-search:focus-within {
+    box-shadow: 0 0 0 2px var(--mh-ink);
   }
   .mobile-nav a {
     font-family: var(--font-head);
