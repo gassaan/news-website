@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { categories } from "@/lib/articles";
 import Logo from "./Logo";
 import ThemeToggle from "./ThemeToggle";
@@ -11,6 +12,19 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const mobileNavRef = useRef<HTMLElement>(null);
   const mobileNavInnerRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+
+  // Both search boxes open the results page with what was typed.
+  function submitSearch(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const input = e.currentTarget.querySelector("input");
+    const q = input?.value.trim() ?? "";
+    if (!q) return;
+    input?.blur();
+    setSearchOpen(false);
+    setMenuOpen(false);
+    router.push(`/search/?q=${encodeURIComponent(q)}`);
+  }
 
   function toggleMenu() {
     if (mobileNavRef.current && mobileNavInnerRef.current) {
@@ -37,7 +51,14 @@ export default function Header() {
             <Link href="/gallery">ގެލެރީ</Link>
             <Link href={`/category/${categories[0].slug}`}>
               ކެޓެގަރީ
-              <svg width="14" height="8" viewBox="0 0 14 8" fill="none" stroke="currentColor" strokeWidth="1.6">
+              <svg
+                width="14"
+                height="8"
+                viewBox="0 0 14 8"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.6"
+              >
                 <path d="M1 1l6 6 6-6" />
               </svg>
             </Link>
@@ -54,7 +75,14 @@ export default function Header() {
               aria-expanded={searchOpen}
               onClick={() => setSearchOpen((v) => !v)}
             >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.6"
+              >
                 <circle cx="11" cy="11" r="8" />
                 <path d="M21 21l-4.3-4.3" />
               </svg>
@@ -94,15 +122,34 @@ export default function Header() {
           </div>
         </div>
 
-        <div className={`searchbox ${searchOpen ? "open" : ""}`}>
+        <form
+          className={`searchbox ${searchOpen ? "open" : ""}`}
+          role="search"
+          onSubmit={submitSearch}
+        >
           <label htmlFor="q">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-              <circle cx="11" cy="11" r="8" />
-              <path d="M21 21l-4.3-4.3" />
-            </svg>
-            <input id="q" type="search" placeholder="ހޯދަން ބޭނުންވާ އެއްޗެއް ލިޔެލާ....." />
+            <button type="submit" className="search-go" aria-label="ހޯދާ">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <path d="M21 21l-4.3-4.3" />
+              </svg>
+            </button>
+            <input
+              id="q"
+              name="q"
+              type="search"
+              enterKeyHint="search"
+              placeholder="ހޯދަން ބޭނުންވާ އެއްޗެއް ލިޔެލާ....."
+            />
           </label>
-        </div>
+        </form>
 
         <nav
           className={`mobile-nav ${menuOpen ? "open" : ""}`}
@@ -110,13 +157,30 @@ export default function Header() {
           ref={mobileNavRef}
         >
           <div className="mobile-nav-inner" ref={mobileNavInnerRef}>
-            <label className="m-search" htmlFor="mq">
-              <input id="mq" type="search" placeholder="ހޯދާ" />
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-                <circle cx="11" cy="11" r="8" />
-                <path d="M21 21l-4.3-4.3" />
-              </svg>
-            </label>
+            <form role="search" onSubmit={submitSearch}>
+              <label className="m-search" htmlFor="mq">
+                <input
+                  id="mq"
+                  name="q"
+                  type="search"
+                  enterKeyHint="search"
+                  placeholder="ހޯދާ"
+                />
+                <button type="submit" className="search-go" aria-label="ހޯދާ">
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                  >
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="M21 21l-4.3-4.3" />
+                  </svg>
+                </button>
+              </label>
+            </form>
             <Link href="/#latest" onClick={() => setMenuOpen(false)}>
               ފަހުގެ ޚަބަރު
             </Link>
@@ -129,7 +193,10 @@ export default function Header() {
             <Link href="/gallery" onClick={() => setMenuOpen(false)}>
               ގެލެރީ
             </Link>
-            <Link href={`/category/${categories[0].slug}`} onClick={() => setMenuOpen(false)}>
+            <Link
+              href={`/category/${categories[0].slug}`}
+              onClick={() => setMenuOpen(false)}
+            >
               ކެޓެގަރީ
             </Link>
           </div>
