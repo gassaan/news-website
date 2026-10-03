@@ -2837,8 +2837,9 @@ footer .logo {
   .m-search {
     transition: box-shadow 0.15s;
   }
+  /* Drawn inside the edge: the menu clips anything outside its width. */
   .m-search:focus-within {
-    box-shadow: 0 0 0 2px var(--mh-ink);
+    box-shadow: inset 0 0 0 2px var(--mh-ink);
   }
   .mobile-nav a {
     font-family: var(--font-head);
