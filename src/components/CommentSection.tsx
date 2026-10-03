@@ -188,51 +188,81 @@ export default function CommentSection({
         </button>
       </form>
 
-      <button
-        type="button"
-        className="comments-toggle"
-        aria-expanded={open}
-        aria-controls="commentsBody"
-        onClick={() => setOpen((o) => !o)}
-      >
-        <span className="ct-icon" aria-hidden="true">
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.6"
-            strokeLinejoin="round"
-          >
-            <path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.6-5A8.5 8.5 0 1 1 21 11.5z" />
-            <path
-              d="M8.5 11.5h.01M12.5 11.5h.01M16.5 11.5h.01"
-              strokeWidth="2.4"
+      {count === 0 ? (
+        // No comments yet: a quiet note in the same bar, nothing to open.
+        <div className="comments-toggle is-empty">
+          <span className="ct-icon" aria-hidden="true">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinejoin="round"
+            >
+              <path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.6-5A8.5 8.5 0 1 1 21 11.5z" />
+              <path
+                d="M8.5 11.5h.01M12.5 11.5h.01M16.5 11.5h.01"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+              />
+            </svg>
+          </span>
+          <span className="ct-text">
+            <b>އަދި ކޮމެންޓެއް ނެތް</b>
+            <span>ފުރަތަމަ ކޮމެންޓް ކުރައްވާ</span>
+          </span>
+        </div>
+      ) : (
+        <button
+          type="button"
+          className="comments-toggle"
+          aria-expanded={open}
+          aria-controls="commentsBody"
+          onClick={() => setOpen((o) => !o)}
+        >
+          <span className="ct-icon" aria-hidden="true">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinejoin="round"
+            >
+              <path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.6-5A8.5 8.5 0 1 1 21 11.5z" />
+              <path
+                d="M8.5 11.5h.01M12.5 11.5h.01M16.5 11.5h.01"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+              />
+            </svg>
+          </span>
+          <span className="ct-text">
+            <b>ކޮމެންޓްތައް</b>
+            <span>
+              {open ? "ކޮމެންޓްތައް ފޮރުވާ" : "ކޮމެންޓްތައް ބައްލަވާ"}
+            </span>
+          </span>
+          <span className="ct-count num">{count}</span>
+          <span className="ct-chev" aria-hidden="true">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
               strokeLinecap="round"
-            />
-          </svg>
-        </span>
-        <span className="ct-text">
-          <b>ކޮމެންޓްތައް</b>
-          <span>{open ? "ކޮމެންޓްތައް ފޮރުވާ" : "ކޮމެންޓްތައް ބައްލަވާ"}</span>
-        </span>
-        <span className="ct-count num">{count}</span>
-        <span className="ct-chev" aria-hidden="true">
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 16 16"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M3.5 6l4.5 4.5L12.5 6" />
-          </svg>
-        </span>
-      </button>
+              strokeLinejoin="round"
+            >
+              <path d="M3.5 6l4.5 4.5L12.5 6" />
+            </svg>
+          </span>
+        </button>
+      )}
 
       <div className="comments-body" id="commentsBody" hidden={!open}>
         <div className="comment-list" id="commentList">
@@ -306,7 +336,7 @@ export default function CommentSection({
             type="button"
             className="more"
             id="moreComments"
-            hidden={moreShown}
+            hidden={moreShown || initialComments.length === 0}
             onClick={loadMore}
           >
             އިތުރު ކޮމެންޓް

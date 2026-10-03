@@ -1883,6 +1883,12 @@ section {
 .comments-toggle[aria-expanded="true"] .ct-chev {
   transform: rotate(180deg);
 }
+.comments-toggle.is-empty {
+  cursor: default;
+}
+.comments-toggle.is-empty:hover {
+  background: var(--surface);
+}
 .comments-body[hidden] {
   display: none;
 }
