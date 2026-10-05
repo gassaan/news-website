@@ -8,12 +8,22 @@ const THUMBS = 3;
 
 // Album card in the news-card style: the cover photo, the next few photos as
 // small circles on its edge with a "+N" for the rest, then the title and date.
-export default function GalleryShot({ album }: { album: PhotoAlbum }) {
+// `featured` is the big card at the top of the gallery page.
+export default function GalleryShot({
+  album,
+  featured = false,
+}: {
+  album: PhotoAlbum;
+  featured?: boolean;
+}) {
   const thumbs = Math.max(0, Math.min(THUMBS, album.photoCount - 1));
   const rest = album.photoCount - 1 - thumbs;
 
   return (
-    <Link href={`/gallery/${album.slug}`} className="card shot-card">
+    <Link
+      href={`/gallery/${album.slug}`}
+      className={featured ? "card shot-card shot-feature" : "card shot-card"}
+    >
       <ArticleImage slug={albumPhotoSlug(album.slug, 0)} alt="" />
       {thumbs > 0 && (
         <div className="shot-thumbs" aria-hidden="true">
@@ -32,8 +42,21 @@ export default function GalleryShot({ album }: { album: PhotoAlbum }) {
           )}
         </div>
       )}
-      <h3>{album.title}</h3>
-      <DateStamp date={album.date} className="meta" />
+      {featured ? (
+        <>
+          <span className="album-new">އެންމެ އާ ގެލެރީ</span>
+          <h2>{album.title}</h2>
+          <div className="shot-foot">
+            <DateStamp date={album.date} />
+            <span className="shot-by">ފޮޓޯ: {album.photographer}</span>
+          </div>
+        </>
+      ) : (
+        <>
+          <h3>{album.title}</h3>
+          <DateStamp date={album.date} className="meta" />
+        </>
+      )}
     </Link>
   );
 }
