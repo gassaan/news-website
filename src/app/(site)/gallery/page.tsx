@@ -1,6 +1,6 @@
 import Link from "next/link";
 import AdSlot from "@/components/AdSlot";
-import AlbumCard from "@/components/AlbumCard";
+import GalleryShot from "@/components/GalleryShot";
 import ArticleImage from "@/components/ArticleImage";
 import PhotoCount from "@/components/PhotoCount";
 import { albumPhotoSlug, formatDhivehiDate, getPhotoAlbums } from "@/lib/articles";
@@ -52,7 +52,7 @@ export default function GalleryPage() {
         </div>
         <div className="album-grid">
           {rest.map((album) => (
-            <AlbumCard key={album.slug} album={album} />
+            <GalleryShot key={album.slug} album={album} />
           ))}
         </div>
       </div>

@@ -1135,66 +1135,6 @@ section {
   grid-template-columns: repeat(4, 1fr);
   gap: 40px 30px;
 }
-.album-card {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.album-stack {
-  position: relative;
-  isolation: isolate;
-  margin-top: 14px;
-}
-.album-stack::before,
-.album-stack::after {
-  content: "";
-  position: absolute;
-  height: 30px;
-  border-radius: 18px 18px 0 0;
-  border: 1px solid var(--line);
-  border-bottom: 0;
-}
-.album-stack::before {
-  inset: -7px 14px auto;
-  background: var(--line);
-}
-.album-stack::after {
-  inset: -14px 30px auto;
-  background: var(--surface);
-  z-index: -1;
-}
-.album-cover {
-  position: relative;
-  z-index: 1;
-  aspect-ratio: 4 / 3;
-  border-radius: 24px;
-  overflow: hidden;
-  border: 1px solid var(--line);
-  box-shadow: var(--card-shadow);
-}
-.album-cover .ph {
-  position: absolute;
-  inset: 0;
-  transition: transform 0.35s ease;
-}
-.album-card:hover .album-cover .ph {
-  transform: scale(1.05);
-}
-.album-card h3 {
-  margin: 4px 0 0;
-  font-family: var(--font-body);
-  font-weight: 700;
-  font-size: clamp(16px, 1.8vw, 26px);
-  line-height: 1.7;
-  color: var(--text);
-}
-.album-card time {
-  color: var(--accent);
-  font-family: var(--font-reading);
-  font-weight: 400;
-  font-size: clamp(12px, 1.2vw, 16px);
-}
-
 .album-crumb {
   color: var(--accent);
   font-size: clamp(16px, 1.6vw, 22px);
@@ -2878,15 +2818,6 @@ footer .logo {
   .album-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 28px 14px;
-  }
-  .album-cover {
-    border-radius: 18px;
-  }
-  .album-stack::before {
-    inset: -6px 10px auto;
-  }
-  .album-stack::after {
-    inset: -12px 22px auto;
   }
   .photo-grid {
     column-count: 2;

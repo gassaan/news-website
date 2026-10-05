@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import AlbumCard from "@/components/AlbumCard";
+import GalleryShot from "@/components/GalleryShot";
 import AlbumViewer from "@/components/AlbumViewer";
 import PhotoCount from "@/components/PhotoCount";
 import { albumPhotoSlug, formatDhivehiDate, getPhotoAlbum, getPhotoAlbums } from "@/lib/articles";
@@ -57,7 +57,7 @@ export default async function AlbumPage({ params }: PageProps<"/gallery/[slug]">
         </div>
         <div className="album-grid">
           {others.map((a) => (
-            <AlbumCard key={a.slug} album={a} />
+            <GalleryShot key={a.slug} album={a} />
           ))}
         </div>
       </section>
