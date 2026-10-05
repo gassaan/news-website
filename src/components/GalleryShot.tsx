@@ -44,11 +44,10 @@ export default function GalleryShot({
       )}
       {featured ? (
         <>
-          <span className="album-new">އެންމެ އާ ގެލެރީ</span>
+          <span className="album-new">އެންމެ ފަހުގެ ގެލެރީ</span>
           <h2>{album.title}</h2>
           <div className="shot-foot">
             <DateStamp date={album.date} />
-            <span className="shot-by">ފޮޓޯ: {album.photographer}</span>
           </div>
         </>
       ) : (

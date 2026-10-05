@@ -1106,11 +1106,6 @@ section {
   margin: 12px 24px 0;
   padding-bottom: 22px;
 }
-.shot-by {
-  color: var(--accent);
-  font-family: var(--font-reading);
-  font-size: clamp(13px, 1.2vw, 16px);
-}
 .gallery-sec-head {
   margin-top: clamp(40px, 5vw, 72px);
 }
