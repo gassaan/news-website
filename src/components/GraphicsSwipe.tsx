@@ -5,9 +5,9 @@ import ArticleImage from "./ArticleImage";
 import Lightbox from "./Lightbox";
 import { GRAPHIC_RATIO, Graphic } from "@/lib/articles";
 
-const AUTO_MS = 4500;
-// After a swipe or tap, wait this long before moving on by itself again.
-const RESUME_MS = 8000;
+const AUTO_MS = 3000;
+// After a touch, the next one comes this long after the finger lifts.
+const RESUME_MS = 5000;
 const FLY_MS = 450;
 // How far a card must be dragged before it counts as a swipe.
 const SWIPE_PX = 60;
@@ -26,7 +26,8 @@ export default function GraphicsSwipe({ graphics }: { graphics: Graphic[] }) {
   const [dragging, setDragging] = useState(false);
   const dragRef = useRef<{ x: number; y: number; moved: boolean } | null>(null);
   const suppressClick = useRef(false);
-  const pausedUntil = useRef(0);
+  // Restarts the countdown to the next graphic; set up by the autoplay effect.
+  const restartRef = useRef<(ms: number) => void>(() => {});
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const openRef = useRef(false);
   const triggerRef = useRef<HTMLElement | null>(null);
@@ -64,25 +65,26 @@ export default function GraphicsSwipe({ graphics }: { graphics: Graphic[] }) {
       { threshold: 0.5 },
     );
     observer.observe(stack);
-    const timer = setInterval(() => {
-      if (
-        !visible ||
-        openRef.current ||
-        document.hidden ||
-        Date.now() < pausedUntil.current
-      )
-        return;
-      next(1);
-    }, AUTO_MS);
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    function restart(ms: number) {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        if (visible && !openRef.current && !document.hidden) next(1);
+        restart(AUTO_MS);
+      }, ms);
+    }
+    restartRef.current = restart;
+    restart(AUTO_MS);
     return () => {
-      clearInterval(timer);
+      clearTimeout(timer);
+      restartRef.current = () => {};
       observer.disconnect();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [n]);
 
   function onPointerDown(e: React.PointerEvent) {
-    pausedUntil.current = Date.now() + RESUME_MS;
+    restartRef.current(RESUME_MS);
     // A new touch starts fresh: the click after a drag may land outside the card.
     suppressClick.current = false;
     dragRef.current = { x: e.clientX, y: e.clientY, moved: false };
@@ -108,6 +110,7 @@ export default function GraphicsSwipe({ graphics }: { graphics: Graphic[] }) {
     setDragX(dx);
   }
   function onPointerUp() {
+    restartRef.current(RESUME_MS);
     const d = dragRef.current;
     dragRef.current = null;
     if (!d?.moved) return;
@@ -201,7 +204,7 @@ export default function GraphicsSwipe({ graphics }: { graphics: Graphic[] }) {
               aria-label={`${i + 1} / ${n}`}
               aria-current={i === active}
               onClick={() => {
-                pausedUntil.current = Date.now() + RESUME_MS;
+                restartRef.current(RESUME_MS);
                 show(i);
               }}
             />
