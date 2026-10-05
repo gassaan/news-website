@@ -2,14 +2,16 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import GalleryShot from "@/components/GalleryShot";
 import AlbumViewer from "@/components/AlbumViewer";
-import PhotoCount from "@/components/PhotoCount";
-import { albumPhotoSlug, formatDhivehiDate, getPhotoAlbum, getPhotoAlbums } from "@/lib/articles";
+import DateStamp from "@/components/DateStamp";
+import { albumPhotoSlug, getPhotoAlbum, getPhotoAlbums } from "@/lib/articles";
 
 export function generateStaticParams() {
   return getPhotoAlbums().map((album) => ({ slug: album.slug }));
 }
 
-export default async function AlbumPage({ params }: PageProps<"/gallery/[slug]">) {
+export default async function AlbumPage({
+  params,
+}: PageProps<"/gallery/[slug]">) {
   const { slug } = await params;
   const album = getPhotoAlbum(slug);
 
@@ -25,7 +27,16 @@ export default async function AlbumPage({ params }: PageProps<"/gallery/[slug]">
     <div className="wrap album-page">
       <div className="page-head">
         <Link className="back" href="/gallery" aria-label="ފަހަތަށް">
-          <svg width="14" height="26" viewBox="0 0 13 26" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            width="14"
+            height="26"
+            viewBox="0 0 13 26"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <path d="M1 1l11 12L1 25" />
           </svg>
         </Link>
@@ -36,15 +47,24 @@ export default async function AlbumPage({ params }: PageProps<"/gallery/[slug]">
 
       <header className="album-head">
         <h1 className="headline">{album.title}</h1>
-        <p className="album-meta">
-          <time dateTime={album.date}>{formatDhivehiDate(album.date)}</time>
-          <PhotoCount count={album.photoCount} className="photo-count-inline" />
-          <span>ފޮޓޯ: {album.photographer}</span>
-        </p>
+        {/* Same calendar date as the article page, with the photo count beside it. */}
+        <div className="album-meta">
+          <DateStamp className="art-date" date={album.date} />
+          <i className="album-meta-rule" aria-hidden="true" />
+          <span className="album-count" aria-label={`${album.photoCount} ފޮޓޯ`}>
+            <b className="num" aria-hidden="true">
+              {album.photoCount}
+            </b>
+            <span aria-hidden="true">ފޮޓޯ</span>
+          </span>
+        </div>
+        <p className="album-by">ފޮޓޯ: {album.photographer}</p>
       </header>
 
       <AlbumViewer
-        photos={Array.from({ length: album.photoCount }, (_, i) => albumPhotoSlug(album.slug, i))}
+        photos={Array.from({ length: album.photoCount }, (_, i) =>
+          albumPhotoSlug(album.slug, i),
+        )}
         title={album.title}
       />
 
