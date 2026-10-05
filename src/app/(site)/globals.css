@@ -909,20 +909,26 @@ section {
   direction: ltr;
 }
 
-/* ---------- Graphics: flat picture cards that swipe and move on by themselves ---------- */
-.gfx-row {
-  --gfx-pad: max(16px, calc((100% - var(--wrap, 1260px)) / 2 + 16px));
-  display: flex;
-  gap: 14px;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
-  padding-inline: var(--gfx-pad);
-  scroll-padding-inline: var(--gfx-pad);
-  padding-block: 4px 8px;
+/* ---------- Graphics: a small pile of cards; the top one slides away ---------- */
+.gfx-stack {
+  display: grid;
+  justify-content: center;
+  padding: 6px 16px 22px;
+  /* Room for the cards peeking out behind; vertical drags still scroll the page. */
+  overflow: hidden;
+  touch-action: pan-y;
+  user-select: none;
 }
-.gfx-row::-webkit-scrollbar {
-  display: none;
+.gfx-stack .gfx-card {
+  grid-area: 1 / 1;
+  transition:
+    transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1),
+    opacity 0.5s;
+  will-change: transform;
+}
+.gfx-stack img {
+  -webkit-user-drag: none;
+  pointer-events: none;
 }
 .gfx-card {
   position: relative;
@@ -957,7 +963,12 @@ section {
   border-radius: 999px;
 }
 .gfx-sec .dots {
-  margin-top: 16px;
+  margin-top: 4px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .gfx-stack .gfx-card {
+    transition-duration: 0.01s;
+  }
 }
 
 /* ---------- Gallery ---------- */

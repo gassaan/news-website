@@ -8,139 +8,202 @@ import { GRAPHIC_RATIO, Graphic } from "@/lib/articles";
 const AUTO_MS = 4500;
 // After a swipe or tap, wait this long before moving on by itself again.
 const RESUME_MS = 8000;
+const FLY_MS = 450;
+// How far a card must be dragged before it counts as a swipe.
+const SWIPE_PX = 60;
 const NEW_FOR_MS = 2 * 24 * 60 * 60 * 1000;
 
+// The graphics sit in a small pile: the top one slides away to show the next.
 export default function GraphicsSwipe({ graphics }: { graphics: Graphic[] }) {
-  const trackRef = useRef<HTMLDivElement>(null);
+  const n = graphics.length;
+  const stackRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
   const activeRef = useRef(0);
+  const [leaving, setLeaving] = useState<{ index: number; dir: 1 | -1 } | null>(
+    null,
+  );
+  const [dragX, setDragX] = useState(0);
+  const [dragging, setDragging] = useState(false);
+  const dragRef = useRef<{ x: number; y: number; moved: boolean } | null>(null);
+  const suppressClick = useRef(false);
+  const pausedUntil = useRef(0);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const openRef = useRef(false);
   const triggerRef = useRef<HTMLElement | null>(null);
   const [now, setNow] = useState<number | null>(null);
 
-  function goTo(i: number) {
-    const track = trackRef.current;
-    const card = track?.children[i] as HTMLElement | undefined;
-    if (!track || !card) return;
-    const cardCenter = card.getBoundingClientRect().left + card.offsetWidth / 2;
-    const trackCenter =
-      track.getBoundingClientRect().left + track.clientWidth / 2;
-    track.scrollBy({ left: cardCenter - trackCenter, behavior: "smooth" });
+  function show(i: number) {
+    activeRef.current = (i + n) % n;
+    setActive(activeRef.current);
   }
 
-  // The card nearest the middle is the current one.
+  // The top card flies off (right by default) and the next one rises.
+  function next(dir: 1 | -1 = 1) {
+    const from = activeRef.current;
+    setLeaving({ index: from, dir });
+    show(from + 1);
+    setTimeout(() => setLeaving((l) => (l?.index === from ? null : l)), FLY_MS);
+  }
+
+  // The "new" badge depends on today's date, so it is only worked out in the browser.
   useEffect(() => {
-    const track = trackRef.current;
-    if (!track) return;
-    let frame: number | null = null;
-    function update() {
-      frame = null;
-      if (!track) return;
-      const rect = track.getBoundingClientRect();
-      const center = rect.left + rect.width / 2;
-      let nearest = 0;
-      let best = Infinity;
-      (Array.from(track.children) as HTMLElement[]).forEach((card, i) => {
-        const r = card.getBoundingClientRect();
-        const dist = Math.abs(r.left + r.width / 2 - center);
-        if (dist < best) {
-          best = dist;
-          nearest = i;
-        }
-      });
-      if (nearest !== activeRef.current) {
-        activeRef.current = nearest;
-        setActive(nearest);
-      }
-    }
-    function onScroll() {
-      if (frame == null) frame = requestAnimationFrame(update);
-    }
-    setNow(Date.now());
-    track.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-    return () => {
-      track.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-      if (frame != null) cancelAnimationFrame(frame);
-    };
+    const id = requestAnimationFrame(() => setNow(Date.now()));
+    return () => cancelAnimationFrame(id);
   }, []);
 
-  // Moves to the next graphic every few seconds, only while it is on screen and
-  // nobody is touching it; back to the first after the last.
+  // Moves on every few seconds, only while on screen and nobody is touching it.
   useEffect(() => {
-    const track = trackRef.current;
-    if (!track || graphics.length < 2) return;
+    const stack = stackRef.current;
+    if (!stack || n < 2) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     let visible = false;
-    let pausedUntil = 0;
-    const pause = () => {
-      pausedUntil = Date.now() + RESUME_MS;
-    };
     const observer = new IntersectionObserver(
       ([entry]) => {
         visible = entry.isIntersecting;
       },
       { threshold: 0.5 },
     );
-    observer.observe(track);
+    observer.observe(stack);
     const timer = setInterval(() => {
       if (
         !visible ||
         openRef.current ||
         document.hidden ||
-        Date.now() < pausedUntil
+        Date.now() < pausedUntil.current
       )
         return;
-      goTo((activeRef.current + 1) % graphics.length);
+      next(1);
     }, AUTO_MS);
-    track.addEventListener("pointerdown", pause, { passive: true });
-    track.addEventListener("touchstart", pause, { passive: true });
-    track.addEventListener("wheel", pause, { passive: true });
     return () => {
       clearInterval(timer);
       observer.disconnect();
-      track.removeEventListener("pointerdown", pause);
-      track.removeEventListener("touchstart", pause);
-      track.removeEventListener("wheel", pause);
     };
-  }, [graphics.length]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [n]);
+
+  function onPointerDown(e: React.PointerEvent) {
+    pausedUntil.current = Date.now() + RESUME_MS;
+    // A new touch starts fresh: the click after a drag may land outside the card.
+    suppressClick.current = false;
+    dragRef.current = { x: e.clientX, y: e.clientY, moved: false };
+  }
+  function onPointerMove(e: React.PointerEvent) {
+    const d = dragRef.current;
+    if (!d) return;
+    const dx = e.clientX - d.x;
+    if (!d.moved) {
+      // Up/down movement is a page scroll, not a swipe.
+      if (
+        Math.abs(e.clientY - d.y) > Math.abs(dx) &&
+        Math.abs(e.clientY - d.y) > 8
+      ) {
+        dragRef.current = null;
+        return;
+      }
+      if (Math.abs(dx) < 8) return;
+      d.moved = true;
+      setDragging(true);
+      (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
+    }
+    setDragX(dx);
+  }
+  function onPointerUp() {
+    const d = dragRef.current;
+    dragRef.current = null;
+    if (!d?.moved) return;
+    suppressClick.current = true;
+    setDragging(false);
+    // Swipe right: next one. Swipe left: back to the one before.
+    if (dragX > SWIPE_PX) next(1);
+    else if (dragX < -SWIPE_PX) show(activeRef.current - 1);
+    setDragX(0);
+  }
 
   function open(i: number, trigger: HTMLElement) {
+    if (suppressClick.current) {
+      suppressClick.current = false;
+      return;
+    }
     triggerRef.current = trigger;
     openRef.current = true;
     setOpenIndex(i);
   }
 
+  function cardStyle(i: number): React.CSSProperties {
+    if (leaving?.index === i) {
+      return {
+        zIndex: 200,
+        opacity: 0,
+        transform: `translateX(${leaving.dir * 115}%) rotate(${leaving.dir * 10}deg)`,
+      };
+    }
+    const k = (i - active + n) % n;
+    if (k === 0) {
+      return {
+        zIndex: 100,
+        transform: `translateX(${dragX}px) rotate(${dragX / 25}deg)`,
+        transition: dragging ? "none" : undefined,
+      };
+    }
+    if (k < 3) {
+      return {
+        zIndex: 100 - k,
+        opacity: 1 - k * 0.25,
+        transform: `translateX(${-k * 16}px) translateY(${k * 10}px) scale(${1 - k * 0.06}) rotate(${-k * 3}deg)`,
+      };
+    }
+    return {
+      zIndex: 0,
+      opacity: 0,
+      transform: "translateX(-40px) scale(0.8)",
+      pointerEvents: "none",
+    };
+  }
+
   return (
     <>
-      <div className="gfx-row" ref={trackRef}>
-        {graphics.map((graphic, i) => (
-          <button
-            type="button"
-            className="gfx-card"
-            key={graphic.slug}
-            aria-label={graphic.title}
-            onClick={(e) => open(i, e.currentTarget)}
-          >
-            {now !== null && now - Date.parse(graphic.date) < NEW_FOR_MS && (
-              <span className="gfx-new">އާ</span>
-            )}
-            <ArticleImage slug={graphic.slug} alt="" className="gfx" />
-          </button>
-        ))}
+      <div
+        className="gfx-stack"
+        ref={stackRef}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerUp}
+      >
+        {graphics.map((graphic, i) => {
+          const top = i === active;
+          return (
+            <button
+              type="button"
+              className="gfx-card"
+              key={graphic.slug}
+              style={cardStyle(i)}
+              aria-label={graphic.title}
+              aria-hidden={!top}
+              tabIndex={top ? 0 : -1}
+              onClick={(e) => open(i, e.currentTarget)}
+            >
+              {now !== null && now - Date.parse(graphic.date) < NEW_FOR_MS && (
+                <span className="gfx-new">އާ</span>
+              )}
+              <ArticleImage slug={graphic.slug} alt="" className="gfx" />
+            </button>
+          );
+        })}
       </div>
 
-      {graphics.length > 1 && (
+      {n > 1 && (
         <div className="wrap dots">
           {graphics.map((graphic, i) => (
             <button
               key={graphic.slug}
               type="button"
-              aria-label={`${i + 1} / ${graphics.length}`}
+              aria-label={`${i + 1} / ${n}`}
               aria-current={i === active}
-              onClick={() => goTo(i)}
+              onClick={() => {
+                pausedUntil.current = Date.now() + RESUME_MS;
+                show(i);
+              }}
             />
           ))}
         </div>
