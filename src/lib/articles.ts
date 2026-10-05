@@ -1100,6 +1100,11 @@ export function getAuthorSlug(authorName: string): string {
   return AUTHOR_SLUG_BY_NAME[authorName] ?? authors[0].slug;
 }
 
+// Only an exact name match: photographers who are not writers have no author page.
+export function findAuthorSlug(name: string): string | undefined {
+  return AUTHOR_SLUG_BY_NAME[name];
+}
+
 export function getAuthor(slug: string): Author | undefined {
   return authors.find((a) => a.slug === slug);
 }

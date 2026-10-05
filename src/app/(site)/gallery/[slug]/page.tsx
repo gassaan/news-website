@@ -3,7 +3,14 @@ import Link from "next/link";
 import GalleryShot from "@/components/GalleryShot";
 import AlbumViewer from "@/components/AlbumViewer";
 import DateStamp from "@/components/DateStamp";
-import { albumPhotoSlug, getPhotoAlbum, getPhotoAlbums } from "@/lib/articles";
+import ArticleImage from "@/components/ArticleImage";
+import { getAuthorPhoto } from "@/lib/authorPhotos";
+import {
+  albumPhotoSlug,
+  findAuthorSlug,
+  getPhotoAlbum,
+  getPhotoAlbums,
+} from "@/lib/articles";
 
 export function generateStaticParams() {
   return getPhotoAlbums().map((album) => ({ slug: album.slug }));
@@ -19,6 +26,7 @@ export default async function AlbumPage({
     notFound();
   }
 
+  const photographerSlug = findAuthorSlug(album.photographer);
   const others = getPhotoAlbums()
     .filter((a) => a.slug !== album.slug)
     .slice(0, 4);
@@ -58,7 +66,39 @@ export default async function AlbumPage({
             <span aria-hidden="true">ފޮޓޯ</span>
           </span>
         </div>
-        <p className="album-by">ފޮޓޯ: {album.photographer}</p>
+        {/* The same author capsule as the article page; it links when the photographer has a page. */}
+        {photographerSlug ? (
+          <Link
+            href={`/author/${photographerSlug}`}
+            className="author album-author"
+          >
+            <ArticleImage
+              slug={`author-${photographerSlug}`}
+              src={getAuthorPhoto(photographerSlug)}
+              alt={album.photographer}
+              className="avatar"
+            />
+            <span>{album.photographer}</span>
+          </Link>
+        ) : (
+          <span className="author album-author">
+            <span className="avatar avatar-blank" aria-hidden="true">
+              <svg
+                width="26"
+                height="26"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.7"
+                strokeLinecap="round"
+              >
+                <circle cx="12" cy="8.5" r="4" />
+                <path d="M4.5 20.5c1.2-3.6 4-5.5 7.5-5.5s6.3 1.9 7.5 5.5" />
+              </svg>
+            </span>
+            <span>{album.photographer}</span>
+          </span>
+        )}
       </header>
 
       <AlbumViewer
