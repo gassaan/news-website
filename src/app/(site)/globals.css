@@ -918,6 +918,8 @@ section {
   overflow: hidden;
   touch-action: pan-y;
   user-select: none;
+  /* Keep the cards' stacking order inside the pile, under the sticky header. */
+  isolation: isolate;
 }
 .gfx-stack .gfx-card {
   grid-area: 1 / 1;
