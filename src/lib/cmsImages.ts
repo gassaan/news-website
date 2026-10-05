@@ -7,3 +7,9 @@ export type CmsImage = { src: string; pos?: string };
 export function cmsImage(key: string): CmsImage | undefined {
   return (images as Record<string, CmsImage>)[key];
 }
+
+// Full-size JPEG of a dashboard photo, for saving and sharing.
+export function fullImage(key: string): string | undefined {
+  const src = cmsImage(key)?.src;
+  return src ? `${src.split("?")[0]}?w=1600&fm=jpg&q=90` : undefined;
+}

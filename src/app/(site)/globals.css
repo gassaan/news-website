@@ -909,84 +909,42 @@ section {
   direction: ltr;
 }
 
-/* ---------- Graphics band ---------- */
-.graphics {
-  background: var(--surface);
-  margin-top: 56px;
-  padding-block: 32px;
-  overflow: hidden;
-}
-.gfx {
-  aspect-ratio: 1;
-  border-radius: 30px;
-  max-width: 100%;
-  height: 100%;
-}
-/* Light mode: the band takes the header purple, fading darker, with light text. */
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme="dark"]) .graphics {
-    --accent: #e1d5ff;
-    --accent-dim: #a882ff;
-    --text: #ffffff;
-    --surface: #291359;
-    --line: #5b3aa3;
-    background: linear-gradient(180deg, #3e2180 0%, #291359 100%);
-  }
-}
-:root[data-theme="light"] .graphics {
-  --accent: #e1d5ff;
-  --accent-dim: #a882ff;
-  --text: #ffffff;
-  --surface: #291359;
-  --line: #5b3aa3;
-  background: linear-gradient(180deg, #3e2180 0%, #291359 100%);
-}
-.graphics .sec-head {
-  /* Stay tappable above the coverflow's glow room. */
-  position: relative;
-  z-index: 1;
-}
-.coverflow-stage {
-  perspective: 1400px;
-  /* The track's padding leaves room for the glow; pull it back up under the heading. */
-  margin-top: -60px;
-}
-.coverflow {
-  --cf-w: clamp(240px, 74vw, 360px);
+/* ---------- Graphics: flat picture cards that swipe and move on by themselves ---------- */
+.gfx-row {
+  --gfx-pad: max(16px, calc((100% - var(--wrap, 1260px)) / 2 + 16px));
   display: flex;
-  gap: 0px;
+  gap: 14px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
-  padding-block: 76px;
-  padding-inline: calc(50% - var(--cf-w) / 2 + 26px);
+  padding-inline: var(--gfx-pad);
+  scroll-padding-inline: var(--gfx-pad);
+  padding-block: 4px 8px;
 }
-.coverflow::-webkit-scrollbar {
+.gfx-row::-webkit-scrollbar {
   display: none;
 }
-.coverflow-item {
+.gfx-card {
   position: relative;
-  display: block;
-  padding: 0;
-  border: 0;
-  background: none;
-  cursor: zoom-in;
   flex: none;
-  width: var(--cf-w);
-  margin-inline: -26px;
+  width: clamp(250px, 80vw, 400px);
+  padding: 8px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 30px;
+  box-shadow: var(--card-shadow);
   scroll-snap-align: center;
-  /* Purple glow behind the graphic in the middle (the image's mask would clip it). */
-  border-radius: 24px;
-  box-shadow: 0 0 60px 4px rgb(168 130 255 / calc(0.55 * var(--focus, 0)));
-  transition:
-    transform 0.15s ease-out,
-    filter 0.15s ease-out;
-  will-change: transform;
+  cursor: zoom-in;
+}
+.gfx {
+  aspect-ratio: 1;
+  width: 100%;
+  border-radius: 23px;
 }
 .gfx-new {
   position: absolute;
-  top: 14px;
-  right: 14px;
+  top: 18px;
+  right: 18px;
   z-index: 2;
   background: var(--accent);
   color: var(--surface);
@@ -994,55 +952,9 @@ section {
   font-size: 14px;
   padding: 3px 14px;
   border-radius: 999px;
-  opacity: var(--focus, 0);
 }
-.cf-cap {
-  text-align: center;
-  padding-inline: 24px;
-  margin-top: -48px;
-}
-.cf-title {
-  margin: 0;
-  font-family: var(--font-body);
-  font-size: clamp(18px, 1.6vw, 22px);
-  line-height: 1.7;
-  color: var(--text);
-}
-.cf-date {
-  margin: 2px 0 0;
-  font-size: 14px;
-  color: var(--accent-dim);
-}
-.cf-dots {
-  display: flex;
-  justify-content: center;
-  gap: 6px;
+.gfx-sec .dots {
   margin-top: 16px;
-}
-.cf-dots button {
-  width: 7px;
-  height: 7px;
-  padding: 0;
-  border: 0;
-  border-radius: 99px;
-  background: var(--line);
-  transition:
-    width 0.2s,
-    background 0.2s;
-}
-.cf-dots button.on {
-  width: 22px;
-  background: var(--accent);
-}
-.cf-acts {
-  display: flex;
-  justify-content: center;
-  gap: 14px;
-  margin-top: 20px;
-}
-.cf-acts .round-btn {
-  width: 52px;
-  height: 52px;
 }
 
 /* ---------- Gallery ---------- */
@@ -1397,6 +1309,24 @@ section {
 .lb-btn:disabled {
   opacity: 0.3;
   cursor: default;
+}
+.lb-acts {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  padding: 0 16px calc(18px + env(safe-area-inset-bottom, 0px));
+}
+.lb-acts .lb-btn {
+  width: 50px;
+  height: 50px;
+}
+.lb-toast {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  margin: 0;
+  color: #e1d5ff;
+  font-size: 14px;
 }
 .lb-prev,
 .lb-next {
@@ -3146,9 +3076,6 @@ footer .logo {
   }
   .shot {
     border-radius: 20px;
-  }
-  .gfx {
-    border-radius: 18px;
   }
 }
 

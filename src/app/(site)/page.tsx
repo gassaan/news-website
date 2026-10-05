@@ -6,7 +6,7 @@ import CategoryMarquee from "@/components/CategoryMarquee";
 import AdSlot from "@/components/AdSlot";
 import StoryCard from "@/components/StoryCard";
 import GalleryShot from "@/components/GalleryShot";
-import GraphicsCoverflow from "@/components/GraphicsCoverflow";
+import GraphicsSwipe from "@/components/GraphicsSwipe";
 import {
   categories,
   getFeaturedArticles,
@@ -85,7 +85,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="graphics" id="graphics">
+      <section className="gfx-sec" id="graphics">
         <div className="wrap">
           <div className="sec-head">
             <h2>ގުރެފިކްސް</h2>
@@ -94,7 +94,7 @@ export default function Home() {
             </Link>
           </div>
         </div>
-        <GraphicsCoverflow graphics={getGraphics()} />
+        <GraphicsSwipe graphics={getGraphics()} />
       </section>
 
       <section className="wrap gallery" id="gallery">
