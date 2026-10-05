@@ -978,45 +978,43 @@ section {
 .gallery .track {
   grid-auto-columns: calc((100% - 30px) / 2);
 }
-.shot {
+/* Album cards: the news card, plus small round photos on the cover's edge. */
+.shot-thumbs {
   position: relative;
-  display: block;
-  aspect-ratio: 6/5;
-  border-radius: 30px;
-  border: 1px solid var(--line);
-  overflow: hidden;
-  background: var(--ground);
-  box-shadow: var(--card-shadow);
-  max-width: 100%;
-  margin: 0;
-}
-.shot .ph {
-  position: absolute;
-  inset: 0;
-}
-.shot::before {
-  content: "";
-  position: absolute;
-  inset: auto 0 0 0;
-  height: 68%;
-  background: linear-gradient(to bottom, rgba(8, 0, 24, 0), var(--ground));
   z-index: 1;
+  display: flex;
+  margin: -28px 22px 0;
 }
-.shot-cap {
-  position: absolute;
-  inset: auto 0 0 0;
-  padding: 0 40px 32px;
-  z-index: 2;
+/* Beats .card .ph, which would square off the circles. */
+.card .shot-thumb {
+  flex: none;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 3px solid var(--surface);
+  margin-inline-start: -14px;
 }
-.shot strong {
-  display: block;
-  font-family: var(--font-head);
-  font-weight: 900;
-  font-size: clamp(20px, 2.2vw, 32px);
+.card .shot-thumb:first-child {
+  margin-inline-start: 0;
 }
-.shot time {
-  color: var(--accent);
-  font-size: clamp(14px, 1.4vw, 20px);
+.shot-more {
+  display: grid;
+  place-items: center;
+  background: var(--accent);
+  color: var(--surface);
+  font-weight: 700;
+  font-size: 15px;
+}
+.shot-thumbs + h3 {
+  margin-top: 10px;
+}
+/* Album names are short: no room kept for a second line; the date sits at the bottom. */
+.shot-card h3 {
+  min-height: 0;
+}
+.shot-card .meta {
+  margin-top: auto;
+  padding-top: 14px;
 }
 
 /* ---------- Photo albums ---------- */
@@ -3064,6 +3062,20 @@ footer .logo {
     border-radius: 24px;
     padding: 5px;
   }
+  .shot-thumbs {
+    margin: -24px 12px 0;
+  }
+  .card .shot-thumb {
+    width: 44px;
+    height: 44px;
+    margin-inline-start: -12px;
+  }
+  .shot-more {
+    font-size: 13px;
+  }
+  .shot-thumbs + h3 {
+    margin-top: 6px;
+  }
   .gfx {
     border-radius: 20px;
   }
@@ -3094,12 +3106,6 @@ footer .logo {
   .story .rating svg {
     width: 13px;
     height: 13px;
-  }
-  .shot-cap {
-    padding: 0 20px 18px;
-  }
-  .shot {
-    border-radius: 20px;
   }
 }
 
