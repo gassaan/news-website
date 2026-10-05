@@ -8,7 +8,7 @@ import { GRAPHIC_RATIO, Graphic } from "@/lib/articles";
 const AUTO_MS = 3000;
 // After a touch, the next one comes this long after the finger lifts.
 const RESUME_MS = 5000;
-const FLY_MS = 450;
+const FLY_MS = 1000;
 // How far a card must be dragged before it counts as a swipe.
 const SWIPE_PX = 60;
 const NEW_FOR_MS = 2 * 24 * 60 * 60 * 1000;
