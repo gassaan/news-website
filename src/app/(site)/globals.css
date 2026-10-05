@@ -928,10 +928,11 @@ section {
   position: relative;
   flex: none;
   width: clamp(250px, 80vw, 400px);
+  /* Same frame as the news cards. */
   padding: 8px;
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: 30px;
+  border-radius: 50px;
   box-shadow: var(--card-shadow);
   scroll-snap-align: center;
   cursor: zoom-in;
@@ -939,7 +940,9 @@ section {
 .gfx {
   aspect-ratio: 1;
   width: 100%;
-  border-radius: 23px;
+  border-radius: 43px;
+  border: 1px solid var(--line);
+  box-shadow: var(--img-shadow);
 }
 .gfx-new {
   position: absolute;
@@ -3041,6 +3044,13 @@ footer .logo {
     padding: 5px 5px 0;
   }
   .card .ph {
+    border-radius: 20px;
+  }
+  .gfx-card {
+    border-radius: 24px;
+    padding: 5px;
+  }
+  .gfx {
     border-radius: 20px;
   }
   .card h3 {
