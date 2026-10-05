@@ -1,14 +1,30 @@
 import { defineType, defineField, defineArrayMember } from "sanity";
-import { dateField, formatWhen, photoField, slugField, titleField } from "./fields";
+import {
+  dateField,
+  formatWhen,
+  photoField,
+  slugField,
+  titleField,
+} from "./fields";
+import MultiPhotoUpload from "../components/MultiPhotoUpload";
 
 export const graphic = defineType({
   name: "graphic",
   title: "ގުރެފިކްސް",
   type: "document",
-  fields: [titleField(), slugField(), dateField("date"), photoField("image", "ގުރެފިކް (ދިގު ފޮޓޯ)", true)],
+  fields: [
+    titleField(),
+    slugField(),
+    dateField("date"),
+    photoField("image", "ގުރެފިކް (ދިގު ފޮޓޯ)", true),
+  ],
   preview: {
     select: { title: "title", date: "date", media: "image" },
-    prepare: ({ title, date, media }) => ({ title, subtitle: formatWhen(date), media }),
+    prepare: ({ title, date, media }) => ({
+      title,
+      subtitle: formatWhen(date),
+      media,
+    }),
   },
 });
 
@@ -27,12 +43,18 @@ export const photoAlbum = defineType({
       type: "array",
       of: [defineArrayMember({ type: "image", options: { hotspot: true } })],
       options: { layout: "grid" },
+      // Adds a "choose many photos at once" button above the list.
+      components: { input: MultiPhotoUpload },
       validation: (r) => r.min(1),
     }),
   ],
   preview: {
     select: { title: "title", date: "date", media: "photos.0" },
-    prepare: ({ title, date, media }) => ({ title, subtitle: formatWhen(date), media }),
+    prepare: ({ title, date, media }) => ({
+      title,
+      subtitle: formatWhen(date),
+      media,
+    }),
   },
 });
 
@@ -41,7 +63,12 @@ export const poll = defineType({
   title: "ޕޯލްސް",
   type: "document",
   fields: [
-    defineField({ name: "title", title: "ސުވާލު", type: "string", validation: (r) => r.required() }),
+    defineField({
+      name: "title",
+      title: "ސުވާލު",
+      type: "string",
+      validation: (r) => r.required(),
+    }),
     defineField({
       name: "options",
       title: "ޖަވާބުތައް",
