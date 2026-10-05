@@ -33,7 +33,7 @@ const QUERY = `{
   "polls": *[_type == "poll"] | order(publishedAt desc) { _id, title, options, "image": image ${img} },
   "graphics": *[_type == "graphic" && defined(slug.current)] | order(date desc) { "slug": slug.current, title, date, "image": image ${img} },
   "albums": *[_type == "photoAlbum" && defined(slug.current)] | order(date desc) {
-    "slug": slug.current, title, date, photographer, "photos": photos[] ${img} },
+    "slug": slug.current, title, date, "photographer": coalesce(photographer->title, photographer), "photos": photos[] ${img} },
   "contact": *[_type == "contactInfo"][0] { intro, email, phone, whatsapp, address, hours },
   "privacy": *[_type == "privacyPolicy"][0] { intro, sections[] { heading, body }, _updatedAt },
   "terms": *[_type == "termsOfUse"][0] { intro, sections[] { heading, body }, _updatedAt },

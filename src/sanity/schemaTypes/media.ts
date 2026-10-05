@@ -36,7 +36,7 @@ export const photoAlbum = defineType({
     titleField(),
     slugField(),
     dateField("date"),
-    defineField({ name: "photographer", title: "ފޮޓޯ ނެގީ", type: "string" }),
+    defineField({ name: "photographer", title: "ފޮޓޯ ނެގީ", type: "reference", to: [{ type: "author" }] }),
     defineField({
       name: "photos",
       title: "ފޮޓޯތައް",
