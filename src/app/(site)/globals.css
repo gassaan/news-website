@@ -3209,7 +3209,6 @@ footer .logo {
   border-radius: 28px;
   background: var(--ep-card);
   border: 1px solid var(--line);
-  box-shadow: 0 12px 30px rgba(8, 0, 24, 0.28);
 }
 #episodes {
   scroll-margin-top: 100px;
