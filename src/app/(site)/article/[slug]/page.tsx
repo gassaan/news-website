@@ -7,7 +7,6 @@ import {
   getPolls,
   getRelatedArticles,
   getSampleComments,
-  pseudoTime,
   pseudoViewCount,
   reports,
 } from "@/lib/articles";
@@ -70,7 +69,7 @@ export default async function ArticlePage({
               </Link>
             )}
             <h1 className="headline">{article.title}</h1>
-            <DateStamp className="art-date" date={article.publishedAt} time={article.time ?? pseudoTime(article.slug)} />
+            <DateStamp className="art-date" date={article.publishedAt} />
           </header>
 
           <div className="wrap">
