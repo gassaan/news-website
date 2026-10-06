@@ -576,7 +576,8 @@ section {
 /* Desktop: photo on one side, framed like the news cards, fading gently towards the text. */
 .slide-ph .ph {
   height: 100%;
-  border-radius: 40px;
+  /* Square corners on the side that fades out, rounded on the other. */
+  border-radius: 0 40px 40px 0;
   border: 1px solid var(--line);
   -webkit-mask: linear-gradient(to left, #000 70%, transparent);
   mask: linear-gradient(to left, #000 70%, transparent);
@@ -3033,7 +3034,8 @@ footer .logo {
   .slide-ph .ph {
     aspect-ratio: 1;
     height: auto;
-    border-radius: 28px;
+    /* Rounded at the top only: the bottom fades out, so its corners stay square. */
+    border-radius: 28px 28px 0 0;
     -webkit-mask: linear-gradient(#000 70%, transparent);
     mask: linear-gradient(#000 70%, transparent);
   }
