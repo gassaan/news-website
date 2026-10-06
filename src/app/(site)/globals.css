@@ -584,6 +584,11 @@ section {
   margin: 0;
   text-wrap: balance;
   color: var(--card-head);
+  /* Never more than two lines; longer headlines end with "…". */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 .slide p {
   color: var(--body-ink);
