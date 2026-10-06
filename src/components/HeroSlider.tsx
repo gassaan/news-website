@@ -9,7 +9,7 @@ import Link from "next/link";
 const AUTO_MS = 6000;
 // After a touch, the next story comes this long after the finger lifts.
 const RESUME_MS = 8000;
-const FLY_MS = 800;
+const FLY_MS = 1000;
 // How far a card must be dragged before it counts as a swipe.
 const SWIPE_PX = 60;
 
