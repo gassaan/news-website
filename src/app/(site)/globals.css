@@ -3229,10 +3229,14 @@ footer .logo {
   color: transparent;
   text-shadow: none;
 }
+/* Light mode: the story page capsules are frosted white glass over the poster. */
 :root[data-theme="light"] .story-hero-chip {
-  background: var(--surface);
-  border-color: var(--line);
+  background: rgba(255, 255, 255, 0.35);
+  border-color: rgba(255, 255, 255, 0.65);
   color: var(--accent);
+  -webkit-backdrop-filter: blur(16px) saturate(1.6);
+  backdrop-filter: blur(16px) saturate(1.6);
+  box-shadow: 0 4px 18px rgba(62, 33, 128, 0.08);
 }
 :root[data-theme="light"] .story-hero-eps,
 :root[data-theme="light"] .story-hero-down {
@@ -3240,9 +3244,12 @@ footer .logo {
 }
 :root[data-theme="light"] .story-hero .author,
 :root[data-theme="light"] .story-hero .stat {
-  background: var(--surface);
-  border-color: var(--line);
+  background: rgba(255, 255, 255, 0.35);
+  border-color: rgba(255, 255, 255, 0.65);
   color: var(--accent);
+  -webkit-backdrop-filter: blur(16px) saturate(1.6);
+  backdrop-filter: blur(16px) saturate(1.6);
+  box-shadow: 0 4px 18px rgba(62, 33, 128, 0.08);
 }
 @media (prefers-color-scheme: light) {
   :root:not([data-theme="dark"]) .story-hero::after {
@@ -3261,9 +3268,12 @@ footer .logo {
     text-shadow: none;
   }
   :root:not([data-theme="dark"]) .story-hero-chip {
-    background: var(--surface);
-    border-color: var(--line);
+    background: rgba(255, 255, 255, 0.35);
+    border-color: rgba(255, 255, 255, 0.65);
     color: var(--accent);
+    -webkit-backdrop-filter: blur(16px) saturate(1.6);
+    backdrop-filter: blur(16px) saturate(1.6);
+    box-shadow: 0 4px 18px rgba(62, 33, 128, 0.08);
   }
   :root:not([data-theme="dark"]) .story-hero-eps,
   :root:not([data-theme="dark"]) .story-hero-down {
@@ -3271,9 +3281,12 @@ footer .logo {
   }
   :root:not([data-theme="dark"]) .story-hero .author,
   :root:not([data-theme="dark"]) .story-hero .stat {
-    background: var(--surface);
-    border-color: var(--line);
+    background: rgba(255, 255, 255, 0.35);
+    border-color: rgba(255, 255, 255, 0.65);
     color: var(--accent);
+    -webkit-backdrop-filter: blur(16px) saturate(1.6);
+    backdrop-filter: blur(16px) saturate(1.6);
+    box-shadow: 0 4px 18px rgba(62, 33, 128, 0.08);
   }
 }
 /* Light mode: solid title with a soft light glow behind the text so it reads over busy photos. */
