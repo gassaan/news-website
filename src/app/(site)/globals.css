@@ -531,22 +531,32 @@ section {
 .hero {
   padding-top: 40px;
 }
+/* The top stories sit in a pile; the top card flies away to show the next. */
 .hero-track {
   display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: 100%;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
-  border-radius: 50px;
+  /* Room for the next card peeking out below; vertical drags still scroll the page. */
+  padding-bottom: 16px;
+  touch-action: pan-y;
+  user-select: none;
+  isolation: isolate;
 }
-.hero-track::-webkit-scrollbar {
-  display: none;
+.hero-track .slide {
+  grid-area: 1 / 1;
+  transition:
+    transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1),
+    opacity 0.8s;
+}
+.hero-track img {
+  -webkit-user-drag: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-track .slide {
+    transition-duration: 0.01s;
+  }
 }
 /* Same colours as the site's news cards, in both themes. The photo runs to the
    card's edges and fades into it; the big headline overlaps the faded part. */
 .slide {
-  scroll-snap-align: center;
   display: grid;
   grid-template-columns: 1fr 1fr;
   background: var(--surface);
@@ -3001,9 +3011,6 @@ footer .logo {
     grid-template-rows: auto 1fr;
     border-radius: 36px;
     min-height: 0;
-  }
-  .hero-track {
-    border-radius: 36px;
   }
   /* Phone: square photo across the card's top, fading into the card below. */
   .slide-ph .ph {
