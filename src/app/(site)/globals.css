@@ -1040,7 +1040,7 @@ section {
   font-family: var(--font-head);
   font-weight: 900;
   font-size: clamp(22px, 2.2vw, 30px);
-  color: var(--card-head);
+  line-height: 1.75;
 }
 .photo-count {
   display: inline-flex;
@@ -1443,8 +1443,10 @@ section {
   background: var(--line);
   margin-bottom: clamp(16px, 2vw, 26px);
 }
-/* Headline letters fade from the text colour into purple. */
-.art-head .headline {
+/* Headline letters fade from the text colour into purple (article and album pages). */
+.art-head .headline,
+.album-head .headline,
+.album-photos-head h2 {
   background: linear-gradient(180deg, var(--text) 30%, var(--head-grad-end) 100%);
   -webkit-background-clip: text;
   background-clip: text;
