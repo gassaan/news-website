@@ -566,16 +566,20 @@ section {
   box-shadow: var(--card-shadow);
   overflow: hidden;
   min-height: clamp(420px, 48vw, 704px);
+  /* The photo sits inside the card with a gap around it, like the small news cards. */
+  padding: 14px;
 }
 .slide-ph {
   order: -1;
   display: block;
 }
-/* Desktop: photo on one side, fading towards the text. */
+/* Desktop: photo on one side, framed like the news cards, fading gently towards the text. */
 .slide-ph .ph {
   height: 100%;
-  -webkit-mask: linear-gradient(to left, #000 35%, transparent);
-  mask: linear-gradient(to left, #000 35%, transparent);
+  border-radius: 40px;
+  border: 1px solid var(--line);
+  -webkit-mask: linear-gradient(to left, #000 70%, transparent);
+  mask: linear-gradient(to left, #000 70%, transparent);
 }
 .slide .copy {
   position: relative;
@@ -603,6 +607,10 @@ section {
   -webkit-box-orient: vertical;
   overflow: hidden;
   padding-bottom: 0.18em;
+  /* A soft card-colour glow keeps the letters clear where they sit on the photo. */
+  text-shadow:
+    0 0 8px var(--surface),
+    0 0 18px var(--surface);
 }
 .slide p {
   color: var(--body-ink);
@@ -3016,17 +3024,26 @@ footer .logo {
     border-radius: 36px;
     min-height: 0;
   }
-  /* Phone: square photo across the card's top, fading into the card below. */
+  /* Phone: square framed photo at the card's top; only its bottom fades, under the headline. */
+  .slide {
+    padding: 10px;
+  }
   .slide-ph .ph {
     aspect-ratio: 1;
     height: auto;
-    -webkit-mask: linear-gradient(#000 55%, transparent 92%);
-    mask: linear-gradient(#000 55%, transparent 92%);
+    border-radius: 28px;
+    -webkit-mask: linear-gradient(#000 70%, transparent);
+    mask: linear-gradient(#000 70%, transparent);
   }
   .slide .copy {
-    margin: -96px 0 0;
-    padding: 0 22px 22px;
+    margin: -84px 0 0;
+    padding: 0 14px 14px;
     gap: 14px;
+    justify-content: flex-start;
+  }
+  /* All top stories share one card height, so the date and arrow stay at the bottom. */
+  .slide-foot {
+    margin-top: auto;
   }
   .slide h1 {
     font-size: 38px;
