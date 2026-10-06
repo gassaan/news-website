@@ -69,6 +69,18 @@ export default function Home() {
         <CardGrid articles={reports.slice(0, 6)} />
       </section>
 
+      <section className="gfx-sec" id="graphics">
+        <div className="wrap">
+          <div className="sec-head">
+            <h2>ގުރެފިކްސް</h2>
+            <Link className="more" href="/graphics">
+              އިތުރު ގުރެފިކްސް <span aria-hidden="true">›</span>
+            </Link>
+          </div>
+        </div>
+        <GraphicsSwipe graphics={getGraphics()} />
+      </section>
+
       <AdSlot />
 
       <section id="stories" className="wrap">
@@ -83,18 +95,6 @@ export default function Home() {
             <StoryCard key={story.slug} article={story} />
           ))}
         </div>
-      </section>
-
-      <section className="gfx-sec" id="graphics">
-        <div className="wrap">
-          <div className="sec-head">
-            <h2>ގުރެފިކްސް</h2>
-            <Link className="more" href="/graphics">
-              އިތުރު ގުރެފިކްސް <span aria-hidden="true">›</span>
-            </Link>
-          </div>
-        </div>
-        <GraphicsSwipe graphics={getGraphics()} />
       </section>
 
       <section className="wrap gallery" id="gallery">
