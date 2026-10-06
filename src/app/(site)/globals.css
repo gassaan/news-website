@@ -968,6 +968,25 @@ section {
 .gfx-sec .dots {
   margin-top: 4px;
 }
+/* Faint purple grid lines behind the section, fading out towards the edges. */
+.gfx-sec {
+  position: relative;
+  isolation: isolate;
+  padding: 34px 0 30px;
+}
+.gfx-sec::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--accent) 18%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--accent) 18%, transparent) 1px, transparent 1px);
+  background-size: 28px 28px;
+  -webkit-mask: radial-gradient(ellipse 75% 70% at 50% 55%, #000 30%, transparent 75%);
+  mask: radial-gradient(ellipse 75% 70% at 50% 55%, #000 30%, transparent 75%);
+}
 @media (prefers-reduced-motion: reduce) {
   .gfx-stack .gfx-card {
     transition-duration: 0.01s;
