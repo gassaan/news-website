@@ -59,6 +59,8 @@ export default function Home() {
         <CardGrid articles={popular} />
       </section>
 
+      <AdSlot />
+
       <section id="reports" className="wrap">
         <div className="sec-head">
           <h2>ރިޕޯޓް</h2>
