@@ -1022,36 +1022,44 @@ section {
 .album-page {
   padding-top: clamp(40px, 7vw, 100px);
 }
-.album-meta {
+.album-author {
+  margin: clamp(2px, 0.6vw, 8px) 0 clamp(2px, 0.4vw, 6px);
+}
+/* "Photos" heading over the album grid, with the photo count pill beside it. */
+.album-photos-head {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 10px;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 4px clamp(14px, 1.8vw, 24px);
+  padding-top: clamp(18px, 2.2vw, 28px);
+  border-top: 1px solid var(--line);
+}
+.album-photos-head h2 {
+  margin: 0;
+  font-family: var(--font-head);
+  font-weight: 900;
+  font-size: clamp(22px, 2.2vw, 30px);
+  color: var(--card-head);
+}
+.photo-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: clamp(40px, 3.6vw, 48px);
+  padding: 0 clamp(16px, 1.6vw, 20px);
+  border-radius: 50px;
+  background: var(--surface);
+  border: 1px solid var(--line);
   color: var(--accent);
+  font-size: clamp(14px, 1.2vw, 16px);
+  white-space: nowrap;
 }
-.album-meta-rule {
-  width: 1px;
-  height: 26px;
-  background: color-mix(in srgb, var(--accent) 35%, transparent);
-}
-/* Photo count in the same shape as the date: big number, small word beside it. */
-.album-count {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.album-count b {
+.photo-count b {
   font-family: var(--font-latin);
   font-weight: 700;
-  font-size: clamp(24px, 2.2vw, 32px);
+  font-size: clamp(18px, 1.6vw, 22px);
   line-height: 1;
-}
-.album-count span {
-  font-size: clamp(11px, 1vw, 14px);
-  opacity: 0.85;
-}
-.album-author {
-  margin-top: clamp(8px, 1.2vw, 16px);
 }
 /* Photographers without an author photo get a simple person icon. */
 .avatar-blank {

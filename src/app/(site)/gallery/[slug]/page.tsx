@@ -55,17 +55,6 @@ export default async function AlbumPage({
 
       <header className="album-head">
         <h1 className="headline">{album.title}</h1>
-        {/* Same calendar date as the article page, with the photo count beside it. */}
-        <div className="album-meta">
-          <DateStamp className="art-date" date={album.date} />
-          <i className="album-meta-rule" aria-hidden="true" />
-          <span className="album-count" aria-label={`${album.photoCount} ފޮޓޯ`}>
-            <b className="num" aria-hidden="true">
-              {album.photoCount}
-            </b>
-            <span aria-hidden="true">ފޮޓޯ</span>
-          </span>
-        </div>
         {/* The same author capsule as the article page; it links when the photographer has a page. */}
         {photographerSlug ? (
           <Link
@@ -99,7 +88,34 @@ export default async function AlbumPage({
             <span>{album.photographer}</span>
           </span>
         )}
+        <DateStamp className="art-date" date={album.date} />
       </header>
+
+      {/* A small heading over the photos, with the photo count beside it. */}
+      <div className="album-photos-head">
+        <h2>ފޮޓޯތައް</h2>
+        <span className="photo-count" aria-label={`${album.photoCount} ފޮޓޯ`}>
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <rect x="3" y="7" width="14" height="14" rx="3" />
+            <path d="M7 3h11a3 3 0 0 1 3 3v11" />
+            <path d="M3 17l4-4 4 4 2-2 4 4" />
+          </svg>
+          <b className="num" aria-hidden="true">
+            {album.photoCount}
+          </b>
+          <span aria-hidden="true">ފޮޓޯ</span>
+        </span>
+      </div>
 
       <AlbumViewer
         photos={Array.from({ length: album.photoCount }, (_, i) =>
