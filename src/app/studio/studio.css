@@ -39,7 +39,7 @@ button {
   )
   textarea {
   font-size: 18px !important;
-  line-height: 2 !important;
+  line-height: 1.85 !important;
 }
 
 /* Lists (articles, stories, …) also run right-to-left: picture and title on the right. */
@@ -57,4 +57,37 @@ button {
 }
 [data-testid="default-preview__header"] > :last-child {
   padding-top: 4px;
+}
+
+/* Field names and their help text: bigger, with room between lines so the marks
+   above and below Thaana letters don't run into each other. Sanity trims each
+   text line to its letters' height, which also cuts the marks, so that is undone. */
+[data-ui="fieldHeaderContentBox"] [data-ui="Text"] {
+  font-size: 16px !important;
+  line-height: 1.85 !important;
+}
+[data-ui="fieldHeaderContentBox"] [data-ui="Text"] > span {
+  font-size: inherit !important;
+  line-height: inherit !important;
+}
+[data-ui="fieldHeaderContentBox"] [data-ui="Text"]::before,
+[data-ui="fieldHeaderContentBox"] [data-ui="Text"]::after {
+  margin: 0 !important;
+}
+[data-ui="fieldHeaderContentBox"] label[data-ui="Text"] {
+  font-size: 17px !important;
+}
+/* Help text a little brighter so it reads on the dark background. */
+[data-ui="fieldHeaderContentBox"] [id^="desc_"] {
+  color: #b9bdcc !important;
+}
+/* Keep the warning and error signs clear of the field name. */
+[data-ui="fieldHeaderContentBox"] label[data-ui="Text"] {
+  margin-inline-end: 16px;
+}
+/* The field's comment and "…" buttons sit on the right, which is where Dhivehi
+   field names start, so they covered the name. Move them to the empty left side. */
+[data-ui="Flex"]:has(> [data-ui="fieldHeaderContentBox"]) > [data-ui="Card"] {
+  right: auto !important;
+  left: 0 !important;
 }
