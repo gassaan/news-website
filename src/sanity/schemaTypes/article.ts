@@ -24,7 +24,17 @@ export const article = defineType({
     }),
     dateTimeField(),
     photoField("image", "މައި ފޮޓޯ", true),
-    defineField({ name: "excerpt", title: "ކުރު ޚުލާސާ", type: "text", rows: 3 }),
+    defineField({
+      name: "excerpt",
+      title: "ކުރު ޚުލާސާ",
+      // Used on the home page top story and on the article's share picture.
+      description:
+        "ހޯމްޕޭޖުގެ މައި ޚަބަރާއި، ޝެއާ ކުރާ ފޮޓޯގައި ދައްކާނީ މިއެވެ. ފޮޓޯގައި ފުރިހަމައަށް ފެންނާނީ ގާތްގަނޑަކަށް 250 އަކުރު.",
+      type: "text",
+      rows: 3,
+      validation: (r) =>
+        r.max(250).warning("250 އަކުރަށް ވުރެ ދިގު. ޝެއާ ކުރާ ފޮޓޯގައި ފަހަތު ބައި ކެނޑިގެންދާނެ."),
+    }),
     bodyField(),
     defineField({
       name: "featured",

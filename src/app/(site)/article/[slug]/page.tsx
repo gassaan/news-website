@@ -78,7 +78,7 @@ export default async function ArticlePage({
             <ArticleActions
               title={article.title}
               slug={article.slug}
-              summary={(article.body.join(" ") || article.excerpt).slice(0, 600)}
+              summary={article.excerpt.trim() || article.body.join(" ").slice(0, 600)}
               date={formatDhivehiDate(article.publishedAt)}
             />
           </div>
