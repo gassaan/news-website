@@ -87,7 +87,7 @@ button {
 }
 /* The field's comment and "…" buttons sit on the right, which is where Dhivehi
    field names start, so they covered the name. Move them to the empty left side. */
-[data-ui="Flex"]:has(> [data-ui="fieldHeaderContentBox"]) > [data-ui="Card"] {
+[data-ui="fieldHeaderContentBox"] + [data-ui="Card"] {
   right: auto !important;
   left: 0 !important;
 }
