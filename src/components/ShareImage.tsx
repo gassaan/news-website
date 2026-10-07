@@ -25,7 +25,7 @@ const SHIFT = 20;
 const FOOT = { size: 15, line: 22, gap: 18, color: "#d9ccf7", alpha: 0.35 };
 const SITE = "hulhangu.com";
 // Big faint logo, tilted, running off the card's bottom corner behind the text.
-const MARK = { h: 260, x: -30, bottom: 720, rotate: -12, alpha: 0.06 };
+const MARK = { h: 260, x: -30, bottom: 720, rotate: -12, alpha: 0.045 };
 
 function roundRect(
   ctx: CanvasRenderingContext2D,
