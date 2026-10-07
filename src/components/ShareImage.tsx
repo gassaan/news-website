@@ -16,9 +16,9 @@ const SCALE = 2;
 const CARD = { x: 30, y: 30, w: 1140, h: 640, r: 44, border: 2 };
 const PHOTO_W = 545;
 const TEXT = { right: 573, left: 72 };
-const HEAD = { size: 64, line: 112, max: 2, color: "#ece6ff" };
+const HEAD = { size: 64, line: 104, max: 2, color: "#ece6ff" };
 const SUM = { size: 26, line: 60, max: 5, color: "#d9ccf7" };
-const GAP = 30;
+const GAP = 4;
 // Small faint line under the summary: the date on the right, the website on the left.
 const FOOT = { size: 15, line: 22, gap: 18, color: "#d9ccf7", alpha: 0.35 };
 const SITE = "hulhangu.com";
