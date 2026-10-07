@@ -9,6 +9,7 @@ import {
   getSampleComments,
   pseudoViewCount,
   reports,
+  formatDhivehiDate,
 } from "@/lib/articles";
 import ArticleImage from "@/components/ArticleImage";
 import ArticleBody from "@/components/ArticleBody";
@@ -78,6 +79,7 @@ export default async function ArticlePage({
               title={article.title}
               slug={article.slug}
               summary={(article.body.join(" ") || article.excerpt).slice(0, 600)}
+              date={formatDhivehiDate(article.publishedAt)}
             />
           </div>
         </div>

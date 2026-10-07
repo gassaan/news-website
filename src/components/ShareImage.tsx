@@ -4,9 +4,12 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { cmsImage, fullImage } from "@/lib/cmsImages";
 import { pseudoHue } from "@/lib/hue";
+import logoMask from "@/assets/hulhangu-logo-mask.png";
 
 // The picture: a dark card, the photo on one side and the headline with the
-// news summary on the other. Sizes are for 1200 x 700, drawn twice as sharp.
+// news summary on the other, a big faint logo behind the text, and the date
+// and website in small faint letters underneath. Sizes are for 1200 x 700,
+// drawn twice as sharp.
 const W = 1200;
 const H = 700;
 const SCALE = 2;
@@ -16,6 +19,11 @@ const TEXT = { right: 573, left: 72 };
 const HEAD = { size: 64, line: 112, max: 2, color: "#ece6ff" };
 const SUM = { size: 26, line: 60, max: 5, color: "#d9ccf7" };
 const GAP = 30;
+// Small faint line under the summary: the date on the right, the website on the left.
+const FOOT = { size: 15, line: 22, gap: 18, color: "#d9ccf7", alpha: 0.35 };
+const SITE = "hulhangu.com";
+// Big faint logo, tilted, running off the card's bottom corner behind the text.
+const MARK = { h: 260, x: -30, bottom: 720, rotate: -12, alpha: 0.06 };
 
 function roundRect(
   ctx: CanvasRenderingContext2D,
@@ -87,21 +95,47 @@ async function loadPhoto(slug: string): Promise<ImageBitmap | null> {
   }
 }
 
+// The site logo in white, drawn from its mask image.
+async function loadLogo(): Promise<HTMLCanvasElement | null> {
+  try {
+    const img = new Image();
+    img.src = logoMask.src;
+    await img.decode();
+    const c = document.createElement("canvas");
+    c.width = img.naturalWidth;
+    c.height = img.naturalHeight;
+    const g = c.getContext("2d");
+    if (!g) return null;
+    g.drawImage(img, 0, 0);
+    g.globalCompositeOperation = "source-in";
+    g.fillStyle = "#fff";
+    g.fillRect(0, 0, c.width, c.height);
+    return c;
+  } catch {
+    return null;
+  }
+}
+
 async function drawPicture(
   slug: string,
   title: string,
   summary: string,
+  date: string,
 ): Promise<Blob | null> {
   const headEl = document.querySelector("h1.headline");
   const bodyEl = document.querySelector(".art-body p") ?? document.body;
   const headFont = `900 ${HEAD.size}px ${headEl ? getComputedStyle(headEl).fontFamily : "sans-serif"}`;
   const bodyStyle = getComputedStyle(bodyEl);
   const sumFont = `${bodyStyle.fontWeight} ${SUM.size}px ${bodyStyle.fontFamily}`;
+  const dateFont = `700 ${FOOT.size}px ${getComputedStyle(document.body).fontFamily}`;
+  const siteFont = `500 ${FOOT.size}px ${getComputedStyle(document.body).getPropertyValue("--font-latin") || "sans-serif"}`;
   await Promise.all([
     document.fonts.load(headFont, title),
     document.fonts.load(sumFont, summary),
+    document.fonts.load(dateFont, date),
+    document.fonts.load(siteFont, SITE),
   ]).catch(() => {});
-  const photo = await loadPhoto(slug);
+  const [photo, logo] = await Promise.all([loadPhoto(slug), loadLogo()]);
 
   const canvas = document.createElement("canvas");
   canvas.width = W * SCALE;
@@ -125,6 +159,19 @@ async function drawPicture(
   roundRect(ctx, inner.x, inner.y, inner.w, inner.h, CARD.r - CARD.border);
   ctx.fillStyle = "#150735";
   ctx.fill();
+
+  // Faint logo behind the text, kept inside the card.
+  if (logo) {
+    const lw = (MARK.h * logo.width) / logo.height;
+    ctx.save();
+    roundRect(ctx, inner.x, inner.y, inner.w, inner.h, CARD.r - CARD.border);
+    ctx.clip();
+    ctx.globalAlpha = MARK.alpha;
+    ctx.translate(MARK.x + lw / 2, MARK.bottom - MARK.h / 2);
+    ctx.rotate((MARK.rotate * Math.PI) / 180);
+    ctx.drawImage(logo, -lw / 2, -MARK.h / 2, lw, MARK.h);
+    ctx.restore();
+  }
 
   // Photo on the right, filling its side of the card.
   const px = inner.x + inner.w - PHOTO_W;
@@ -171,7 +218,9 @@ async function drawPicture(
   const sumLines = summary ? wrap(ctx, summary, width, SUM.max) : [];
   const total =
     headLines.length * HEAD.line +
-    (sumLines.length ? GAP + sumLines.length * SUM.line : 0);
+    (sumLines.length ? GAP + sumLines.length * SUM.line : 0) +
+    FOOT.gap +
+    FOOT.line;
   let y = inner.y + (inner.h - total) / 2;
   ctx.font = headFont;
   ctx.fillStyle = HEAD.color;
@@ -186,6 +235,16 @@ async function drawPicture(
     ctx.fillText(line, TEXT.right, y + SUM.line / 2);
     y += SUM.line;
   }
+  y += FOOT.gap;
+  ctx.globalAlpha = FOOT.alpha;
+  ctx.fillStyle = FOOT.color;
+  ctx.font = dateFont;
+  ctx.fillText(date, TEXT.right, y + FOOT.line / 2);
+  ctx.direction = "ltr";
+  ctx.textAlign = "left";
+  ctx.font = siteFont;
+  ctx.fillText(SITE, TEXT.left, y + FOOT.line / 2);
+  ctx.globalAlpha = 1;
 
   return new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.92));
 }
@@ -195,10 +254,12 @@ export default function ShareImage({
   slug,
   title,
   summary,
+  date,
 }: {
   slug: string;
   title: string;
   summary: string;
+  date: string;
 }) {
   const [open, setOpen] = useState(false);
   const [picture, setPicture] = useState<{ file: File; url: string } | null>(
@@ -212,7 +273,7 @@ export default function ShareImage({
     setOpen(true);
     if (picture) return;
     setFailed(false);
-    const blob = await drawPicture(slug, title, summary);
+    const blob = await drawPicture(slug, title, summary, date);
     if (!blob) {
       setFailed(true);
       return;

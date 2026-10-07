@@ -7,10 +7,12 @@ export default function ArticleActions({
   title,
   slug,
   summary,
+  date,
 }: {
   title: string;
   slug: string;
   summary: string;
+  date: string;
 }) {
   const [toastVisible, setToastVisible] = useState(false);
 
@@ -57,7 +59,7 @@ export default function ArticleActions({
             <path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4" />
           </svg>
         </button>
-        <ShareImage slug={slug} title={title} summary={summary} />
+        <ShareImage slug={slug} title={title} summary={summary} date={date} />
       </div>
       <p className="toast" id="toast" role="status" hidden={!toastVisible}>
         ލިންކު ކޮޕީ ކުރެވިއްޖެ
