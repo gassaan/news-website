@@ -1,8 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import ShareImage from "./ShareImage";
 
-export default function ArticleActions({ title }: { title: string }) {
+export default function ArticleActions({
+  title,
+  slug,
+  summary,
+}: {
+  title: string;
+  slug: string;
+  summary: string;
+}) {
   const [toastVisible, setToastVisible] = useState(false);
 
   async function share() {
@@ -48,6 +57,7 @@ export default function ArticleActions({ title }: { title: string }) {
             <path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4" />
           </svg>
         </button>
+        <ShareImage slug={slug} title={title} summary={summary} />
       </div>
       <p className="toast" id="toast" role="status" hidden={!toastVisible}>
         ލިންކު ކޮޕީ ކުރެވިއްޖެ

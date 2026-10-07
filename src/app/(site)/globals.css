@@ -1320,6 +1320,87 @@ section {
   opacity: 0.3;
   cursor: default;
 }
+/* Share-as-picture panel: the made picture with Share and Save below it. */
+.si-back {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(8, 0, 24, 0.7);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+.si-sheet {
+  position: relative;
+  width: min(100%, 640px);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 56px 16px 16px;
+  border-radius: 32px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+.si-close {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--ground);
+  border: 1px solid var(--line);
+  color: var(--accent);
+}
+.si-preview {
+  aspect-ratio: 1200 / 700;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #080018;
+  display: grid;
+  place-items: center;
+}
+.si-preview img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.si-wait {
+  color: #d9ccf7;
+  font-size: 15px;
+}
+.si-btns {
+  display: flex;
+  gap: 10px;
+}
+.si-btns > * {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 52px;
+  border-radius: 999px;
+  font-family: var(--font-body);
+  font-size: 16px;
+}
+.si-go {
+  background: var(--accent);
+  color: var(--surface);
+}
+.si-save {
+  background: var(--ground);
+  border: 1px solid var(--line);
+  color: var(--accent);
+}
+.si-go:disabled,
+.si-save[aria-disabled="true"] {
+  opacity: 0.5;
+}
 .lb-acts {
   position: relative;
   display: flex;

@@ -74,7 +74,11 @@ export default async function ArticlePage({
 
           <div className="wrap">
             <ArticleBody slug={article.slug} paragraphs={article.body} author={article.author} />
-            <ArticleActions title={article.title} />
+            <ArticleActions
+              title={article.title}
+              slug={article.slug}
+              summary={(article.body.join(" ") || article.excerpt).slice(0, 600)}
+            />
           </div>
         </div>
       </article>
