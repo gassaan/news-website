@@ -19,6 +19,8 @@ const TEXT = { right: 573, left: 72 };
 const HEAD = { size: 64, line: 104, max: 2, color: "#ece6ff" };
 const SUM = { size: 26, line: 60, max: 5, color: "#d9ccf7" };
 const GAP = 4;
+// The text block sits a little below the middle, leaving more room above the headline.
+const SHIFT = 20;
 // Small faint line under the summary: the date on the right, the website on the left.
 const FOOT = { size: 15, line: 22, gap: 18, color: "#d9ccf7", alpha: 0.35 };
 const SITE = "hulhangu.com";
@@ -221,7 +223,7 @@ async function drawPicture(
     (sumLines.length ? GAP + sumLines.length * SUM.line : 0) +
     FOOT.gap +
     FOOT.line;
-  let y = inner.y + (inner.h - total) / 2;
+  let y = inner.y + (inner.h - total) / 2 + SHIFT;
   ctx.font = headFont;
   ctx.fillStyle = HEAD.color;
   for (const line of headLines) {
