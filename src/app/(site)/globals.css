@@ -3096,13 +3096,14 @@ footer .logo {
     border-radius: 23px;
     min-height: 0;
   }
+  /* An even gap between the card's edge and the photo on the top and sides. */
   .slide-ph {
-    padding-inline: 4.5px;
+    padding: 4.5px 4.5px 0;
   }
   .slide-ph .ph {
     aspect-ratio: 378.6 / 347.4;
     height: auto;
-    border-radius: 23px;
+    border-radius: 19px;
   }
   .slide .copy {
     justify-content: flex-start;
