@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Article } from "@/lib/articles";
 import ArticleImage from "./ArticleImage";
-import DateStamp from "./DateStamp";
 import Link from "next/link";
 
 const AUTO_MS = 6000;
@@ -165,21 +164,16 @@ export default function HeroSlider({ articles }: { articles: Article[] }) {
               aria-hidden={!top}
               inert={!top}
             >
-              {/* The photo runs to the card's edges and fades into it; the big headline sits over the fade. */}
               <Link className="slide-ph" href={`/article/${article.slug}`} aria-label={article.title} tabIndex={-1} draggable={false}>
                 <ArticleImage slug={article.slug} alt="" />
               </Link>
               <div className="copy">
-                <h1>{article.title}</h1>
-                <p>{article.excerpt}</p>
-                <div className="slide-foot">
-                  <DateStamp date={article.publishedAt} />
-                  <Link className="hero-go" href={`/article/${article.slug}`} aria-label="ފުރިހަމައަށް ކިޔާލާ" draggable={false}>
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <path d="M15 6l-6 6 6 6" />
-                    </svg>
+                <h1>
+                  <Link href={`/article/${article.slug}`} draggable={false}>
+                    {article.title}
                   </Link>
-                </div>
+                </h1>
+                <p>{article.excerpt}</p>
               </div>
             </article>
           );
