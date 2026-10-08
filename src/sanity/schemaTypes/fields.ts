@@ -45,6 +45,8 @@ export const dateTimeField = (name = "publishedAt", title = "ތާރީޚާއި ގ
   defineField({
     name,
     title,
+    // A later time schedules the item: the site leaves it out until then.
+    description: "ކުރިއަށް އޮތް ގަޑިއެއް ލިޔުއްވައިފިނަމަ، ވެބްސައިޓުގައި ފެންނާނީ އެ ގަޑި ޖެހުމުން (10-20 މިނިޓު ތެރޭގައި).",
     type: "datetime",
     initialValue: () => new Date().toISOString(),
     options: { timeStep: 5 },
@@ -87,6 +89,12 @@ const DHIVEHI_MONTHS = [
 ];
 
 // List subtitle: "19 އޯގަސްޓް 2026 · 20:14" in Maldives time (UTC+5). Date-only values show no time.
+// Like formatWhen, but marks items set to go live later with a clock.
+export function formatPublish(value?: string): string {
+  const when = formatWhen(value);
+  return value && new Date(value).getTime() > Date.now() ? `⏰ ފަހުން ނެރޭނެ: ${when}` : when;
+}
+
 export function formatWhen(value?: string): string {
   if (!value) return "";
   if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {

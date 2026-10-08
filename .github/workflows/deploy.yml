@@ -40,8 +40,8 @@ jobs:
           # Same stamp format as scripts/fetch-cms.mjs writes to cms-stamp.txt.
           NEW=$(curl -fsS -G "https://$PID.apicdn.sanity.io/v2025-02-19/data/query/$DS" \
             --data-urlencode "perspective=published" \
-            --data-urlencode 'query={"latest": *[] | order(_updatedAt desc)[0]._updatedAt, "count": count(*[])}' \
-            | node -e 'let d="";process.stdin.on("data",c=>d+=c).on("end",()=>{const r=JSON.parse(d).result;console.log(`${r.latest??""}|${r.count}`)})')
+            --data-urlencode 'query={"latest": *[] | order(_updatedAt desc)[0]._updatedAt, "count": count(*[]), "due": count(*[_type in ["article", "story"] && publishedAt <= now()])}' \
+            | node -e 'let d="";process.stdin.on("data",c=>d+=c).on("end",()=>{const r=JSON.parse(d).result;console.log(`${r.latest??""}|${r.count}|${r.due}`)})')
           OLD=$(curl -fsS "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/cms-stamp.txt" || true)
           echo "dashboard: $NEW  site: $OLD"
           if [ "$NEW" != "$OLD" ]; then echo "changed=true" >> "$GITHUB_OUTPUT"; else echo "changed=false" >> "$GITHUB_OUTPUT"; fi

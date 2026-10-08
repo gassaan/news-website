@@ -1,5 +1,5 @@
 import { defineType, defineField, defineArrayMember } from "sanity";
-import { bodyField, dateTimeField, formatWhen, photoField, slugField, titleField } from "./fields";
+import { bodyField, dateTimeField, formatPublish, photoField, slugField, titleField } from "./fields";
 
 export const story = defineType({
   name: "story",
@@ -41,6 +41,6 @@ export const story = defineType({
   ],
   preview: {
     select: { title: "title", date: "publishedAt", media: "poster" },
-    prepare: ({ title, date, media }) => ({ title, subtitle: formatWhen(date), media }),
+    prepare: ({ title, date, media }) => ({ title, subtitle: formatPublish(date), media }),
   },
 });

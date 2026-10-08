@@ -24,11 +24,15 @@ if (!projectId || process.env.SKIP_CMS === "1") {
 }
 
 const img = `{ "url": asset->url, hotspot }`;
+// Articles and stories with a later time are scheduled: they stay off the site until
+// then. "due" counts the ones whose time has come, so the 10-minute check rebuilds
+// the site when a scheduled item's time arrives.
+const DUE = `count(*[_type in ["article", "story"] && publishedAt <= now()])`;
 const QUERY = `{
   "authors": *[_type == "author" && defined(slug.current)] { "slug": slug.current, "name": title, role, bio, "photo": photo ${img} },
-  "articles": *[_type == "article" && defined(slug.current)] | order(publishedAt desc) {
+  "articles": *[_type == "article" && defined(slug.current) && publishedAt <= now()] | order(publishedAt desc) {
     "slug": slug.current, title, excerpt, body, category, "author": author->title, publishedAt, _createdAt, featured, "image": image ${img} },
-  "stories": *[_type == "story" && defined(slug.current)] | order(publishedAt desc) {
+  "stories": *[_type == "story" && defined(slug.current) && publishedAt <= now()] | order(publishedAt desc) {
     "slug": slug.current, title, excerpt, "author": author->title, publishedAt, _createdAt, "poster": poster ${img}, episodes[] { title, body, "image": image ${img} } },
   "polls": *[_type == "poll"] | order(publishedAt desc) { _id, title, options, "image": image ${img} },
   "graphics": *[_type == "graphic" && defined(slug.current)] | order(date desc) { "slug": slug.current, title, date, "image": image ${img} },
@@ -37,7 +41,7 @@ const QUERY = `{
   "contact": *[_type == "contactInfo"][0] { intro, email, phone, whatsapp, address, hours },
   "privacy": *[_type == "privacyPolicy"][0] { intro, sections[] { heading, body }, _updatedAt },
   "terms": *[_type == "termsOfUse"][0] { intro, sections[] { heading, body }, _updatedAt },
-  "stamp": { "latest": *[] | order(_updatedAt desc)[0]._updatedAt, "count": count(*[]) }
+  "stamp": { "latest": *[] | order(_updatedAt desc)[0]._updatedAt, "count": count(*[]), "due": ${DUE} }
 }`;
 
 const url =
@@ -164,7 +168,7 @@ if (r.contact) cms.contact = r.contact;
 if (r.privacy) cms.privacy = r.privacy;
 if (r.terms) cms.terms = r.terms;
 
-write(cms, images, `${r.stamp.latest ?? ""}|${r.stamp.count}`);
+write(cms, images, `${r.stamp.latest ?? ""}|${r.stamp.count}|${r.stamp.due}`);
 console.log(
   `[cms] Loaded from Sanity: ${Object.entries(cms).map(([k, v]) => (Array.isArray(v) ? `${v.length} ${k}` : k)).join(", ") || "nothing yet (sample content stays)"}.`,
 );
