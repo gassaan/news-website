@@ -40,7 +40,6 @@
   --chip-on: #a882ff;
   --head-grad-end: #a882ff;
   --card-head: #d9ccf7;
-  --hero-edge: #270e61;
   --hero-sum: #d4c6f2;
   color-scheme: dark;
 }
@@ -86,7 +85,6 @@
     --chip-on: #3e2180;
     --head-grad-end: #7958c5;
     --card-head: #2a1260;
-    --hero-edge: transparent;
     --hero-sum: #3e2180;
     color-scheme: light;
   }
@@ -131,7 +129,6 @@
   --chip-on: #3e2180;
   --head-grad-end: #7958c5;
   --card-head: #2a1260;
-  --hero-edge: transparent;
   --hero-sum: #3e2180;
   color-scheme: light;
 }
@@ -175,7 +172,6 @@
   --chip-on: #a882ff;
   --head-grad-end: #a882ff;
   --card-head: #d9ccf7;
-  --hero-edge: #270e61;
   --hero-sum: #d4c6f2;
   color-scheme: dark;
 }
@@ -572,7 +568,7 @@ section {
   display: grid;
   grid-template-columns: 648fr 612fr;
   background: var(--surface);
-  border: 1px solid var(--hero-edge);
+  border: 1px solid var(--line);
   border-radius: 50px;
   box-shadow: 0 0 7.8px rgba(43, 43, 139, 0.06);
   overflow: hidden;
