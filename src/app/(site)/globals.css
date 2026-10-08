@@ -974,7 +974,6 @@ section {
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 50px;
-  box-shadow: var(--card-shadow);
   scroll-snap-align: center;
   cursor: zoom-in;
 }
@@ -983,7 +982,6 @@ section {
   width: 100%;
   border-radius: 43px;
   border: 1px solid var(--line);
-  box-shadow: var(--img-shadow);
 }
 .gfx-new {
   position: absolute;
