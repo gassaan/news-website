@@ -574,13 +574,17 @@ section {
   overflow: hidden;
   min-height: clamp(420px, 49vw, 704px);
 }
+/* The photo sits inside the card with the same gap and frame as the small news cards. */
 .slide-ph {
   order: -1;
   display: block;
+  padding-block: 8px;
+  padding-inline-start: 10px;
 }
 .slide-ph .ph {
   height: 100%;
-  border-radius: 50px;
+  border-radius: 43px;
+  border: 1px solid var(--line);
 }
 .slide .copy {
   display: flex;
@@ -3091,17 +3095,17 @@ footer .logo {
   .slide {
     grid-template-columns: 1fr;
     grid-template-rows: auto 1fr;
-    border-radius: 23px;
+    border-radius: 24px;
     min-height: 0;
   }
-  /* An even gap between the card's edge and the photo on the top and sides. */
+  /* Same gap around the photo as the small news cards. */
   .slide-ph {
-    padding: 4.5px 4.5px 0;
+    padding: 5px 5px 0;
   }
   .slide-ph .ph {
     aspect-ratio: 378.6 / 347.4;
     height: auto;
-    border-radius: 19px;
+    border-radius: 20px;
   }
   .slide .copy {
     justify-content: flex-start;
