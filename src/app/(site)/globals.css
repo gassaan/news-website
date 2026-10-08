@@ -682,6 +682,15 @@ section {
   background: var(--on-band);
   transform: rotate(45deg);
 }
+/* Breaking news: the same strip in a deep, soft red, right under the header on article pages. */
+.ticker.breaking {
+  margin-top: 0;
+  background: #a8293b;
+  color: #fff;
+}
+.ticker.breaking .ticker-row span::after {
+  background: #fff;
+}
 
 /* ---------- Carousels ---------- */
 .carousel {

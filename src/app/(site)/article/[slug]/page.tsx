@@ -20,6 +20,8 @@ import CommentSection from "@/components/CommentSection";
 import SectionCarousel from "@/components/SectionCarousel";
 import Card from "@/components/Card";
 import AdSlot from "@/components/AdSlot";
+import NewsTicker from "@/components/NewsTicker";
+import { getBreakingNews } from "@/lib/breaking";
 
 export function generateStaticParams() {
   return [...articles, ...reports].map((article) => ({ slug: article.slug }));
@@ -39,9 +41,17 @@ export default async function ArticlePage({
   const polls = getPolls();
   const poll = polls[Math.abs(slug.length) % polls.length];
   const related = getRelatedArticles(article);
+  const breaking = getBreakingNews();
 
   return (
     <>
+      {breaking && (
+        <NewsTicker
+          className="breaking"
+          headlines={[breaking.headline]}
+          href={breaking.slug ? `/article/${breaking.slug}` : undefined}
+        />
+      )}
       <AdSlot className="art-top-ad" />
 
       <article className="story-page">

@@ -19,6 +19,12 @@ export default defineConfig({
         S.list()
           .title("Hulhangu")
           .items([
+            // A single document: the red breaking news strip on article pages.
+            S.listItem()
+              .title("އަވަސް ޚަބަރު")
+              .id("breakingNews")
+              .child(S.document().schemaType("breakingNews").documentId("breakingNews")),
+            S.divider(),
             ...[
               ["article", "publishedAt"],
               ["story", "publishedAt"],

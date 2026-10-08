@@ -41,6 +41,7 @@ const QUERY = `{
   "contact": *[_type == "contactInfo"][0] { intro, email, phone, whatsapp, address, hours },
   "privacy": *[_type == "privacyPolicy"][0] { intro, sections[] { heading, body }, _updatedAt },
   "terms": *[_type == "termsOfUse"][0] { intro, sections[] { heading, body }, _updatedAt },
+  "breaking": *[_id == "breakingNews"][0] { on, headline, "slug": article->slug.current, "title": article->title },
   "stamp": { "latest": *[] | order(_updatedAt desc)[0]._updatedAt, "count": count(*[]), "due": ${DUE} }
 }`;
 
@@ -167,6 +168,14 @@ if (r.albums.length) {
 if (r.contact) cms.contact = r.contact;
 if (r.privacy) cms.privacy = r.privacy;
 if (r.terms) cms.terms = r.terms;
+// The red strip on article pages, only while it is switched on. The link is kept
+// only if that article is on the site (not still scheduled for later).
+if (r.breaking?.on) {
+  const slug = cleanSlug(r.breaking.slug);
+  const live = slug && r.articles.some((a) => a.slug === slug);
+  const headline = (r.breaking.headline ?? "").trim() || (live ? r.breaking.title : "");
+  if (headline) cms.breaking = { headline, ...(live ? { slug } : {}) };
+}
 
 write(cms, images, `${r.stamp.latest ?? ""}|${r.stamp.count}|${r.stamp.due}`);
 console.log(
