@@ -928,6 +928,12 @@ section {
 .cat:hover span {
   transform: scale(1.06);
 }
+/* Computers: a name sized to the tile, the same share of it as on phones. */
+@media (min-width: 981px) {
+  .cat span {
+    font-size: 32px;
+  }
+}
 
 /* ---------- Ad slot ---------- */
 .ad {
