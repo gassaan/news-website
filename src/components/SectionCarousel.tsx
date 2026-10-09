@@ -49,7 +49,7 @@ export default function SectionCarousel({
             <path d="M12 1L1 13l11 12" />
           </svg>
         </button>
-        <div className="track" ref={trackRef}>
+        <div className="track news-track" ref={trackRef}>
           {children}
         </div>
       </div>

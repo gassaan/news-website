@@ -2719,6 +2719,41 @@ a.contact-card:hover {
 .cat-grid .card {
   animation: rise 0.35s ease both;
 }
+/* Computers: news cards five to a row, with the card's insides scaled down to fit. */
+@media (min-width: 981px) {
+  .news-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 20px;
+  }
+  .news-track {
+    grid-auto-columns: calc((100% - 80px) / 5);
+    gap: 20px;
+  }
+  :is(.news-grid, .news-track) .card {
+    border-radius: 32px;
+    padding: 6px 6px 0;
+  }
+  :is(.news-grid, .news-track) .card .ph {
+    border-radius: 27px;
+  }
+  :is(.news-grid, .news-track) .card h3 {
+    font-size: 19px;
+    margin: 16px 12px 0;
+  }
+  :is(.news-grid, .news-track) .card .meta {
+    margin: 12px 12px 0;
+    padding-block: 4px 14px;
+  }
+  :is(.news-grid, .news-track) .date-stamp b {
+    font-size: 20px;
+  }
+  :is(.news-grid, .news-track) .date-stamp i {
+    height: 18px;
+  }
+  :is(.news-grid, .news-track) .date-stamp > span {
+    font-size: 11px;
+  }
+}
 .load-wrap {
   display: flex;
   justify-content: center;
