@@ -4,11 +4,11 @@ import { useState, useSyncExternalStore } from "react";
 import { Article } from "@/lib/articles";
 import Card from "./Card";
 
-// Computers show five cards a row: two rows at first, then two more rows each time.
+// Computers show four cards a row: two rows at first, then two more rows each time.
 const MOBILE_STEP = 6;
-const DESKTOP_STEP = 10;
+const DESKTOP_STEP = 8;
 const MOBILE_INITIAL = 8;
-const DESKTOP_INITIAL = 10;
+const DESKTOP_INITIAL = 8;
 const DESKTOP_QUERY = "(min-width: 981px)";
 
 function subscribeIsDesktop(callback: () => void): () => void {

@@ -2725,39 +2725,56 @@ a.contact-card:hover {
 .cat-grid .card {
   animation: rise 0.35s ease both;
 }
-/* Computers: news cards five to a row, with the card's insides scaled down to fit. */
+/* Computers: news cards and story cards four to a row, with the news card's insides scaled to fit. */
 @media (min-width: 981px) {
-  .news-grid {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 20px;
+  .news-grid,
+  .story-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 24px;
   }
   .news-track {
-    grid-auto-columns: calc((100% - 80px) / 5);
-    gap: 20px;
+    grid-auto-columns: calc((100% - 72px) / 4);
+    gap: 24px;
   }
   :is(.news-grid, .news-track) .card {
-    border-radius: 32px;
-    padding: 6px 6px 0;
+    border-radius: 36px;
+    padding: 7px 7px 0;
   }
   :is(.news-grid, .news-track) .card .ph {
-    border-radius: 27px;
+    border-radius: 30px;
   }
   :is(.news-grid, .news-track) .card h3 {
-    font-size: 19px;
-    margin: 16px 12px 0;
+    font-size: 21px;
+    margin: 18px 14px 0;
   }
   :is(.news-grid, .news-track) .card .meta {
-    margin: 12px 12px 0;
-    padding-block: 4px 14px;
+    margin: 14px 14px 0;
+    padding-block: 4px 16px;
   }
   :is(.news-grid, .news-track) .date-stamp b {
-    font-size: 20px;
+    font-size: 22px;
   }
   :is(.news-grid, .news-track) .date-stamp i {
-    height: 18px;
+    height: 20px;
   }
   :is(.news-grid, .news-track) .date-stamp > span {
     font-size: 11px;
+  }
+  .story-grid .story {
+    border-radius: 38px;
+  }
+  .story-grid .story .ph {
+    border-radius: 32px;
+  }
+  /* Home page: one full row of stories until there are eight for two rows. */
+  .home-stories:not(:has(> :nth-child(8))) > :nth-child(n + 5) {
+    display: none;
+  }
+}
+/* Phones and tablets keep six stories on the home page. */
+@media (max-width: 980px) {
+  .home-stories > :nth-child(n + 7) {
+    display: none;
   }
 }
 .load-wrap {

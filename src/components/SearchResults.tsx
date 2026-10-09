@@ -116,7 +116,7 @@ export default function SearchResults({
           {foundStories.length > 0 && (
             <>
               <h2 className="search-sub">ވާހަކަ</h2>
-              <div className="cat-grid">
+              <div className="cat-grid story-grid">
                 {foundStories.map((s) => (
                   <StoryCard key={s.slug} article={s} />
                 ))}

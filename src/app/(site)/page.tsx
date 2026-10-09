@@ -22,8 +22,8 @@ import {
 export default function Home() {
   const featured = getFeaturedArticles();
   const heroArticles = featured.length > 0 ? featured : articles.slice(0, 3);
-  const latest = getLatestArticles(10);
-  const popular = getPopularArticles(10);
+  const latest = getLatestArticles(8);
+  const popular = getPopularArticles(8);
   const tickerHeadlines = latest.slice(0, 4).map((a) => a.title);
   const visibleCategories = categories.filter((c) => c.slug !== "report");
 
@@ -40,7 +40,7 @@ export default function Home() {
             އިތުރު ލިޔުން <span aria-hidden="true">›</span>
           </Link>
         </div>
-        <CardGrid articles={latest} counts={[6, 10]} />
+        <CardGrid articles={latest} counts={[6, 8]} />
       </section>
 
       <section id="cats">
@@ -56,7 +56,7 @@ export default function Home() {
             އިތުރު ލިޔުން <span aria-hidden="true">›</span>
           </Link>
         </div>
-        <CardGrid articles={popular} counts={[6, 10]} />
+        <CardGrid articles={popular} counts={[6, 8]} />
       </section>
 
       <AdSlot />
@@ -68,7 +68,7 @@ export default function Home() {
             އިތުރު ލިޔުން <span aria-hidden="true">›</span>
           </Link>
         </div>
-        <CardGrid articles={reports} counts={[6, 10]} />
+        <CardGrid articles={reports} counts={[6, 8]} />
       </section>
 
       <section className="gfx-sec" id="graphics">
@@ -92,8 +92,8 @@ export default function Home() {
             އިތުރު ލިޔުން <span aria-hidden="true">›</span>
           </Link>
         </div>
-        <div className="cat-grid">
-          {stories.slice(0, 6).map((story) => (
+        <div className="cat-grid story-grid home-stories">
+          {stories.slice(0, 8).map((story) => (
             <StoryCard key={story.slug} article={story} />
           ))}
         </div>

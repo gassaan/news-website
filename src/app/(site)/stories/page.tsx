@@ -14,7 +14,7 @@ export default function StoriesPage() {
         <h1 className="page-title">ވާހަކަ</h1>
       </div>
 
-      <div className="cat-grid">
+      <div className="cat-grid story-grid">
         {stories.map((story) => (
           <StoryCard key={story.slug} article={story} />
         ))}
