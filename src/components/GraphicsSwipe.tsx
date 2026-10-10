@@ -11,7 +11,6 @@ const RESUME_MS = 5000;
 const FLY_MS = 1000;
 // How far a card must be dragged before it counts as a swipe.
 const SWIPE_PX = 60;
-const NEW_FOR_MS = 2 * 24 * 60 * 60 * 1000;
 
 // The graphics sit in a small pile: the top one slides away to show the next.
 export default function GraphicsSwipe({ graphics }: { graphics: Graphic[] }) {
@@ -31,7 +30,6 @@ export default function GraphicsSwipe({ graphics }: { graphics: Graphic[] }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const openRef = useRef(false);
   const triggerRef = useRef<HTMLElement | null>(null);
-  const [now, setNow] = useState<number | null>(null);
 
   function show(i: number) {
     activeRef.current = (i + n) % n;
@@ -45,12 +43,6 @@ export default function GraphicsSwipe({ graphics }: { graphics: Graphic[] }) {
     show(from + 1);
     setTimeout(() => setLeaving((l) => (l?.index === from ? null : l)), FLY_MS);
   }
-
-  // The "new" badge depends on today's date, so it is only worked out in the browser.
-  useEffect(() => {
-    const id = requestAnimationFrame(() => setNow(Date.now()));
-    return () => cancelAnimationFrame(id);
-  }, []);
 
   // Moves on every few seconds, only while on screen and nobody is touching it.
   useEffect(() => {
@@ -186,9 +178,6 @@ export default function GraphicsSwipe({ graphics }: { graphics: Graphic[] }) {
               tabIndex={top ? 0 : -1}
               onClick={(e) => open(i, e.currentTarget)}
             >
-              {now !== null && now - Date.parse(graphic.date) < NEW_FOR_MS && (
-                <span className="gfx-new">އާ</span>
-              )}
               <ArticleImage slug={graphic.slug} alt="" className="gfx" />
             </button>
           );

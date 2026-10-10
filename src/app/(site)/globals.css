@@ -1043,18 +1043,6 @@ section {
   border-radius: 43px;
   border: 1px solid var(--line);
 }
-.gfx-new {
-  position: absolute;
-  top: 18px;
-  right: 18px;
-  z-index: 2;
-  background: var(--accent);
-  color: var(--surface);
-  font-family: var(--font-body);
-  font-size: 14px;
-  padding: 3px 14px;
-  border-radius: 999px;
-}
 .gfx-sec .dots {
   margin-top: 4px;
 }
