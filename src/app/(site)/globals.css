@@ -348,6 +348,12 @@ a {
 body {
   padding-top: calc(77px + env(safe-area-inset-top, 0px));
 }
+/* Cards that fly or slide off the screen (the top stories, graphics) must not
+   make the page wider than the screen, or the whole page and header shift sideways.
+   "clip" cuts them at the screen edge without stopping the sticky parts from working. */
+main {
+  overflow-x: clip;
+}
 html {
   scroll-padding-top: 90px;
 }
