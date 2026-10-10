@@ -983,13 +983,15 @@ section {
   font-size: clamp(20px, 3vw, 40px);
   letter-spacing: 0.02em;
 }
+/* A slim "Sponsored" strip under each ad. */
 .ad small {
   display: block;
   background: var(--surface);
   color: var(--accent-dim);
   font-family: var(--font-latin);
-  font-size: 12px;
-  padding: 4px 8px;
+  font-size: 10px;
+  line-height: 1.4;
+  padding: 1px 8px;
   direction: ltr;
 }
 
@@ -1736,9 +1738,9 @@ section {
   color: var(--accent-dim);
   font-family: var(--font-latin);
   font-weight: 400;
-  font-size: 12px;
-  line-height: 1.6;
-  padding: 4px 10px;
+  font-size: 10px;
+  line-height: 1.4;
+  padding: 1px 10px;
   direction: ltr;
 }
 .art-actions {
