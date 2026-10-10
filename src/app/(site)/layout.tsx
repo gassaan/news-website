@@ -28,6 +28,14 @@ const democratsAkuruRegular = localFont({
   display: "swap",
 });
 
+// The reading font from the design (article text, summaries, card headlines).
+const akRasmee = localFont({
+  src: "../../fonts/AK-Rasmee-Regular.ttf",
+  weight: "400",
+  variable: "--font-rasmee",
+  display: "swap",
+});
+
 const inter = Inter({
   subsets: ["latin"],
   weight: ["400", "500"],
@@ -54,7 +62,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="dv"
       dir="rtl"
       suppressHydrationWarning
-      className={`${democratsAkBlack.variable} ${democratsAkuruBold.variable} ${democratsAkuruRegular.variable} ${inter.variable} h-full antialiased`}
+      className={`${democratsAkBlack.variable} ${democratsAkuruBold.variable} ${democratsAkuruRegular.variable} ${akRasmee.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="bg-ground text-text font-body flex min-h-full flex-col font-bold">
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
