@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Article } from "@/lib/articles";
 import ArticleImage from "./ArticleImage";
+import DateStamp from "./DateStamp";
 import Link from "next/link";
 
 const AUTO_MS = 6000;
@@ -174,6 +175,7 @@ export default function HeroSlider({ articles }: { articles: Article[] }) {
                   </Link>
                 </h1>
                 <p>{article.excerpt}</p>
+                <DateStamp className="hero-date" date={article.publishedAt} />
               </div>
             </article>
           );

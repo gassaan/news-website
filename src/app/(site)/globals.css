@@ -641,6 +641,10 @@ section {
 .dots button[aria-current="true"] {
   background: var(--accent);
 }
+/* The date under the hero summary, in the same style as the small cards. */
+.slide .hero-date {
+  margin-top: 4px;
+}
 /* Hero dots, sized and spaced as in the design. */
 .hero .dots {
   gap: 10px;
@@ -3187,6 +3191,9 @@ footer .logo {
     font-size: 16px;
     line-height: 37px;
     -webkit-line-clamp: 4;
+  }
+  .slide .hero-date {
+    margin-top: 14px;
   }
   .hero .dots {
     gap: 7px;
