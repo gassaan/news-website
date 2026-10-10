@@ -168,6 +168,16 @@ export default function HeroSlider({ articles }: { articles: Article[] }) {
               <Link className="slide-ph" href={`/article/${article.slug}`} aria-label={article.title} tabIndex={-1} draggable={false}>
                 <ArticleImage slug={article.slug} alt="" />
               </Link>
+              {/* Articles picked in the dashboard carry a gold-edged bookmark with a star. */}
+              {article.featured && (
+                <span className="hero-mark" role="img" aria-label="ޚާއްޞަ ލިޔުން">
+                  <span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                      <path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3 6.1 20.6l1.3-6.6L2.5 9.4l6.6-.8z" />
+                    </svg>
+                  </span>
+                </span>
+              )}
               <div className="copy">
                 <h1>
                   <Link href={`/article/${article.slug}`} draggable={false}>

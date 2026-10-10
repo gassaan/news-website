@@ -999,7 +999,8 @@ export function getFeaturedArticles(): Article[] {
   const picked = (cms.featured ?? [])
     .map((slug) => [...articles, ...reports].find((a) => a.slug === slug))
     .filter((a): a is Article => Boolean(a));
-  if (picked.length) return picked;
+  // Marked as featured so the top card shows its bookmark on them.
+  if (picked.length) return picked.map((a) => ({ ...a, featured: true }));
   const featured = articles.filter((a) => a.featured);
   return featured.length ? featured : getLatestArticles(5);
 }
