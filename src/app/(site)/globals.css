@@ -641,37 +641,20 @@ section {
 .dots button[aria-current="true"] {
   background: var(--accent);
 }
-/* Featured articles: a dark bookmark with a thin gold edge and a gold star,
-   hanging from the top of the card over the photo's corner. */
-.slide {
-  position: relative;
-}
-.hero-mark,
-.hero-mark > span {
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 78%, 0 100%);
-}
-.hero-mark {
-  position: absolute;
-  top: -1px;
-  right: 84px;
-  z-index: 3;
-  width: 56px;
-  height: 76px;
-  background: #f2b632;
-  pointer-events: none;
-}
-.hero-mark > span {
-  position: absolute;
-  inset: 0 3px 3px;
+/* Featured articles: a small soft purple pill with a star above the headline. */
+.hero-star {
+  align-self: flex-start;
   display: grid;
   place-items: center;
-  padding-bottom: 14px;
-  background: var(--surface);
-  color: #f2b632;
+  width: 60px;
+  height: 36px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: var(--accent);
 }
-.hero-mark svg {
-  width: 24px;
-  height: 24px;
+.hero-star svg {
+  width: 19px;
+  height: 19px;
 }
 /* The date under the hero summary, in the same style as the small cards. */
 .slide .hero-date {
@@ -3227,17 +3210,14 @@ footer .logo {
   .slide .hero-date {
     margin-top: 14px;
   }
-  .hero-mark {
-    right: 30px;
-    width: 42px;
-    height: 58px;
+  .hero-star {
+    width: 50px;
+    height: 30px;
+    margin-bottom: 10px;
   }
-  .hero-mark > span {
-    padding-bottom: 12px;
-  }
-  .hero-mark svg {
-    width: 20px;
-    height: 20px;
+  .hero-star svg {
+    width: 16px;
+    height: 16px;
   }
   .hero .dots {
     gap: 7px;
