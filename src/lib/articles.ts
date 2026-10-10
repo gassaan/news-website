@@ -61,6 +61,8 @@ type CmsData = Partial<{
   polls: Poll[];
   graphics: Graphic[];
   photoAlbums: PhotoAlbum[];
+  // Slugs picked in the dashboard for the home page's top card, in order.
+  featured: string[];
 }>;
 const cms = cmsData as CmsData;
 
@@ -993,6 +995,11 @@ export function getArticlesByCategory(categorySlug: string): Article[] {
 }
 
 export function getFeaturedArticles(): Article[] {
+  // Picked in the dashboard under "މައި ކާޑުގެ ލިޔުންތައް", in that order.
+  const picked = (cms.featured ?? [])
+    .map((slug) => [...articles, ...reports].find((a) => a.slug === slug))
+    .filter((a): a is Article => Boolean(a));
+  if (picked.length) return picked;
   const featured = articles.filter((a) => a.featured);
   return featured.length ? featured : getLatestArticles(5);
 }

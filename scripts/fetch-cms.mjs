@@ -41,6 +41,7 @@ const QUERY = `{
   "contact": *[_type == "contactInfo"][0] { intro, email, phone, whatsapp, address, hours },
   "privacy": *[_type == "privacyPolicy"][0] { intro, sections[] { heading, body }, _updatedAt },
   "terms": *[_type == "termsOfUse"][0] { intro, sections[] { heading, body }, _updatedAt },
+  "featured": *[_id == "featuredArticles"][0].articles[]->slug.current,
   "breaking": *[_id == "breakingNews"][0] { on, headline, "slug": article->slug.current, "title": article->title },
   "stamp": { "latest": *[] | order(_updatedAt desc)[0]._updatedAt, "count": count(*[]), "due": ${DUE} }
 }`;
@@ -168,6 +169,12 @@ if (r.albums.length) {
 if (r.contact) cms.contact = r.contact;
 if (r.privacy) cms.privacy = r.privacy;
 if (r.terms) cms.terms = r.terms;
+// The home page's top card: the articles picked in the dashboard, in that order,
+// leaving out any not on the site yet (still scheduled for later).
+const live = new Set(r.articles.map((a) => a.slug));
+const featured = (r.featured ?? []).map(cleanSlug).filter((s) => s && live.has(s));
+if (featured.length) cms.featured = featured;
+
 // The red strip on article pages, only while it is switched on. The link is kept
 // only if that article is on the site (not still scheduled for later).
 if (r.breaking?.on) {

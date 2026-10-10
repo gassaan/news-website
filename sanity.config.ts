@@ -24,6 +24,11 @@ export default defineConfig({
               .title("އަވަސް ޚަބަރު")
               .id("breakingNews")
               .child(S.document().schemaType("breakingNews").documentId("breakingNews")),
+            // A single document: the articles in the home page's big top card.
+            S.listItem()
+              .title("މައި ކާޑުގެ ލިޔުންތައް")
+              .id("featuredArticles")
+              .child(S.document().schemaType("featuredArticles").documentId("featuredArticles")),
             S.divider(),
             ...[
               ["article", "publishedAt"],

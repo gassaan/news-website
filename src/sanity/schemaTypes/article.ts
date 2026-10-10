@@ -41,6 +41,8 @@ export const article = defineType({
       title: "މައި ސްލައިޑަރުގައި ދައްކާ",
       type: "boolean",
       initialValue: false,
+      // Replaced by the "މައި ކާޑުގެ ލިޔުންތައް" list; kept hidden so saved values stay valid.
+      hidden: true,
     }),
   ],
   orderings: [{ title: "އެންމެ އާ", name: "newest", by: [{ field: "publishedAt", direction: "desc" }] }],
