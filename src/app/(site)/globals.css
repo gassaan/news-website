@@ -1125,10 +1125,16 @@ section {
 .album-page {
   padding-top: clamp(40px, 7vw, 100px);
 }
+/* Over the album grid: the photographer's capsule with the photo count pill beside it. */
 .album-author {
-  margin: clamp(2px, 0.6vw, 8px) 0 clamp(2px, 0.4vw, 6px);
+  min-width: 0;
 }
-/* "Photos" heading over the album grid, with the photo count pill beside it. */
+/* A very long photographer name ends with "…" instead of pushing the count off the row. */
+.album-author > span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .album-photos-head {
   display: flex;
   align-items: center;
@@ -1138,30 +1144,29 @@ section {
   padding-top: clamp(18px, 2.2vw, 28px);
   border-top: 1px solid var(--line);
 }
-.album-photos-head h2 {
-  margin: 0;
-  font-family: var(--font-head);
-  font-weight: 900;
-  font-size: clamp(22px, 2.2vw, 30px);
-  line-height: 1.75;
-}
+/* The same height as the author capsule beside it. */
 .photo-count {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  height: clamp(40px, 3.6vw, 48px);
-  padding: 0 clamp(16px, 1.6vw, 20px);
+  gap: 9px;
+  flex: none;
+  height: clamp(64px, 5.8vw, 80px);
+  padding: 0 clamp(24px, 2.4vw, 34px);
   border-radius: 50px;
   background: var(--surface);
   border: 1px solid var(--line);
   color: var(--accent);
-  font-size: clamp(14px, 1.2vw, 16px);
+  font-size: clamp(16px, 1.5vw, 20px);
   white-space: nowrap;
+}
+.photo-count svg {
+  width: clamp(20px, 1.8vw, 24px);
+  height: clamp(20px, 1.8vw, 24px);
 }
 .photo-count b {
   font-family: var(--font-latin);
   font-weight: 700;
-  font-size: clamp(18px, 1.6vw, 22px);
+  font-size: clamp(20px, 2vw, 26px);
   line-height: 1;
 }
 /* Photographers without an author photo get a simple person icon. */
@@ -1629,8 +1634,7 @@ section {
 }
 /* Headline letters fade from the text colour into purple (article and album pages). */
 .art-head .headline,
-.album-head .headline,
-.album-photos-head h2 {
+.album-head .headline {
   background: linear-gradient(180deg, var(--text) 30%, var(--head-grad-end) 100%);
   -webkit-background-clip: text;
   background-clip: text;
@@ -3178,6 +3182,15 @@ footer .logo {
     padding: 4px 4px 4px 22px;
     gap: 10px;
     font-size: 16px;
+  }
+  .photo-count {
+    height: 52px;
+    padding: 0 18px;
+    gap: 7px;
+    font-size: 15px;
+  }
+  .photo-count b {
+    font-size: 20px;
   }
   .avatar {
     width: 44px;

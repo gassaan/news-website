@@ -55,45 +55,44 @@ export default async function AlbumPage({
 
       <header className="album-head">
         <h1 className="headline">{album.title}</h1>
-        {/* The same author capsule as the article page; it links when the photographer has a page. */}
-        {photographerSlug ? (
-          <Link
-            href={`/author/${photographerSlug}`}
-            className="author album-author"
-          >
-            <ArticleImage
-              slug={`author-${photographerSlug}`}
-              src={getAuthorPhoto(photographerSlug)}
-              alt={album.photographer}
-              className="avatar"
-            />
-            <span>{album.photographer}</span>
-          </Link>
-        ) : (
-          <span className="author album-author">
-            <span className="avatar avatar-blank" aria-hidden="true">
-              <svg
-                width="26"
-                height="26"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.7"
-                strokeLinecap="round"
-              >
-                <circle cx="12" cy="8.5" r="4" />
-                <path d="M4.5 20.5c1.2-3.6 4-5.5 7.5-5.5s6.3 1.9 7.5 5.5" />
-              </svg>
-            </span>
-            <span>{album.photographer}</span>
-          </span>
-        )}
         <DateStamp className="art-date" date={album.date} />
       </header>
 
-      {/* A small heading over the photos, with the photo count beside it. */}
+      {/* Over the photos: the photographer's capsule (as on the article page; it links
+          when the photographer has a page) and the photo count, the same height. */}
       <div className="album-photos-head">
-        <h2>ފޮޓޯތައް</h2>
+          {photographerSlug ? (
+            <Link
+              href={`/author/${photographerSlug}`}
+              className="author album-author"
+            >
+              <ArticleImage
+                slug={`author-${photographerSlug}`}
+                src={getAuthorPhoto(photographerSlug)}
+                alt={album.photographer}
+                className="avatar"
+              />
+              <span>{album.photographer}</span>
+            </Link>
+          ) : (
+            <span className="author album-author">
+              <span className="avatar avatar-blank" aria-hidden="true">
+                <svg
+                  width="26"
+                  height="26"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.7"
+                  strokeLinecap="round"
+                >
+                  <circle cx="12" cy="8.5" r="4" />
+                  <path d="M4.5 20.5c1.2-3.6 4-5.5 7.5-5.5s6.3 1.9 7.5 5.5" />
+                </svg>
+              </span>
+              <span>{album.photographer}</span>
+            </span>
+          )}
         <span className="photo-count" aria-label={`${album.photoCount} ފޮޓޯ`}>
           <svg
             width="18"
