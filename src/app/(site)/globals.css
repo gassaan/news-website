@@ -647,20 +647,33 @@ section {
 .dots button[aria-current="true"] {
   background: var(--accent);
 }
-/* Featured articles: a small soft purple pill with a star above the headline. */
+/* Featured articles: a star in the photo's top corner, in the same dark pill
+   with a glowing purple edge as the story cards' rating; same in both themes. */
+.slide-ph {
+  position: relative;
+}
 .hero-star {
-  align-self: flex-start;
+  position: absolute;
+  top: 26px;
+  right: 28px;
+  z-index: 2;
   display: grid;
   place-items: center;
-  width: 60px;
-  height: 36px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--accent) 14%, transparent);
-  color: var(--accent);
+  padding: 7px 14px;
+  border-radius: 50px;
+  background: rgba(8, 0, 24, 0.7);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  border: 1px solid #a882ff;
+  box-shadow:
+    0 0 14px rgba(168, 130, 255, 0.6),
+    inset 0 0 8px rgba(168, 130, 255, 0.25);
+  color: #f2b632;
 }
 .hero-star svg {
-  width: 19px;
-  height: 19px;
+  width: 18px;
+  height: 18px;
+  filter: drop-shadow(0 0 4px rgba(242, 182, 50, 0.8));
 }
 /* The date under the hero summary, in the same style as the small cards. */
 .slide .hero-date {
@@ -3218,13 +3231,13 @@ footer .logo {
     margin-top: 14px;
   }
   .hero-star {
-    width: 50px;
-    height: 30px;
-    margin-bottom: 10px;
+    top: 15px;
+    right: 15px;
+    padding: 5px 10px;
   }
   .hero-star svg {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
   }
   .hero .dots {
     gap: 7px;

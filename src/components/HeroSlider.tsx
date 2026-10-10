@@ -167,9 +167,7 @@ export default function HeroSlider({ articles }: { articles: Article[] }) {
             >
               <Link className="slide-ph" href={`/article/${article.slug}`} aria-label={article.title} tabIndex={-1} draggable={false}>
                 <ArticleImage slug={article.slug} alt="" />
-              </Link>
-              <div className="copy">
-                {/* Articles picked in the dashboard get a small star pill above the headline. */}
+                {/* Articles picked in the dashboard get a star in the photo's corner, like the story cards' rating. */}
                 {article.featured && (
                   <span className="hero-star" role="img" aria-label="ޚާއްޞަ ލިޔުން">
                     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -177,6 +175,8 @@ export default function HeroSlider({ articles }: { articles: Article[] }) {
                     </svg>
                   </span>
                 )}
+              </Link>
+              <div className="copy">
                 <h1>
                   <Link href={`/article/${article.slug}`} draggable={false}>
                     {article.title}
