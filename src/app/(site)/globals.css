@@ -540,6 +540,28 @@ section {
 /* ---------- Hero ---------- */
 .hero {
   padding-top: 40px;
+  position: relative;
+  isolation: isolate;
+}
+/* The same faint purple grid as behind the graphics, across the full screen
+   width behind the top stories, fading out towards the edges. */
+.hero::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: -20px;
+  left: 50%;
+  width: 100vw;
+  translate: -50% 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--accent) 18%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--accent) 18%, transparent) 1px, transparent 1px);
+  background-size: 28px 28px;
+  /* The card covers the middle, so the grid fades out further out than behind the graphics. */
+  -webkit-mask: radial-gradient(ellipse 85% 80% at 50% 50%, #000 45%, transparent 92%);
+  mask: radial-gradient(ellipse 85% 80% at 50% 50%, #000 45%, transparent 92%);
 }
 /* The top stories sit in a pile; the top card flies away to show the next. */
 .hero-track {
