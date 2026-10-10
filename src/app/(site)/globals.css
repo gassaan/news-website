@@ -556,12 +556,12 @@ section {
   z-index: -1;
   pointer-events: none;
   background-image:
-    linear-gradient(color-mix(in srgb, var(--accent) 18%, transparent) 1px, transparent 1px),
-    linear-gradient(90deg, color-mix(in srgb, var(--accent) 18%, transparent) 1px, transparent 1px);
+    linear-gradient(color-mix(in srgb, var(--accent) 13%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--accent) 13%, transparent) 1px, transparent 1px);
   background-size: 28px 28px;
-  /* The card covers the middle, so the grid fades out further out than behind the graphics. */
-  -webkit-mask: radial-gradient(ellipse 85% 80% at 50% 50%, #000 45%, transparent 92%);
-  mask: radial-gradient(ellipse 85% 80% at 50% 50%, #000 45%, transparent 92%);
+  /* Lighter lines than behind the graphics, fading softly away from the card. */
+  -webkit-mask: radial-gradient(ellipse 80% 75% at 50% 50%, #000 15%, transparent 78%);
+  mask: radial-gradient(ellipse 80% 75% at 50% 50%, #000 15%, transparent 78%);
 }
 /* The top stories sit in a pile; the top card flies away to show the next. */
 .hero-track {
