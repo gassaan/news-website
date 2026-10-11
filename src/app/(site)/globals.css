@@ -947,7 +947,8 @@ section {
 .cat {
   position: relative;
   flex: none;
-  width: 220px;
+  /* Square, as wide as a news card: four to a row inside the page width on computers. */
+  width: calc((min(100vw, 1260px) - 32px - 72px) / 4);
   aspect-ratio: 1;
   border-radius: 30px;
   border: 1px solid var(--line);
@@ -3105,7 +3106,8 @@ footer .logo {
     gap: 10px;
   }
   .cat {
-    width: 150px;
+    /* As wide as a news card: two to a row, with the page's side gaps and the 15px between cards. */
+    width: calc((100vw - 47px) / 2);
     border-radius: 20px;
   }
   .cat span {
