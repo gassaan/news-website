@@ -213,6 +213,12 @@
   box-sizing: border-box;
 }
 
+/* iPhone Safari greys out a square box over tapped links; the rounded cards and buttons have their own states. */
+a,
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
 html,
 body,
 header.site,
@@ -296,7 +302,7 @@ a {
   }
 }
 .animate-rise {
-  animation: rise 0.35s ease both;
+  animation: rise 0.35s ease backwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -807,9 +813,12 @@ section {
     transform 0.2s,
     border-color 0.2s;
 }
-.card:hover {
-  transform: translateY(-4px);
-  border-color: var(--accent-dim);
+/* Only with a real mouse: on phones a tap left the card stuck lifted with a purple border. */
+@media (hover: hover) {
+  .card:hover {
+    transform: translateY(-4px);
+    border-color: var(--accent-dim);
+  }
 }
 .card .ph {
   aspect-ratio: 388/297;
@@ -2783,7 +2792,7 @@ a.contact-card:hover {
   margin-top: clamp(28px, 3.5vw, 56px);
 }
 .cat-grid .card {
-  animation: rise 0.35s ease both;
+  animation: rise 0.35s ease backwards;
 }
 /* Computers: news cards and story cards four to a row, with the news card's insides scaled to fit. */
 @media (min-width: 981px) {
