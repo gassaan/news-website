@@ -1730,7 +1730,7 @@ section {
   margin: 0 0 1.4em;
   /* The reading font has only one weight, so a hair-thin outline in the text's
      own colour makes it a very little bolder without changing the font. */
-  -webkit-text-stroke: 0.3px currentColor;
+  -webkit-text-stroke: 0.2px currentColor;
 }
 .art-body h2 {
   font-family: var(--font-head);
