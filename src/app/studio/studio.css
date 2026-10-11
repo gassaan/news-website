@@ -77,9 +77,12 @@ button {
 [data-ui="fieldHeaderContentBox"] label[data-ui="Text"] {
   font-size: 17px !important;
 }
-/* Help text a little brighter so it reads on the dark background. */
-[data-ui="fieldHeaderContentBox"] [id^="desc_"] {
-  color: #b9bdcc !important;
+/* Help text in the site's soft purple, clear on both the dark and the light background. */
+[data-scheme="dark"] [data-ui="fieldHeaderContentBox"] [id^="desc_"] {
+  color: #c9b6f5 !important;
+}
+[data-scheme="light"] [data-ui="fieldHeaderContentBox"] [id^="desc_"] {
+  color: #5b4691 !important;
 }
 /* Keep the warning and error signs clear of the field name. */
 [data-ui="fieldHeaderContentBox"] label[data-ui="Text"] {
@@ -90,4 +93,27 @@ button {
 [data-ui="fieldHeaderContentBox"] + [data-ui="Card"] {
   right: auto !important;
   left: 0 !important;
+}
+
+/* ---------- The website's look ---------- */
+/* Buttons are pills and icon buttons are round, like on the site. */
+[data-ui="Button"] {
+  border-radius: 999px !important;
+}
+[data-ui="Button"] > span[data-border],
+[data-ui="Button"] > span:first-child {
+  border-radius: inherit !important;
+}
+/* Rows in the menus and lists: rounded like the site's cards, titles in the site's bold Thaana. */
+a[data-ui="PreviewCard"] {
+  border-radius: 18px !important;
+}
+:is([data-testid="compact-preview__header"], [data-testid="default-preview__header"]) > [data-ui="Text"]:first-child {
+  font-weight: 700 !important;
+}
+/* Pictures in the lists get the site's rounded corners. */
+a[data-ui="PreviewCard"] [data-testid="Media"],
+a[data-ui="PreviewCard"] [data-testid="Media"] img,
+a[data-ui="PreviewCard"] [data-testid="Media"] [data-border] {
+  border-radius: 10px !important;
 }

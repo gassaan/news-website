@@ -4,10 +4,14 @@ import { defineConfig } from "sanity";
 import { structureTool } from "sanity/structure";
 import { schemaTypes } from "./src/sanity/schemaTypes";
 import project from "./src/sanity/project.json";
+import { studioTheme } from "./src/sanity/theme";
+import StudioLogo from "./src/sanity/StudioLogo";
 
 export default defineConfig({
   name: "hulhangu",
   title: "Hulhangu",
+  icon: StudioLogo,
+  theme: studioTheme,
   projectId: project.projectId || "missing",
   dataset: project.dataset,
   // The Studio lives at /studio inside the site (plus the GitHub Pages sub-path).
