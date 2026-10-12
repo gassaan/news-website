@@ -932,12 +932,14 @@ section {
   max-width: 100%;
   display: block;
   position: relative;
-  overflow: hidden;
-  -webkit-mask-image: -webkit-radial-gradient(white, black);
+  /* The same soft glow as the news cards (dark mode only). The poster clips itself, so the card doesn't need to. */
+  box-shadow: var(--card-shadow);
   transition: transform 0.2s;
 }
-.story:hover {
-  transform: translateY(-4px);
+@media (hover: hover) {
+  .story:hover {
+    transform: translateY(-4px);
+  }
 }
 .story .ph {
   position: absolute;
