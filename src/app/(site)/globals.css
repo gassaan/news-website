@@ -67,7 +67,7 @@
     --mh-field: #291359;
     --mh-rule: #7958c5;
     --rule: #c7afff;
-    --story: #c7afff;
+    --story: #dacafd;
     --nav-bg: #3e2180;
     --nav-line: #3e2180;
     --nav-ink: #e1d5ff;
@@ -112,7 +112,7 @@
   --mh-field: #291359;
   --mh-rule: #7958c5;
   --rule: #c7afff;
-  --story: #c7afff;
+  --story: #dacafd;
   --nav-bg: #3e2180;
   --nav-line: #3e2180;
   --nav-ink: #e1d5ff;
@@ -926,7 +926,9 @@ section {
 
 .story {
   border-radius: 50px;
-  background: var(--story);
+  /* Same fill and outline as the news cards. */
+  background: var(--surface);
+  border: 1px solid var(--line);
   padding: 6px;
   aspect-ratio: 400/550;
   max-width: 100%;
@@ -945,6 +947,7 @@ section {
   position: absolute;
   inset: 6px;
   border-radius: 44px;
+  border: 1px solid var(--line);
 }
 .story .rating {
   position: absolute;
@@ -3367,11 +3370,11 @@ footer .logo {
   }
   .story {
     border-radius: 24px;
-    padding: 3px;
+    padding: 5px;
   }
   .story .ph {
-    inset: 3px;
-    border-radius: 21px;
+    inset: 5px;
+    border-radius: 20px;
   }
   .story .rating {
     top: 10px;
