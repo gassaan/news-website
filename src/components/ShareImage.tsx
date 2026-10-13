@@ -251,6 +251,13 @@ async function drawPicture(
   return new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.92));
 }
 
+declare global {
+  interface Window {
+    // Lets the Facebook posting step (scripts/post-facebook.mjs) make this same picture.
+    hulhanguSharePicture?: () => Promise<Blob | null>;
+  }
+}
+
 // Round button on the article page that turns the story into a picture to share or save.
 export default function ShareImage({
   slug,
@@ -270,6 +277,13 @@ export default function ShareImage({
   const [failed, setFailed] = useState(false);
   const closeRef = useRef<HTMLButtonElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    window.hulhanguSharePicture = () => drawPicture(slug, title, summary, date);
+    return () => {
+      delete window.hulhanguSharePicture;
+    };
+  }, [slug, title, summary, date]);
 
   async function start() {
     setOpen(true);

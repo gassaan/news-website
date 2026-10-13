@@ -116,8 +116,11 @@ export const FACEBOOK_FIELDSET = {
 };
 
 type FacebookDoc = { facebookPostedAt?: string; facebookShare?: boolean };
+const posted = (document: unknown) => Boolean((document as FacebookDoc | undefined)?.facebookPostedAt);
+const ticked = (document: unknown) => Boolean((document as FacebookDoc | undefined)?.facebookShare);
 
-export const facebookFields = () => [
+// withPicture: articles can post the share-button picture instead of the main photo.
+export const facebookFields = ({ withPicture = false } = {}) => [
   defineField({
     name: "facebookShare",
     title: "ފޭސްބުކް ޕޭޖަށް ޝެއާ ކުރޭ",
@@ -127,8 +130,28 @@ export const facebookFields = () => [
     initialValue: false,
     options: { layout: "checkbox" },
     fieldset: "facebook",
-    readOnly: ({ document }) => Boolean((document as FacebookDoc | undefined)?.facebookPostedAt),
+    readOnly: ({ document }) => posted(document),
   }),
+  ...(withPicture
+    ? [
+        defineField({
+          name: "facebookImage",
+          title: "ފޭސްބުކުގައި ދައްކާނެ ފޮޓޯ",
+          type: "string",
+          options: {
+            list: [
+              { title: "ލިޔުމުގެ މައި ފޮޓޯ (ލިންކާއެކު)", value: "photo" },
+              { title: "ޝެއާ ފޮޓޯ (ސުރުޚީ އާއި ޚުލާސާ ލިޔެވިފައިވާ)", value: "card" },
+            ],
+            layout: "radio",
+          },
+          initialValue: "photo",
+          fieldset: "facebook",
+          hidden: ({ document }) => !ticked(document),
+          readOnly: ({ document }) => posted(document),
+        }),
+      ]
+    : []),
   defineField({
     name: "facebookText",
     title: "ފޭސްބުކް ޕޯސްޓުގައި ލިޔާނެ ބަސް",
@@ -136,8 +159,8 @@ export const facebookFields = () => [
     type: "text",
     rows: 3,
     fieldset: "facebook",
-    hidden: ({ document }) => !(document as FacebookDoc | undefined)?.facebookShare,
-    readOnly: ({ document }) => Boolean((document as FacebookDoc | undefined)?.facebookPostedAt),
+    hidden: ({ document }) => !ticked(document),
+    readOnly: ({ document }) => posted(document),
   }),
   defineField({
     name: "facebookPostedAt",
@@ -145,7 +168,7 @@ export const facebookFields = () => [
     type: "datetime",
     fieldset: "facebook",
     readOnly: true,
-    hidden: ({ document }) => !(document as FacebookDoc | undefined)?.facebookPostedAt,
+    hidden: ({ document }) => !posted(document),
   }),
   defineField({ name: "facebookPostId", type: "string", hidden: true, readOnly: true }),
 ];

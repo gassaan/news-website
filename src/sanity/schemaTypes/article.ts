@@ -37,7 +37,7 @@ export const article = defineType({
         r.max(250).warning("250 އަކުރަށް ވުރެ ދިގު. ޝެއާ ކުރާ ފޮޓޯގައި ފަހަތު ބައި ކެނޑިގެންދާނެ."),
     }),
     bodyField(),
-    ...facebookFields(),
+    ...facebookFields({ withPicture: true }),
     defineField({
       name: "featured",
       title: "މައި ސްލައިޑަރުގައި ދައްކާ",
