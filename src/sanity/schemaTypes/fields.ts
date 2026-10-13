@@ -105,3 +105,47 @@ export function formatWhen(value?: string): string {
   const [y, m, d] = mv.slice(0, 10).split("-").map(Number);
   return `${d} ${DHIVEHI_MONTHS[m - 1]} ${y} · ${mv.slice(11, 16)}`;
 }
+
+// Facebook: tick the box and publish, and the next website update also posts the link on
+// the Facebook page (scripts/post-facebook.mjs). The post time is filled in afterwards,
+// which locks the box so the same item is never posted twice.
+export const FACEBOOK_FIELDSET = {
+  name: "facebook",
+  title: "ފޭސްބުކް",
+  options: { collapsible: false },
+};
+
+type FacebookDoc = { facebookPostedAt?: string; facebookShare?: boolean };
+
+export const facebookFields = () => [
+  defineField({
+    name: "facebookShare",
+    title: "ފޭސްބުކް ޕޭޖަށް ޝެއާ ކުރޭ",
+    description:
+      "ޓިކް ޖައްސަވައި ޕަބްލިޝް ކުރައްވައިފިނަމަ، ވެބްސައިޓަށް އެރުމާއެކު ފޭސްބުކް ޕޭޖަށްވެސް އަމިއްލައަށް ޕޯސްޓްވާނެ.",
+    type: "boolean",
+    initialValue: false,
+    options: { layout: "checkbox" },
+    fieldset: "facebook",
+    readOnly: ({ document }) => Boolean((document as FacebookDoc | undefined)?.facebookPostedAt),
+  }),
+  defineField({
+    name: "facebookText",
+    title: "ފޭސްބުކް ޕޯސްޓުގައި ލިޔާނެ ބަސް",
+    description: "ހުސްކޮށް ބާއްވައިފިނަމަ، ސުރުޚީ އާއި ކުރު ޚުލާސާ ލިޔެވޭނެ.",
+    type: "text",
+    rows: 3,
+    fieldset: "facebook",
+    hidden: ({ document }) => !(document as FacebookDoc | undefined)?.facebookShare,
+    readOnly: ({ document }) => Boolean((document as FacebookDoc | undefined)?.facebookPostedAt),
+  }),
+  defineField({
+    name: "facebookPostedAt",
+    title: "ފޭސްބުކަށް ޕޯސްޓް ކުރި ވަގުތު",
+    type: "datetime",
+    fieldset: "facebook",
+    readOnly: true,
+    hidden: ({ document }) => !(document as FacebookDoc | undefined)?.facebookPostedAt,
+  }),
+  defineField({ name: "facebookPostId", type: "string", hidden: true, readOnly: true }),
+];

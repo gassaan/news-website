@@ -6,9 +6,22 @@ import { getStoryPoster, getStoryPosterStyle } from "@/lib/storyPosters";
 import ArticleImage from "@/components/ArticleImage";
 import EpisodeRatingLabel from "@/components/EpisodeRatingLabel";
 import StoryRatingBadge from "@/components/StoryRatingBadge";
+import { shareMetadata } from "@/lib/share";
 
 export function generateStaticParams() {
   return stories.map((story) => ({ slug: story.slug }));
+}
+
+export async function generateMetadata({ params }: PageProps<"/story/[slug]">) {
+  const { slug } = await params;
+  const story = stories.find((s) => s.slug === slug);
+  if (!story) return {};
+  return shareMetadata({
+    title: story.title,
+    description: story.excerpt,
+    path: `/story/${story.slug}/`,
+    imageKey: story.slug,
+  });
 }
 
 export default async function StoryEpisodeListPage({

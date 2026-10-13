@@ -1,10 +1,11 @@
 import { defineType, defineField, defineArrayMember } from "sanity";
-import { bodyField, dateTimeField, formatPublish, photoField, slugField, titleField } from "./fields";
+import { bodyField, dateTimeField, FACEBOOK_FIELDSET, facebookFields, formatPublish, photoField, slugField, titleField } from "./fields";
 
 export const story = defineType({
   name: "story",
   title: "ވާހަކަ",
   type: "document",
+  fieldsets: [FACEBOOK_FIELDSET],
   fields: [
     titleField("ވާހަކައިގެ ނަން"),
     slugField(),
@@ -38,6 +39,7 @@ export const story = defineType({
       ],
       validation: (r) => r.min(1),
     }),
+    ...facebookFields(),
   ],
   preview: {
     select: { title: "title", date: "publishedAt", media: "poster" },

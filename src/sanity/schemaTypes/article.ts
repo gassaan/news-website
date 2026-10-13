@@ -1,10 +1,11 @@
 import { defineType, defineField } from "sanity";
-import { CATEGORY_OPTIONS, bodyField, dateTimeField, formatPublish, photoField, slugField, titleField } from "./fields";
+import { CATEGORY_OPTIONS, FACEBOOK_FIELDSET, facebookFields, bodyField, dateTimeField, formatPublish, photoField, slugField, titleField } from "./fields";
 
 export const article = defineType({
   name: "article",
   title: "ޚަބަރު / ރިޕޯޓު",
   type: "document",
+  fieldsets: [FACEBOOK_FIELDSET],
   fields: [
     titleField(),
     slugField(),
@@ -36,6 +37,7 @@ export const article = defineType({
         r.max(250).warning("250 އަކުރަށް ވުރެ ދިގު. ޝެއާ ކުރާ ފޮޓޯގައި ފަހަތު ބައި ކެނޑިގެންދާނެ."),
     }),
     bodyField(),
+    ...facebookFields(),
     defineField({
       name: "featured",
       title: "މައި ސްލައިޑަރުގައި ދައްކާ",

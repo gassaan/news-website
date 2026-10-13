@@ -22,9 +22,22 @@ import Card from "@/components/Card";
 import AdSlot from "@/components/AdSlot";
 import NewsTicker from "@/components/NewsTicker";
 import { getBreakingNews } from "@/lib/breaking";
+import { shareMetadata } from "@/lib/share";
 
 export function generateStaticParams() {
   return [...articles, ...reports].map((article) => ({ slug: article.slug }));
+}
+
+export async function generateMetadata({ params }: PageProps<"/article/[slug]">) {
+  const { slug } = await params;
+  const article = getArticle(slug);
+  if (!article) return {};
+  return shareMetadata({
+    title: article.title,
+    description: article.excerpt,
+    path: `/article/${article.slug}/`,
+    imageKey: article.slug,
+  });
 }
 
 export default async function ArticlePage({
