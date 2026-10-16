@@ -1,7 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { episodeBaseline, getUserRating, subscribeUserRatings } from "@/lib/storyRating";
+import { episodeRating, getUserRating, subscribeUserRatings } from "@/lib/storyRating";
 
 export default function EpisodeRatingLabel({
   slug,
@@ -10,12 +10,17 @@ export default function EpisodeRatingLabel({
   slug: string;
   episode: number;
 }) {
-  const userRating = useSyncExternalStore(
+  const rating = useSyncExternalStore(
     subscribeUserRatings,
-    () => getUserRating(slug, episode),
-    () => null,
+    () => episodeRating(slug, episode),
+    () => episodeRating(slug, episode, false),
   );
-  const rating = userRating ?? episodeBaseline(slug, episode);
+  const rated = useSyncExternalStore(
+    subscribeUserRatings,
+    () => getUserRating(slug, episode) !== null,
+    () => false,
+  );
+  if (rating === null) return null;
 
   return (
     <span className="text-accent flex items-center gap-1 text-xs font-medium">
@@ -23,7 +28,8 @@ export default function EpisodeRatingLabel({
         <path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.6l-5.9 3 1.3-6.6-4.9-4.6 6.6-.8Z" />
       </svg>
       {rating.toFixed(1)}
-      {userRating !== null && <span className="text-accent">•</span>}
+      {/* A dot marks episodes this reader has rated. */}
+      {rated && <span className="text-accent">•</span>}
     </span>
   );
 }

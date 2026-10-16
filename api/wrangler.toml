@@ -1,0 +1,19 @@
+# The small online service behind views, poll votes, story ratings and comments.
+# Deployed by .github/workflows/deploy.yml; the database id is filled in there.
+name = "hulhangu-api"
+main = "src/index.js"
+compatibility_date = "2026-09-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "hulhangu"
+database_id = "00000000-0000-0000-0000-000000000000"
+
+[vars]
+SANITY_PROJECT = "b2549qo6"
+SANITY_DATASET = "production"
+ALLOWED_ORIGINS = "https://gassaan.github.io,http://localhost:3000,http://localhost:4567"
+
+# Once a day: forget yesterday's "already counted" marks.
+[triggers]
+crons = ["17 3 * * *"]

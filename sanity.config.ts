@@ -41,6 +41,7 @@ export default defineConfig({
               ["photoAlbum", "date"],
               ["graphic", "date"],
               ["poll", "publishedAt"],
+              ["comment", "submittedAt"],
             ].map(([type, field]) =>
               S.documentTypeListItem(type).child(
                 S.documentTypeList(type).defaultOrdering([

@@ -1,16 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import {
-  getBaselineAverage,
-  getEffectiveEpisodeRatings,
-  subscribeUserRatings,
-} from "@/lib/storyRating";
-
-function averageRating(slug: string, episodeCount: number): number {
-  const effective = getEffectiveEpisodeRatings(slug, episodeCount);
-  return effective.reduce((a, b) => a + b, 0) / effective.length;
-}
+import { storyRating, subscribeUserRatings } from "@/lib/storyRating";
 
 export default function StoryPosterRating({
   slug,
@@ -21,9 +12,11 @@ export default function StoryPosterRating({
 }) {
   const rating = useSyncExternalStore(
     subscribeUserRatings,
-    () => averageRating(slug, episodeCount),
-    () => getBaselineAverage(slug, episodeCount),
+    () => storyRating(slug, episodeCount),
+    () => storyRating(slug, episodeCount, false),
   );
+  // Not rated by anyone yet: no star pill on the poster.
+  if (rating === null) return null;
 
   return (
     <span className="rating" dir="ltr">

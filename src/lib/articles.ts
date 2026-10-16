@@ -63,6 +63,11 @@ type CmsData = Partial<{
   photoAlbums: PhotoAlbum[];
   // Slugs picked in the dashboard for the home page's top card, in order.
   featured: string[];
+  // From the site's online service (api/), when it is set up: total views per
+  // article, the week's most read (most first), and story episode ratings.
+  views: Record<string, number>;
+  popular: string[];
+  ratings: Record<string, Record<string, { avg: number; n: number }>>;
 }>;
 const cms = cmsData as CmsData;
 
@@ -1012,11 +1017,32 @@ export function getLatestArticles(limit = 6): Article[] {
     .slice(0, limit);
 }
 
+// Real counts exist once the site's online service is connected (see src/lib/api.ts).
+const realCounts = Boolean(process.env.NEXT_PUBLIC_API_URL);
+
+// The week's most read articles; topped up with the newest while there are few readings.
 export function getPopularArticles(limit = 6): Article[] {
+  if (realCounts) {
+    const bySlug = new Map(articles.map((a) => [a.slug, a]));
+    const top = (cms.popular ?? []).map((s) => bySlug.get(s)).filter((a): a is Article => Boolean(a));
+    const rest = articles.filter((a) => !top.includes(a));
+    return [...top, ...rest].slice(0, limit);
+  }
   const viewsOf = (slug: string) => Number(pseudoViewCount(slug).replace(/,/g, ""));
   return [...articles]
     .sort((a, b) => viewsOf(b.slug) - viewsOf(a.slug))
     .slice(0, limit);
+}
+
+// Views shown on an article when the page is built; the page then updates it live.
+export function viewCount(slug: string): number {
+  if (realCounts) return cms.views?.[slug] ?? 0;
+  return Number(pseudoViewCount(slug).replace(/,/g, ""));
+}
+
+// Story episode ratings as of the build, for the first paint.
+export function builtRatings(): Record<string, Record<string, { avg: number; n: number }>> {
+  return cms.ratings ?? {};
 }
 
 export function getRelatedArticles(article: Article, limit = 6): Article[] {

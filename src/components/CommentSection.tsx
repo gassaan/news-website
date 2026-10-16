@@ -1,7 +1,9 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Comment } from "@/lib/articles";
+import { apiGet, apiOn, apiPost, remember, timeAgo, voterId } from "@/lib/api";
+import project from "@/sanity/project.json";
 
 type VoteState = "like" | "dislike" | null;
 
@@ -24,17 +26,15 @@ function ReplyIcon() {
 }
 
 function VoteButtons({
-  id,
-  baseLikes,
-  baseDislikes,
+  likes,
+  dislikes,
   vote,
-  setVote,
+  onVote,
 }: {
-  id: string;
-  baseLikes: number;
-  baseDislikes: number;
+  likes: number;
+  dislikes: number;
   vote: VoteState;
-  setVote: (id: string, v: VoteState) => void;
+  onVote: (v: VoteState) => void;
 }) {
   return (
     <div className="votes">
@@ -43,21 +43,21 @@ function VoteButtons({
         className="vote"
         aria-label="Like"
         aria-pressed={vote === "like"}
-        onClick={() => setVote(id, vote === "like" ? null : "like")}
+        onClick={() => onVote(vote === "like" ? null : "like")}
       >
         <span className="vi">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
             <path d="M2 10.5A1.5 1.5 0 0 1 3.5 9h2A1.5 1.5 0 0 1 7 10.5v9A1.5 1.5 0 0 1 5.5 21h-2A1.5 1.5 0 0 1 2 19.5zM9 10l3.6-7a2.4 2.4 0 0 1 4.3 1.9L15.9 9h4.2a2 2 0 0 1 2 2.4l-1.5 7.9A2.6 2.6 0 0 1 18 21H9z" />
           </svg>
         </span>
-        <span className="vn">{baseLikes + (vote === "like" ? 1 : 0)}</span>
+        <span className="vn">{likes}</span>
       </button>
       <button
         type="button"
         className="vote"
         aria-label="Dislike"
         aria-pressed={vote === "dislike"}
-        onClick={() => setVote(id, vote === "dislike" ? null : "dislike")}
+        onClick={() => onVote(vote === "dislike" ? null : "dislike")}
       >
         <span className="vi">
           <svg
@@ -72,60 +72,169 @@ function VoteButtons({
             <path d="M22 13.5A1.5 1.5 0 0 1 20.5 15h-2a1.5 1.5 0 0 1-1.5-1.5v-9A1.5 1.5 0 0 1 18.5 3h2A1.5 1.5 0 0 1 22 4.5zM15 14l-3.6 7a2.4 2.4 0 0 1-4.3-1.9L8.1 15H3.9a2 2 0 0 1-2-2.4l1.5-7.9A2.6 2.6 0 0 1 6 3h9z" />
           </svg>
         </span>
-        <span className="vn">
-          {baseDislikes + (vote === "dislike" ? 1 : 0)}
-        </span>
+        <span className="vn">{dislikes}</span>
       </button>
     </div>
   );
 }
 
+// Published comments for one article, straight from the dashboard (Sanity), so a
+// comment shows as soon as an editor publishes it.
+type Stored = { _id: string; name: string; text: string; parent?: string; submittedAt?: string; _createdAt: string };
+const PAGE = 10;
+const QUERY = `*[_type == "comment" && target == $t && kind == $k] | order(_createdAt desc)[0...300]{_id, name, text, parent, submittedAt, _createdAt}`;
+
+async function loadComments(target: string, kind: string): Promise<Comment[] | null> {
+  const url =
+    `https://${project.projectId}.apicdn.sanity.io/v2025-02-19/data/query/${project.dataset}` +
+    `?query=${encodeURIComponent(QUERY)}&%24t=${encodeURIComponent(JSON.stringify(target))}&%24k=${encodeURIComponent(JSON.stringify(kind))}`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const rows = ((await res.json()).result ?? []) as Stored[];
+    const toComment = (r: Stored): Comment => ({
+      id: r._id,
+      author: r.name,
+      text: r.text,
+      timeAgo: timeAgo(r.submittedAt ?? r._createdAt),
+      likes: 0,
+      dislikes: 0,
+    });
+    const top = rows.filter((r) => !r.parent).map(toComment);
+    const byId = new Map(top.map((c) => [c.id, c]));
+    for (const r of [...rows].reverse()) {
+      const parent = r.parent && byId.get(r.parent);
+      if (parent) parent.replies = [...(parent.replies ?? []), toComment(r)];
+    }
+    return top;
+  } catch {
+    return null;
+  }
+}
+
 export default function CommentSection({
   initialComments,
+  target,
+  kind = "article",
 }: {
   initialComments: Comment[];
+  // The article's web address name; with the online service on, comments are real.
+  target: string;
+  kind?: "article" | "story";
 }) {
-  const [comments, setComments] = useState(initialComments);
+  // Without the online service the page shows the sample thread, as before.
+  const [comments, setComments] = useState(apiOn ? [] : initialComments);
   const [votes, setVotes] = useState<Record<string, VoteState>>({});
+  const [counts, setCounts] = useState<Record<string, { up: number; down: number }>>({});
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [text, setText] = useState("");
+  const [shown, setShown] = useState(PAGE);
   const [moreShown, setMoreShown] = useState(false);
+  const [sent, setSent] = useState<"" | "ok" | "error">("");
+  const [busy, setBusy] = useState(false);
   // The form is always shown; the comments below it stay folded until opened.
   const [open, setOpen] = useState(false);
+  const trap = useRef<HTMLInputElement>(null);
   const nextId = useRef(0);
   const count = comments.reduce((n, c) => n + 1 + (c.replies?.length ?? 0), 0);
+
+  useEffect(() => {
+    if (!apiOn) return;
+    loadComments(target, kind).then(async (list) => {
+      setName((n) => n || (remember("hulhangu-name") ?? ""));
+      if (!list) return;
+      setComments(list);
+      const ids = list.flatMap((c) => [c.id, ...(c.replies ?? []).map((r) => r.id)]);
+      const mine: Record<string, VoteState> = {};
+      for (const id of ids) {
+        const v = remember(`hulhangu-like:${id}`);
+        if (v === "like" || v === "dislike") mine[id] = v;
+      }
+      setVotes(mine);
+      for (let i = 0; i < ids.length; i += 100) {
+        const got = await apiGet<Record<string, { up: number; down: number }>>(
+          `/likes?ids=${ids.slice(i, i + 100).join(",")}`,
+        );
+        if (got) setCounts((prev) => ({ ...prev, ...got }));
+      }
+    });
+  }, [target, kind]);
 
   function makeId(prefix: string): string {
     nextId.current += 1;
     return `${prefix}-${nextId.current}`;
   }
 
+  function likesOf(c: Comment) {
+    const v = votes[c.id] ?? null;
+    if (apiOn) return { up: counts[c.id]?.up ?? 0, down: counts[c.id]?.down ?? 0 };
+    return { up: c.likes + (v === "like" ? 1 : 0), down: c.dislikes + (v === "dislike" ? 1 : 0) };
+  }
+
   function setVote(id: string, v: VoteState) {
     setVotes((prev) => ({ ...prev, [id]: v }));
+    if (!apiOn || id.startsWith("local")) return;
+    remember(`hulhangu-like:${id}`, v ?? "");
+    apiPost<{ up: number; down: number }>("/like", {
+      comment: id,
+      value: v === "like" ? 1 : v === "dislike" ? -1 : 0,
+      voter: voterId(),
+    }).then((res) => res && setCounts((prev) => ({ ...prev, [id]: res })));
   }
 
-  function submitComment(e: React.FormEvent) {
+  // Sends a comment or reply to the editors. Returns true when it was received.
+  async function send(body: string, author: string, parent?: string): Promise<boolean> {
+    const res = await apiPost<{ ok?: boolean }>("/comment", {
+      target,
+      kind,
+      name: author,
+      text: body,
+      ...(parent ? { parent } : {}),
+      website: trap.current?.value ?? "",
+    });
+    return Boolean(res?.ok);
+  }
+
+  async function submitComment(e: React.FormEvent) {
     e.preventDefault();
     if (!name.trim() || !text.trim()) return;
-    const c: Comment = {
-      id: makeId("local"),
-      author: name.trim(),
-      text: text.trim(),
-      timeAgo: "މިހާރު",
-      likes: 0,
-      dislikes: 0,
-    };
-    setComments((prev) => [c, ...prev]);
+    if (apiOn) {
+      setBusy(true);
+      const ok = await send(text.trim(), name.trim());
+      setBusy(false);
+      setSent(ok ? "ok" : "error");
+      if (!ok) return;
+      remember("hulhangu-name", name.trim());
+    } else {
+      const c: Comment = {
+        id: makeId("local"),
+        author: name.trim(),
+        text: text.trim(),
+        timeAgo: "މިހާރު",
+        likes: 0,
+        dislikes: 0,
+      };
+      setComments((prev) => [c, ...prev]);
+      setOpen(true);
+    }
     setText("");
-    setOpen(true);
-    // TODO(phase 2): save comment to database
   }
 
-  function submitReply(parentId: string, replyText: string) {
+  async function submitReply(parentId: string, replyText: string, author: string): Promise<boolean> {
+    if (apiOn) {
+      const ok = await send(replyText, author, parentId);
+      if (ok) {
+        remember("hulhangu-name", author);
+        setName(author);
+        setReplyingTo(null);
+        setSent("ok");
+      }
+      return ok;
+    }
     const r: Comment = {
       id: makeId("local"),
-      author: "ތިބާ",
+      author: author || "ތިބާ",
       text: replyText,
       timeAgo: "މިހާރު",
       likes: 0,
@@ -137,10 +246,14 @@ export default function CommentSection({
       ),
     );
     setReplyingTo(null);
-    // TODO(phase 2): save reply to database
+    return true;
   }
 
   function loadMore() {
+    if (apiOn) {
+      setShown((n) => n + PAGE);
+      return;
+    }
     const filler = comments[0];
     if (!filler) return;
     const extra: Comment[] = [0, 1].map(() => ({
@@ -153,8 +266,10 @@ export default function CommentSection({
     }));
     setComments((prev) => [...prev, ...extra]);
     setMoreShown(true);
-    // TODO(phase 2): fetch the next page of comments from the database
   }
+
+  const visible = apiOn ? comments.slice(0, shown) : comments;
+  const hasMore = apiOn ? comments.length > shown : !moreShown && initialComments.length > 0;
 
   return (
     <section className="wrap narrow comments-wrap" id="comments">
@@ -183,9 +298,18 @@ export default function CommentSection({
           value={text}
           onChange={(e) => setText(e.target.value)}
         />
-        <button className="btn-solid" type="submit">
+        {/* Left empty by people; robots that fill every box are ignored. */}
+        <input ref={trap} className="sr" type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" />
+        <button className="btn-solid" type="submit" disabled={busy}>
           ފޮނުއްވާ
         </button>
+        {sent && (
+          <p className={`comment-note ${sent}`} role="status">
+            {sent === "ok"
+              ? "ޝުކުރިއްޔާ! ތިޔަ ކޮމެންޓް ލިބިއްޖެ. ބަލައިފައި ޝާއިޢު ކުރެވޭނެ."
+              : "ކޮމެންޓް ނުފޮނުވުނު. ކޮންމެވެސް ވަގުތަކަށްފަހު އަލުން މަސައްކަތް ކުރައްވާ."}
+          </p>
+        )}
       </form>
 
       {count === 0 ? (
@@ -266,7 +390,7 @@ export default function CommentSection({
 
       <div className="comments-body" id="commentsBody" hidden={!open}>
         <div className="comment-list" id="commentList">
-          {comments.map((c) => (
+          {visible.map((c) => (
             <article className="comment" key={c.id}>
               <header>
                 <strong>{c.author}</strong>
@@ -285,16 +409,19 @@ export default function CommentSection({
                   <ReplyIcon />
                 </button>
                 <VoteButtons
-                  id={c.id}
-                  baseLikes={c.likes}
-                  baseDislikes={c.dislikes}
+                  likes={likesOf(c).up}
+                  dislikes={likesOf(c).down}
                   vote={votes[c.id] ?? null}
-                  setVote={setVote}
+                  onVote={(v) => setVote(c.id, v)}
                 />
               </div>
 
               {replyingTo === c.id && (
-                <ReplyForm onSubmit={(t) => submitReply(c.id, t)} />
+                <ReplyForm
+                  defaultName={name}
+                  askName={apiOn}
+                  onSubmit={(t, n) => submitReply(c.id, t, n)}
+                />
               )}
 
               {c.replies?.map((r) => (
@@ -314,15 +441,15 @@ export default function CommentSection({
                       type="button"
                       className="reply-btn"
                       aria-label="ޖަވާބު ދޭ"
+                      onClick={() => setReplyingTo(replyingTo === c.id ? null : c.id)}
                     >
                       <ReplyIcon />
                     </button>
                     <VoteButtons
-                      id={r.id}
-                      baseLikes={r.likes}
-                      baseDislikes={r.dislikes}
+                      likes={likesOf(r).up}
+                      dislikes={likesOf(r).down}
                       vote={votes[r.id] ?? null}
-                      setVote={setVote}
+                      onVote={(v) => setVote(r.id, v)}
                     />
                   </div>
                 </article>
@@ -336,7 +463,7 @@ export default function CommentSection({
             type="button"
             className="more"
             id="moreComments"
-            hidden={moreShown || initialComments.length === 0}
+            hidden={!hasMore}
             onClick={loadMore}
           >
             އިތުރު ކޮމެންޓް
@@ -358,17 +485,40 @@ export default function CommentSection({
   );
 }
 
-function ReplyForm({ onSubmit }: { onSubmit: (text: string) => void }) {
+function ReplyForm({
+  onSubmit,
+  defaultName,
+  askName,
+}: {
+  onSubmit: (text: string, name: string) => Promise<boolean>;
+  defaultName: string;
+  askName: boolean;
+}) {
   const [value, setValue] = useState("");
+  const [who, setWho] = useState(defaultName);
+  const [state, setState] = useState<"" | "busy" | "error">("");
   return (
     <form
       className="reply-form"
-      onSubmit={(e) => {
+      onSubmit={async (e) => {
         e.preventDefault();
-        if (!value.trim()) return;
-        onSubmit(value.trim());
+        if (!value.trim() || (askName && !who.trim())) return;
+        setState("busy");
+        const ok = await onSubmit(value.trim(), who.trim());
+        setState(ok ? "" : "error");
       }}
     >
+      {askName && (
+        <input
+          type="text"
+          placeholder="ނަން"
+          required
+          maxLength={60}
+          aria-label="ނަން"
+          value={who}
+          onChange={(e) => setWho(e.target.value)}
+        />
+      )}
       <input
         type="text"
         placeholder="ޖަވާބު ލިޔުއްވާ"
@@ -379,9 +529,14 @@ function ReplyForm({ onSubmit }: { onSubmit: (text: string) => void }) {
         onChange={(e) => setValue(e.target.value)}
         autoFocus
       />
-      <button className="btn-solid" type="submit">
+      <button className="btn-solid" type="submit" disabled={state === "busy"}>
         ފޮނުއްވާ
       </button>
+      {state === "error" && (
+        <p className="comment-note error" role="status">
+          ޖަވާބު ނުފޮނުވުނު. އަލުން މަސައްކަތް ކުރައްވާ.
+        </p>
+      )}
     </form>
   );
 }

@@ -2606,6 +2606,30 @@ a.contact-card:hover {
   height: auto;
   padding: 10px 22px;
 }
+/* With a name box too, the reply form wraps: name above, reply and button below. */
+.reply-form {
+  flex-wrap: wrap;
+}
+.reply-form input[aria-label="ނަން"] {
+  flex-basis: 100%;
+}
+.reply-form .comment-note {
+  flex-basis: 100%;
+}
+/* "Thank you, received" / "Not sent" under the comment form. */
+.comment-note {
+  margin: 4px 0 0;
+  padding: 12px 20px;
+  border-radius: 24px;
+  font-size: 15px;
+  line-height: 1.8;
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: var(--accent);
+}
+.comment-note.error {
+  background: color-mix(in srgb, #c8475a 16%, transparent);
+  color: #e0697b;
+}
 
 /* ---------- Polls page ---------- */
 .polls-page {

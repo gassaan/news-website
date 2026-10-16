@@ -7,7 +7,7 @@ import {
   getPolls,
   getRelatedArticles,
   getSampleComments,
-  pseudoViewCount,
+  viewCount,
   reports,
   formatDhivehiDate,
 } from "@/lib/articles";
@@ -17,6 +17,7 @@ import DateStamp from "@/components/DateStamp";
 import ArticleActions from "@/components/ArticleActions";
 import PollCard from "@/components/PollCard";
 import CommentSection from "@/components/CommentSection";
+import ViewCount from "@/components/ViewCount";
 import SectionCarousel from "@/components/SectionCarousel";
 import Card from "@/components/Card";
 import AdSlot from "@/components/AdSlot";
@@ -75,7 +76,7 @@ export default async function ArticlePage({
               <span>{article.excerpt}</span>
             </span>
             <span className="views">
-              <span className="num">{pseudoViewCount(article.slug)}</span>
+              <ViewCount slug={article.slug} initial={viewCount(article.slug)} />
               <svg width="26" height="18" viewBox="0 0 26 18" fill="none" stroke="currentColor" strokeWidth="1.6">
                 <path d="M1.5 9S5.5 1.5 13 1.5 24.5 9 24.5 9 20.5 16.5 13 16.5 1.5 9 1.5 9z" />
                 <circle cx="13" cy="9" r="3.6" />
@@ -114,7 +115,7 @@ export default async function ArticlePage({
         <PollCard poll={poll} />
       </section>
 
-      <CommentSection initialComments={getSampleComments()} />
+      <CommentSection initialComments={getSampleComments()} target={article.slug} />
 
       {related.length > 0 && (
         <SectionCarousel id="related" title="ގުޅުންހުރި ލިޔުން">

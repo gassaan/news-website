@@ -43,7 +43,7 @@ const QUERY = `{
   "terms": *[_type == "termsOfUse"][0] { intro, sections[] { heading, body }, _updatedAt },
   "featured": *[_id == "featuredArticles"][0].articles[]->slug.current,
   "breaking": *[_id == "breakingNews"][0] { on, headline, "slug": article->slug.current, "title": article->title },
-  "stamp": { "latest": *[] | order(_updatedAt desc)[0]._updatedAt, "count": count(*[]), "due": ${DUE} }
+  "stamp": { "latest": *[_type != "comment"] | order(_updatedAt desc)[0]._updatedAt, "count": count(*[_type != "comment"]), "due": ${DUE} }
 }`;
 
 const url =
@@ -184,7 +184,36 @@ if (r.breaking?.on) {
   if (headline) cms.breaking = { headline, ...(live ? { slug } : {}) };
 }
 
-write(cms, images, `${r.stamp.latest ?? ""}|${r.stamp.count}|${r.stamp.due}`);
+// Real numbers from the site's online service (api/), when it is set up: views per
+// article, the week's most read, and story ratings. Missing numbers never stop a build.
+const API = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/$/, "");
+let stamp = `${r.stamp.latest ?? ""}|${r.stamp.count}|${r.stamp.due}`;
+if (API) {
+  const get = async (path) => {
+    try {
+      const res = await fetch(`${API}${path}`);
+      return res.ok ? await res.json() : null;
+    } catch {
+      return null;
+    }
+  };
+  const top = (await get("/top?days=7&limit=20")) ?? [];
+  const slugs = [...(cms.articles ?? []), ...(cms.reports ?? [])].map((a) => a.slug);
+  const views = {};
+  for (let i = 0; i < slugs.length; i += 60) {
+    Object.assign(views, (await get(`/views?slugs=${slugs.slice(i, i + 60).join(",")}`)) ?? {});
+  }
+  const liveSlugs = new Set(slugs);
+  cms.views = views;
+  cms.popular = top.map((t) => t.slug).filter((s) => liveSlugs.has(s));
+  cms.ratings = (await get("/ratings")) ?? {};
+  // The week's top eight is part of the stamp, so the 10-minute check rebuilds the
+  // site when the "most read" list changes (the same rule is in deploy.yml).
+  const top8 = (await get("/top?days=7&limit=8")) ?? [];
+  stamp += `|${top8.map((t) => t.slug).join(",")}`;
+}
+
+write(cms, images, stamp);
 console.log(
   `[cms] Loaded from Sanity: ${Object.entries(cms).map(([k, v]) => (Array.isArray(v) ? `${v.length} ${k}` : k)).join(", ") || "nothing yet (sample content stays)"}.`,
 );
