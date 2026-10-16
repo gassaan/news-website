@@ -2776,6 +2776,10 @@ a.contact-card:hover {
   font-size: clamp(17px, 1.7vw, 24px);
   line-height: 2.5;
 }
+/* Articles, stories and photo albums each get their own block on an author's page. */
+.author-sec {
+  margin-top: clamp(32px, 4.4vw, 64px);
+}
 @media (max-width: 720px) {
   .profile {
     flex-direction: column;

@@ -1305,6 +1305,17 @@ export function getPhotoAlbums(): PhotoAlbum[] {
   return photoAlbums;
 }
 
+// Stories an author wrote and albums they photographed, for their page.
+export function getStoriesByAuthor(slug: string): Article[] {
+  const author = getAuthor(slug);
+  return author ? stories.filter((s) => s.author === author.name) : [];
+}
+
+export function getAlbumsByPhotographer(slug: string): PhotoAlbum[] {
+  const author = getAuthor(slug);
+  return author ? photoAlbums.filter((a) => a.photographer === author.name) : [];
+}
+
 export function getPhotoAlbum(slug: string): PhotoAlbum | undefined {
   return photoAlbums.find((a) => a.slug === slug);
 }
