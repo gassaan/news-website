@@ -2046,6 +2046,7 @@ section {
   }
 }
 .comment-form {
+  position: relative;
   margin-top: clamp(48px, 6vw, 90px);
   background: var(--panel);
   border: 1px solid var(--line);
@@ -2469,12 +2470,22 @@ a.contact-card:hover {
     margin-inline: auto;
   }
 }
+/* Hidden from view. Pinned inside its own box with no padding or border, so it
+   can never make the page wider than the screen. */
 .sr {
   position: absolute;
-  width: 1px;
-  height: 1px;
+  top: 0;
+  inset-inline-start: 0;
+  width: 1px !important;
+  height: 1px !important;
+  min-width: 0 !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  border: 0 !important;
   overflow: hidden;
   clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 .comment-list {
   display: flex;
