@@ -6,6 +6,7 @@ import {
   slugField,
   titleField,
 } from "./fields";
+import PollDurationInput from "../components/PollDurationInput";
 import MultiPhotoUpload from "../components/MultiPhotoUpload";
 
 export const graphic = defineType({
@@ -76,8 +77,22 @@ export const poll = defineType({
       of: [defineArrayMember({ type: "string" })],
       validation: (r) => r.min(2),
     }),
+    defineField({
+      name: "closesAt",
+      title: "ވޯޓު ނިމޭ ވަގުތު",
+      description: "ބަޓަނަކަށް ފިތުމުން މިހާރުން ފެށިގެން ގުނާނެ. ވޯޓު ނިމުމުން ސައިޓުގައި ނަތީޖާ ދައްކާނެ. ހުސްކޮށް ބާއްވައިފިނަމަ ވޯޓު ނުނިމޭނެ.",
+      type: "datetime",
+      components: { input: PollDurationInput },
+    }),
     photoField("image", "ފޮޓޯ"),
     dateField(),
   ],
-  preview: { select: { title: "title", media: "image" } },
+  preview: {
+    select: { title: "title", media: "image", closesAt: "closesAt" },
+    prepare: ({ title, media, closesAt }) => ({
+      title,
+      media,
+      subtitle: !closesAt ? undefined : Date.parse(closesAt) <= Date.now() ? "ވޯޓު ނިމިއްޖެ" : "ވޯޓު ހުޅުވިފައި",
+    }),
+  },
 });

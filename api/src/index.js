@@ -120,6 +120,18 @@ async function pollCounts(env, poll) {
   return Object.fromEntries(results.map((r) => [r.option, r.n]));
 }
 
+// True once a poll's voting time (set in the dashboard) has passed. Polls without
+// one stay open; if the dashboard can't be reached the vote is allowed.
+async function pollClosed(env, poll) {
+  try {
+    const query = `?query=${encodeURIComponent('*[_type == "poll" && _id == $id][0].closesAt')}&%24id=${encodeURIComponent(JSON.stringify(poll))}`;
+    const at = (await sanity(env, "query", { query })).result;
+    return typeof at === "string" && Date.parse(at) <= Date.now();
+  } catch {
+    return false;
+  }
+}
+
 // ---------- Ratings ----------
 
 async function allRatings(env) {
@@ -253,6 +265,7 @@ async function handle(request, env) {
     const voter = String(data.voter ?? "");
     if (!DOC_ID.test(poll) || !Number.isInteger(option) || option < 0 || option > 20 || !VOTER.test(voter))
       return json({ error: "invalid" }, 400, h);
+    if (await pollClosed(env, poll)) return json({ error: "closed", counts: await pollCounts(env, poll) }, 403, h);
     const res = await env.DB.prepare("INSERT OR IGNORE INTO poll_votes (poll, voter, option) VALUES (?1, ?2, ?3)")
       .bind(poll, voter, option)
       .run();

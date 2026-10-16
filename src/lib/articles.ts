@@ -39,6 +39,10 @@ export type Poll = {
   question: string;
   options: string[];
   votes: number[];
+  // When voting stops (from the dashboard); without it the poll stays open.
+  closesAt?: string;
+  // Already over when the site was built, so the page starts on the results.
+  closed?: boolean;
 };
 
 export type Comment = {
@@ -1193,7 +1197,11 @@ const SAMPLE_POLLS: Poll[] = [
     votes: [48, 30, 22],
   },
 ];
-export const polls: Poll[] = cms.polls?.length ? cms.polls : SAMPLE_POLLS;
+const builtAt = Date.now();
+export const polls: Poll[] = (cms.polls?.length ? (cms.polls as Poll[]) : SAMPLE_POLLS).map((p) => ({
+  ...p,
+  closed: Boolean(p.closesAt && Date.parse(p.closesAt) <= builtAt),
+}));
 
 export function getPolls(): Poll[] {
   return polls;

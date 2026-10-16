@@ -1933,6 +1933,47 @@ section {
 .poll.done .dot {
   display: none;
 }
+/* Voting has ended: the most-voted answer stands out. */
+.poll.closed .opt .bar {
+  opacity: 0.16;
+}
+.opt.winner {
+  border-color: var(--accent);
+}
+.opt.winner .bar {
+  opacity: 0.4 !important;
+}
+.opt.winner .txt,
+.opt.winner .pct {
+  font-weight: 700;
+  color: var(--text);
+}
+/* "Time left" while open, "voting has ended" with the total once closed. */
+.poll-status {
+  margin: 4px 0 0;
+  font-size: clamp(14px, 1.3vw, 17px);
+  line-height: 1.9;
+  color: var(--body-ink);
+  opacity: 0.85;
+}
+.poll-status.ended {
+  opacity: 1;
+}
+.poll-status strong {
+  color: var(--accent);
+  font-weight: 700;
+}
+.poll-status.ended {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px 16px;
+  padding: 12px 20px;
+  border-radius: 24px;
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: var(--accent);
+}
 .btn-solid {
   align-self: flex-end;
   min-width: clamp(120px, 11vw, 150px);
