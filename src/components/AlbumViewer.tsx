@@ -43,7 +43,7 @@ export default function AlbumViewer({
               setStartIndex(i);
             }}
           >
-            <ArticleImage slug={photo} alt="" />
+            <ArticleImage slug={photo} alt="" sizes="(max-width: 720px) 45vw, 290px" />
           </button>
         ))}
       </div>

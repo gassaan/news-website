@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { preconnect } from "react-dom";
 import localFont from "next/font/local";
 import { Inter } from "next/font/google";
 import Header from "@/components/Header";
@@ -9,21 +10,21 @@ import "./globals.css";
 const THEME_INIT_SCRIPT = `(function(){try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark"){document.documentElement.setAttribute("data-theme",t);}}catch(e){}})();`;
 
 const democratsAkBlack = localFont({
-  src: "../../fonts/Democrats-AK-Black.ttf",
+  src: "../../fonts/Democrats-AK-Black.woff2",
   weight: "900",
   variable: "--font-democrats-ak",
   display: "swap",
 });
 
 const democratsAkuruBold = localFont({
-  src: "../../fonts/Democrats-Akuru-Bold.ttf",
+  src: "../../fonts/Democrats-Akuru-Bold.woff2",
   weight: "700",
   variable: "--font-akuru-bold",
   display: "swap",
 });
 
 const democratsAkuruRegular = localFont({
-  src: "../../fonts/Democrats-Akuru-Regular.ttf",
+  src: "../../fonts/Democrats-Akuru-Regular.woff2",
   weight: "400",
   variable: "--font-akuru-regular",
   display: "swap",
@@ -50,6 +51,8 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
+  // Photos come from the dashboard's image service: open that connection early.
+  preconnect("https://cdn.sanity.io");
   return (
     <html
       lang="dv"

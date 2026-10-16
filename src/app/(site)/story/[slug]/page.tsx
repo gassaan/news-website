@@ -37,7 +37,7 @@ export default async function StoryEpisodeListPage({
   return (
     <>
       <header className="story-hero" style={getStoryPosterStyle(story.slug)}>
-        <ArticleImage slug={story.slug} src={getStoryPoster(story.slug)} alt="" className="story-hero-img" />
+        <ArticleImage slug={story.slug} src={getStoryPoster(story.slug)} alt="" className="story-hero-img" priority />
         <div className="story-hero-text">
           <Link href="/stories" className="story-hero-chip">
             ވާހަކަ

@@ -1,4 +1,4 @@
-import logoMask from "@/assets/hulhangu-logo-mask.png";
+import logoMask from "@/assets/hulhangu-logo-mask-web.png";
 
 // The site's logo for the dashboard's top bar, on the purple tile.
 export default function StudioLogo() {

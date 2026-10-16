@@ -8,7 +8,7 @@ export default function StoryCard({ article }: { article: Article }) {
   return (
     <Link href={`/story/${article.slug}`} className="story" style={getStoryPosterStyle(article.slug)}>
       <StoryPosterRating slug={article.slug} episodeCount={article.episodes?.length ?? 1} />
-      <ArticleImage slug={article.slug} src={getStoryPoster(article.slug)} alt={article.title} />
+      <ArticleImage slug={article.slug} src={getStoryPoster(article.slug)} alt={article.title} sizes="(max-width: 720px) 45vw, 290px" />
     </Link>
   );
 }

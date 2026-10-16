@@ -1,4 +1,4 @@
-import logoMask from "@/assets/hulhangu-logo-mask.png";
+import logoMask from "@/assets/hulhangu-logo-mask-web.png";
 
 export default function Logo({ className = "h-10" }: { className?: string }) {
   return (

@@ -6,8 +6,8 @@ export const metadata = { title: "Hulhangu – Studio" };
 // The website's Thaana fonts, used across the dashboard (English stays in Sanity's Inter).
 const thaana = localFont({
   src: [
-    { path: "../../fonts/Democrats-Akuru-Regular.ttf", weight: "400" },
-    { path: "../../fonts/Democrats-Akuru-Bold.ttf", weight: "700" },
+    { path: "../../fonts/Democrats-Akuru-Regular.woff2", weight: "400" },
+    { path: "../../fonts/Democrats-Akuru-Bold.woff2", weight: "700" },
   ],
   variable: "--font-thaana",
   display: "swap",

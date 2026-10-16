@@ -73,7 +73,7 @@ export default async function ArticlePage({
 
       <article className="story-page">
         <figure className="lead lead-hero">
-          <ArticleImage slug={article.slug} alt={article.title} className="lead-img" />
+          <ArticleImage slug={article.slug} alt={article.title} className="lead-img" priority />
           <figcaption>
             <span className="cap">
               <span>{article.excerpt}</span>

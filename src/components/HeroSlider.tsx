@@ -166,7 +166,7 @@ export default function HeroSlider({ articles }: { articles: Article[] }) {
               inert={!top}
             >
               <Link className="slide-ph" href={`/article/${article.slug}`} aria-label={article.title} tabIndex={-1} draggable={false}>
-                <ArticleImage slug={article.slug} alt="" />
+                <ArticleImage slug={article.slug} alt="" sizes="(max-width: 720px) 90vw, 640px" priority={i === 0} />
                 {/* Articles picked in the dashboard get a star in the photo's corner, like the story cards' rating. */}
                 {article.featured && (
                   <span className="hero-star" role="img" aria-label="ޚާއްޞަ ލިޔުން">

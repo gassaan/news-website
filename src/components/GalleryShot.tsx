@@ -24,7 +24,11 @@ export default function GalleryShot({
       href={`/gallery/${album.slug}`}
       className={featured ? "card shot-card shot-feature" : "card shot-card"}
     >
-      <ArticleImage slug={albumPhotoSlug(album.slug, 0)} alt="" />
+      <ArticleImage
+        slug={albumPhotoSlug(album.slug, 0)}
+        alt=""
+        sizes={featured ? "(max-width: 720px) 92vw, 1210px" : "(max-width: 720px) 75vw, 580px"}
+      />
       {thumbs > 0 && (
         <div className="shot-thumbs" aria-hidden="true">
           {Array.from({ length: thumbs }, (_, i) => (

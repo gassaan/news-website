@@ -59,7 +59,7 @@ export default function ArticleBody({
             <p>{paragraph}</p>
             {index === 0 && (
               <figure className="in-ad">
-                <ArticleImage slug={`${slug}-ad`} alt="" />
+                <ArticleImage slug={`${slug}-ad`} alt="" sizes="(max-width: 720px) 92vw, 570px" />
                 <small>Sponsored</small>
               </figure>
             )}
