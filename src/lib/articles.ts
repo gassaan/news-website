@@ -72,6 +72,8 @@ type CmsData = Partial<{
   views: Record<string, number>;
   popular: string[];
   ratings: Record<string, Record<string, { avg: number; n: number }>>;
+  // Approved comments per article slug, when the site was built.
+  comments: Record<string, number>;
 }>;
 const cms = cmsData as CmsData;
 
@@ -1303,6 +1305,11 @@ export const photoAlbums: PhotoAlbum[] = cms.photoAlbums?.length ? cms.photoAlbu
 
 export function getPhotoAlbums(): PhotoAlbum[] {
   return photoAlbums;
+}
+
+// Approved comments on these articles when the site was built.
+export function builtCommentCount(slugs: string[]): number {
+  return slugs.reduce((n, slug) => n + (cms.comments?.[slug] ?? 0), 0);
 }
 
 // Stories an author wrote and albums they photographed, for their page.

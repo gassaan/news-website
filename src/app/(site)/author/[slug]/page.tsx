@@ -4,8 +4,10 @@ import CardGrid from "@/components/CardGrid";
 import GalleryShot from "@/components/GalleryShot";
 import StoryCard from "@/components/StoryCard";
 import AdSlot from "@/components/AdSlot";
+import AuthorCommentCount from "@/components/AuthorCommentCount";
 import {
   authors,
+  builtCommentCount,
   getAlbumsByPhotographer,
   getArticlesByAuthor,
   getAuthor,
@@ -32,7 +34,7 @@ export default async function AuthorPage({
   const authorStories = getStoriesByAuthor(slug);
   const authorAlbums = getAlbumsByPhotographer(slug);
   const sections = [authorArticles, authorStories, authorAlbums].filter((list) => list.length > 0).length;
-  const commentCount = 40 + authorArticles.length * 12;
+  const articleSlugs = authorArticles.map((a) => a.slug);
 
   return (
     <>
@@ -70,12 +72,15 @@ export default async function AuthorPage({
                 <span className="num">{authorAlbums.length}</span> ގެލެރީ
               </span>
             )}
-            <span className="stat">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 1.5A10.5 10.5 0 0 0 2.8 17.1L1.6 21.3a.9.9 0 0 0 1.1 1.1l4.2-1.2A10.5 10.5 0 1 0 12 1.5zM7.5 13.3a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6zm4.5 0a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6zm4.5 0a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6z" />
-              </svg>
-              <span className="num">{commentCount}</span> ކޮމެންޓް
-            </span>
+            {/* Only articles take comments. */}
+            {authorArticles.length > 0 && (
+              <span className="stat">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 1.5A10.5 10.5 0 0 0 2.8 17.1L1.6 21.3a.9.9 0 0 0 1.1 1.1l4.2-1.2A10.5 10.5 0 1 0 12 1.5zM7.5 13.3a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6zm4.5 0a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6zm4.5 0a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6z" />
+                </svg>
+                <AuthorCommentCount slugs={articleSlugs} initial={builtCommentCount(articleSlugs)} /> ކޮމެންޓް
+              </span>
+            )}
           </div>
         </header>
 

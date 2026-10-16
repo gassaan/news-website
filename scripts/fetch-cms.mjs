@@ -42,6 +42,7 @@ const QUERY = `{
   "privacy": *[_type == "privacyPolicy"][0] { intro, sections[] { heading, body }, _updatedAt },
   "terms": *[_type == "termsOfUse"][0] { intro, sections[] { heading, body }, _updatedAt },
   "featured": *[_id == "featuredArticles"][0].articles[]->slug.current,
+  "commentTargets": *[_type == "comment" && kind == "article"].target,
   "breaking": *[_id == "breakingNews"][0] { on, headline, "slug": article->slug.current, "title": article->title },
   "stamp": { "latest": *[_type != "comment"] | order(_updatedAt desc)[0]._updatedAt, "count": count(*[_type != "comment"]), "due": ${DUE} }
 }`;
@@ -137,6 +138,10 @@ if (r.stories.length) {
     };
   });
 }
+
+// Approved comments per article, as a starting point; author pages refresh it live.
+cms.comments = {};
+for (const t of r.commentTargets ?? []) cms.comments[t] = (cms.comments[t] ?? 0) + 1;
 
 if (r.polls.length) {
   cms.polls = r.polls.map((p) => {
