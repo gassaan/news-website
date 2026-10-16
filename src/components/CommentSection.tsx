@@ -497,7 +497,7 @@ export default function CommentSection({
                       <time>{timeAgo(new Date(p.at).toISOString())}</time>
                     </header>
                     <p>{p.text}</p>
-                    <span className="pending-tag">ޝާއިޢު ކުރުމަށް ބަލަމުން</span>
+                    <span className="pending-tag">ޖަވާބު ލިބިއްޖެ، ބެލުމަށްފަހު ޝާއިޢު ކުރެވޭނެ</span>
                   </article>
                 ))}
             </article>
