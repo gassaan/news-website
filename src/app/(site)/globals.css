@@ -2521,6 +2521,21 @@ a.contact-card:hover {
   color: var(--accent);
   font-size: clamp(18px, 1.8vw, 26px);
 }
+/* A reply this reader sent that is waiting for an editor: faded, with a label. */
+.comment.reply.pending {
+  opacity: 0.62;
+  border-style: dashed;
+}
+.pending-tag {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 2px 14px;
+  border: 1px dashed currentColor;
+  border-radius: 999px;
+  color: var(--accent);
+  font-size: 14px;
+  line-height: 1.9;
+}
 .reply-tag {
   display: grid;
   color: var(--accent);

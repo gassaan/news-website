@@ -112,6 +112,20 @@ async function loadComments(target: string, kind: string): Promise<Comment[] | n
   }
 }
 
+// Replies this device sent that are still waiting for an editor. Only the writer
+// sees them, faded, under the comment they answered, until the reply is published.
+type Pending = { id: string; parent: string; author: string; text: string; at: number };
+const PENDING_DAYS = 14;
+
+function readPending(key: string): Pending[] {
+  try {
+    const list = JSON.parse(remember(key) ?? "[]") as Pending[];
+    return Array.isArray(list) ? list : [];
+  } catch {
+    return [];
+  }
+}
+
 export default function CommentSection({
   initialComments,
   target,
@@ -133,6 +147,8 @@ export default function CommentSection({
   const [moreShown, setMoreShown] = useState(false);
   const [sent, setSent] = useState<"" | "ok" | "error">("");
   const [busy, setBusy] = useState(false);
+  const [pending, setPending] = useState<Pending[]>([]);
+  const pendingKey = `hulhangu-pending:${kind}:${target}`;
   // The form is always shown; the comments below it stay folded until opened.
   const [open, setOpen] = useState(false);
   const trap = useRef<HTMLInputElement>(null);
@@ -145,6 +161,16 @@ export default function CommentSection({
       setName((n) => n || (remember("hulhangu-name") ?? ""));
       if (!list) return;
       setComments(list);
+      // Drop waiting replies that are now published, or too old to still be waiting.
+      const cutoff = Date.now() - PENDING_DAYS * 86400000;
+      const waiting = readPending(pendingKey).filter((p) => {
+        if (p.at < cutoff) return false;
+        const parent = list.find((c) => c.id === p.parent);
+        if (!parent) return true;
+        return !(parent.replies ?? []).some((r) => r.author === p.author && r.text === p.text);
+      });
+      remember(pendingKey, JSON.stringify(waiting));
+      setPending(waiting);
       const ids = list.flatMap((c) => [c.id, ...(c.replies ?? []).map((r) => r.id)]);
       const mine: Record<string, VoteState> = {};
       for (const id of ids) {
@@ -159,7 +185,7 @@ export default function CommentSection({
         if (got) setCounts((prev) => ({ ...prev, ...got }));
       }
     });
-  }, [target, kind]);
+  }, [target, kind, pendingKey]);
 
   function makeId(prefix: string): string {
     nextId.current += 1;
@@ -226,9 +252,11 @@ export default function CommentSection({
       const ok = await send(replyText, author, parentId);
       if (ok) {
         remember("hulhangu-name", author);
-        setName(author);
+        const waiting: Pending = { id: `pending-${Date.now()}`, parent: parentId, author, text: replyText, at: Date.now() };
+        const next = [...readPending(pendingKey), waiting];
+        remember(pendingKey, JSON.stringify(next));
+        setPending(next);
         setReplyingTo(null);
-        setSent("ok");
       }
       return ok;
     }
@@ -418,7 +446,7 @@ export default function CommentSection({
 
               {replyingTo === c.id && (
                 <ReplyForm
-                  defaultName={name}
+                  defaultName={name || (remember("hulhangu-name") ?? "")}
                   askName={apiOn}
                   onSubmit={(t, n) => submitReply(c.id, t, n)}
                 />
@@ -454,6 +482,24 @@ export default function CommentSection({
                   </div>
                 </article>
               ))}
+
+              {pending
+                .filter((p) => p.parent === c.id)
+                .map((p) => (
+                  <article className="comment reply pending" key={p.id}>
+                    <header>
+                      <strong>
+                        <span className="reply-tag">
+                          <ReplyIcon />
+                        </span>
+                        {p.author}
+                      </strong>
+                      <time>{timeAgo(new Date(p.at).toISOString())}</time>
+                    </header>
+                    <p>{p.text}</p>
+                    <span className="pending-tag">ޝާއިޢު ކުރުމަށް ބަލަމުން</span>
+                  </article>
+                ))}
             </article>
           ))}
         </div>
