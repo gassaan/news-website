@@ -5,6 +5,7 @@
   --ground: #080018;
   --surface: #150735;
   --line: #270e61;
+  --card-line: #270e61;
   --band: #3e2180;
   --on-band: #ffffff;
   --accent: #a882ff;
@@ -51,6 +52,7 @@
     --ground: #efe8ff;
     --surface: #e1d5ff;
     --line: #dacafd;
+    --card-line: rgba(62, 33, 128, 0.1);
     --band: #3e2180;
     --on-band: #ffffff;
     --accent: #3e2180;
@@ -96,6 +98,7 @@
   --ground: #efe8ff;
   --surface: #e1d5ff;
   --line: #dacafd;
+  --card-line: rgba(62, 33, 128, 0.1);
   --band: #3e2180;
   --on-band: #ffffff;
   --accent: #3e2180;
@@ -140,6 +143,7 @@
   --ground: #080018;
   --surface: #150735;
   --line: #270e61;
+  --card-line: #270e61;
   --band: #3e2180;
   --on-band: #ffffff;
   --accent: #a882ff;
@@ -808,7 +812,8 @@ section {
 .card {
   position: relative;
   background: var(--surface);
-  border: 1px solid var(--line);
+  /* A faint see-through edge in light mode; dark mode keeps its line. */
+  border: 1px solid var(--card-line);
   border-radius: 50px;
   box-shadow: var(--card-shadow);
   padding: 8px 10px 0;
@@ -928,7 +933,7 @@ section {
   border-radius: 50px;
   /* Same fill and outline as the news cards. */
   background: var(--surface);
-  border: 1px solid var(--line);
+  border: 1px solid var(--card-line);
   padding: 6px;
   aspect-ratio: 400/550;
   max-width: 100%;
