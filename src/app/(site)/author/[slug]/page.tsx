@@ -5,6 +5,7 @@ import GalleryShot from "@/components/GalleryShot";
 import StoryCard from "@/components/StoryCard";
 import AdSlot from "@/components/AdSlot";
 import AuthorCommentCount from "@/components/AuthorCommentCount";
+import AuthorViewCount from "@/components/AuthorViewCount";
 import {
   authors,
   builtCommentCount,
@@ -12,6 +13,7 @@ import {
   getArticlesByAuthor,
   getAuthor,
   getStoriesByAuthor,
+  viewCount,
 } from "@/lib/articles";
 import { getAuthorPhoto } from "@/lib/authorPhotos";
 
@@ -70,6 +72,15 @@ export default async function AuthorPage({
                   <path d="M5 3h14a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3zm3.5 4a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM4 17.5l5-5 3 3 4-4 4 4V6a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1z" />
                 </svg>
                 <span className="num">{authorAlbums.length}</span> ގެލެރީ
+              </span>
+            )}
+            {/* Total reads of their articles (only articles count views). */}
+            {authorArticles.length > 0 && (
+              <span className="stat">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" fillRule="evenodd">
+                  <path d="M12 4.5C6.6 4.5 2.5 8.4 1 12c1.5 3.6 5.6 7.5 11 7.5s9.5-3.9 11-7.5c-1.5-3.6-5.6-7.5-11-7.5zm0 12.3a4.8 4.8 0 1 1 0-9.6 4.8 4.8 0 0 1 0 9.6zm0-2.4a2.4 2.4 0 1 0 0-4.8 2.4 2.4 0 0 0 0 4.8z" />
+                </svg>
+                <AuthorViewCount slugs={articleSlugs} initial={articleSlugs.reduce((n, s) => n + viewCount(s), 0)} /> ވިއު
               </span>
             )}
             {/* Only articles take comments. */}

@@ -2791,6 +2791,20 @@ a.contact-card:hover {
     flex-direction: column;
     align-items: stretch;
   }
+  /* Phones: slightly smaller capsules so articles, views and comments share one row. */
+  .profile .stats {
+    gap: 8px;
+  }
+  .profile .stat {
+    height: 42px;
+    padding-inline: 13px;
+    gap: 6px;
+    font-size: 13px;
+  }
+  .profile .stat svg {
+    width: 16px;
+    height: 16px;
+  }
 }
 
 /* ---------- Category page ---------- */
