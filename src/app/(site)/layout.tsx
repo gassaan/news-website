@@ -66,6 +66,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <main className="flex-1">{children}</main>
         <Footer />
         <CardRipple />
+        {/* Cloudflare Web Analytics: visit counts without cookies. The token only sends
+            counts and is public by design. Not on the dashboard (studio) pages. */}
+        <script
+          defer
+          src="https://static.cloudflareinsights.com/beacon.min.js"
+          data-cf-beacon='{"token": "a5b07fb501f44044927cf0e49479873c"}'
+        />
       </body>
     </html>
   );
