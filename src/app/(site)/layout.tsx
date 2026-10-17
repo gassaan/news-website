@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { preconnect } from "react-dom";
 import localFont from "next/font/local";
-import { Inter } from "next/font/google";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CardRipple from "@/components/CardRipple";
@@ -30,9 +29,11 @@ const democratsAkuruRegular = localFont({
   display: "swap",
 });
 
-const inter = Inter({
-  subsets: ["latin"],
-  weight: ["400", "500"],
+// Inter (Latin) is kept in the project rather than fetched from Google Fonts at
+// build time, so a Google hiccup can't stop the site from updating.
+const inter = localFont({
+  src: "../../fonts/Inter-latin.woff2",
+  weight: "100 900",
   variable: "--font-inter",
   display: "swap",
 });
