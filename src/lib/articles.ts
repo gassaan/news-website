@@ -1,5 +1,6 @@
 import cmsData from "@/content/cms.json";
 import { pseudoHue } from "./hue";
+import { SECTIONS } from "./sections";
 
 export { pseudoHue };
 
@@ -77,14 +78,7 @@ type CmsData = Partial<{
 }>;
 const cms = cmsData as CmsData;
 
-export const categories: Category[] = [
-  { slug: "siyaasee", name: "ސިޔާސީ" },
-  { slug: "viyafaari", name: "ވިޔަފާރި" },
-  { slug: "kulhivaru", name: "ކުޅިވަރު" },
-  { slug: "dhuniye", name: "ދުނިޔެ" },
-  { slug: "life", name: "ދިރިއުޅުން" },
-  { slug: "report", name: "ރިޕޯޓު" },
-];
+export const categories: Category[] = SECTIONS;
 
 const SAMPLE_ARTICLES: Article[] = [
   {

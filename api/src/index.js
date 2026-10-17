@@ -12,7 +12,10 @@ const VOTER = /^[A-Za-z0-9-]{16,64}$/;
 // Requests allowed per reader per hour, by action.
 const LIMITS = { view: 600, vote: 60, rate: 120, like: 300, comment: 6 };
 
-const today = () => new Date().toISOString().slice(0, 10);
+// Days are counted in Maldives time (UTC+5), so "today" starts at local midnight.
+const MV_MS = 5 * 3600000;
+const mvDay = (ms) => new Date(ms + MV_MS).toISOString().slice(0, 10);
+const today = () => mvDay(Date.now());
 const hour = () => new Date().toISOString().slice(0, 13);
 
 function cors(request, env) {
@@ -100,13 +103,110 @@ async function addView(env, who, slug) {
 }
 
 async function topViewed(env, days, limit) {
-  const since = new Date(Date.now() - days * 86400000).toISOString().slice(0, 10);
+  const since = mvDay(Date.now() - days * 86400000);
   const { results } = await env.DB.prepare(
     "SELECT slug, SUM(n) AS views FROM views_daily WHERE day >= ?1 GROUP BY slug ORDER BY views DESC, slug LIMIT ?2",
   )
     .bind(since, limit)
     .all();
   return results;
+}
+
+// ---------- Dashboard ----------
+
+// Numbers for the editors' dashboard: views per day for 30 days, views per article
+// this week and this month, and poll votes. All of it is counts the site shows anyway.
+async function dashboardStats(env) {
+  const day = (back) => mvDay(Date.now() - back * 86400000);
+  const [daily, week, month, polls] = await env.DB.batch([
+    env.DB.prepare("SELECT day, SUM(n) AS n FROM views_daily WHERE day >= ?1 GROUP BY day ORDER BY day").bind(day(29)),
+    env.DB.prepare("SELECT slug, SUM(n) AS n FROM views_daily WHERE day >= ?1 GROUP BY slug").bind(day(6)),
+    env.DB.prepare("SELECT slug, SUM(n) AS n FROM views_daily WHERE day >= ?1 GROUP BY slug").bind(day(29)),
+    env.DB.prepare("SELECT poll, option, COUNT(*) AS n FROM poll_votes GROUP BY poll, option"),
+  ]);
+  const bySlug = (rows) => Object.fromEntries(rows.results.map((r) => [r.slug, r.n]));
+  const pollVotes = {};
+  for (const r of polls.results) (pollVotes[r.poll] ??= {})[r.option] = r.n;
+  return {
+    today: day(0),
+    daily: daily.results.map((r) => ({ day: r.day, n: r.n })),
+    week: bySlug(week),
+    month: bySlug(month),
+    polls: pollVotes,
+  };
+}
+
+// Readers from Cloudflare Web Analytics, fetched hourly and kept in a private
+// dashboard record ("analytics.readers": ids with a dot are hidden from the public).
+const SITE_HOSTS = ["gassaan.github.io", "hulhangu.com", "www.hulhangu.com"];
+
+async function cloudflare(env, query) {
+  const res = await fetch("https://api.cloudflare.com/client/v4/graphql", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${env.CF_ANALYTICS_TOKEN}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ query }),
+  });
+  const data = await res.json().catch(() => null);
+  if (!res.ok || !data || data.errors?.length) {
+    throw new Error(data?.errors?.map((e) => e.message).join("; ") || `HTTP ${res.status}`);
+  }
+  return data.data.viewer.accounts[0] ?? {};
+}
+
+async function readerStats(env) {
+  const now = Date.now();
+  const iso = (ms) => new Date(ms).toISOString();
+  const week = `datetime_geq: "${iso(now - 7 * 86400000)}", datetime_lt: "${iso(now)}"`;
+  const prev = `datetime_geq: "${iso(now - 14 * 86400000)}", datetime_lt: "${iso(now - 7 * 86400000)}"`;
+  const hosts = `requestHost_in: ${JSON.stringify(SITE_HOSTS)}`;
+  const acct = JSON.stringify(env.CF_ACCOUNT_ID);
+  const wrap = (inner) => `{ viewer { accounts(filter: { accountTag: ${acct} }) { ${inner} } } }`;
+  const group = (name, dim) =>
+    `${name}: rumPageloadEventsAdaptiveGroups(limit: 8, orderBy: [count_DESC], filter: { ${week}, ${hosts} }) { count sum { visits } dimensions { ${dim} } }`;
+
+  const out = { fetchedAt: iso(now), errors: {} };
+  const parts = {
+    totals: wrap(
+      `week: rumPageloadEventsAdaptiveGroups(limit: 1, filter: { ${week}, ${hosts} }) { count sum { visits } } ` +
+        `prev: rumPageloadEventsAdaptiveGroups(limit: 1, filter: { ${prev}, ${hosts} }) { count sum { visits } }`,
+    ),
+    referrers: wrap(group("rows", "refererHost")),
+    countries: wrap(group("rows", "countryName")),
+    devices: wrap(group("rows", "deviceType")),
+    speed: wrap(
+      `rows: rumWebVitalsEventsAdaptiveGroups(limit: 1, filter: { ${week}, ${hosts} }) { count sum { lcpGood lcpNeedsImprovement lcpPoor } }`,
+    ),
+  };
+  for (const [key, query] of Object.entries(parts)) {
+    try {
+      const a = await cloudflare(env, query);
+      if (key === "totals") {
+        out.totals = {
+          views: a.week?.[0]?.count ?? 0,
+          visits: a.week?.[0]?.sum?.visits ?? 0,
+          prevViews: a.prev?.[0]?.count ?? 0,
+          prevVisits: a.prev?.[0]?.sum?.visits ?? 0,
+        };
+      } else if (key === "speed") {
+        out.speed = a.rows?.[0]?.sum ?? null;
+      } else {
+        out[key] = (a.rows ?? []).map((r) => ({
+          name: Object.values(r.dimensions ?? {})[0] || "",
+          views: r.count,
+          visits: r.sum?.visits ?? 0,
+        }));
+      }
+    } catch (err) {
+      out.errors[key] = String(err.message ?? err).slice(0, 300);
+    }
+  }
+  await sanity(env, "mutate", {
+    method: "POST",
+    body: JSON.stringify({
+      mutations: [{ createOrReplace: { _id: "analytics.readers", _type: "siteAnalytics", data: JSON.stringify(out) } }],
+    }),
+  });
+  return out;
 }
 
 // ---------- Polls ----------
@@ -235,6 +335,7 @@ async function handle(request, env) {
       return json(await pollCounts(env, id), 200, h, 10);
     }
     if (path === "/ratings") return json(await allRatings(env), 200, h, 30);
+    if (path === "/stats") return json(await dashboardStats(env), 200, h, 60);
     if (path === "/likes") {
       const ids = (q.get("ids") ?? "").split(",").filter((s) => DOC_ID.test(s)).slice(0, 100);
       return json(await likeCounts(env, ids), 200, h, 10);
@@ -312,6 +413,8 @@ async function handle(request, env) {
   return json(result, result.error ? 400 : 200, h);
 }
 
+const DAILY_CRON = "17 3 * * *";
+
 const worker = {
   async fetch(request, env) {
     try {
@@ -321,8 +424,13 @@ const worker = {
       return json({ error: "server" }, 500, cors(request, env));
     }
   },
-  // Daily tidy-up: yesterday's "already counted" marks and old flood counters.
-  async scheduled(_event, env) {
+  async scheduled(event, env) {
+    // Hourly: refresh the readers numbers for the dashboard, once Cloudflare is set up.
+    if (event.cron !== DAILY_CRON) {
+      if (env.CF_ANALYTICS_TOKEN && env.CF_ACCOUNT_ID && env.SANITY_TOKEN) await readerStats(env);
+      return;
+    }
+    // Daily tidy-up: yesterday's "already counted" marks and old flood counters.
     await env.DB.batch([
       env.DB.prepare("DELETE FROM seen WHERE day < ?1").bind(today()),
       env.DB.prepare("DELETE FROM hits"),

@@ -14,6 +14,7 @@ SANITY_PROJECT = "b2549qo6"
 SANITY_DATASET = "production"
 ALLOWED_ORIGINS = "https://gassaan.github.io,http://localhost:3000,http://localhost:4567"
 
-# Once a day: forget yesterday's "already counted" marks.
+# Once a day: forget yesterday's "already counted" marks (must match DAILY_CRON).
+# Every hour: refresh the readers numbers for the editors' dashboard.
 [triggers]
-crons = ["17 3 * * *"]
+crons = ["17 3 * * *", "7 * * * *"]

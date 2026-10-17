@@ -6,6 +6,8 @@ import { schemaTypes } from "./src/sanity/schemaTypes";
 import project from "./src/sanity/project.json";
 import { studioTheme } from "./src/sanity/theme";
 import StudioLogo from "./src/sanity/StudioLogo";
+import Dashboard from "./src/sanity/dashboard/Dashboard";
+import DashboardIcon from "./src/sanity/dashboard/DashboardIcon";
 
 export default defineConfig({
   name: "hulhangu",
@@ -66,5 +68,7 @@ export default defineConfig({
           ]),
     }),
   ],
+  // The editors' dashboard: views, waiting comments, polls and readers.
+  tools: (prev) => [...prev, { name: "dashboard", title: "Dashboard", icon: DashboardIcon, component: Dashboard }],
   schema: { types: schemaTypes },
 });
