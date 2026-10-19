@@ -675,3 +675,205 @@
 .ef-lib .ef-note {
   color: var(--ef-muted);
 }
+
+/* The home page's main card: numbered article cards with ↑ ↓ and ×. */
+.ef-feat {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ef-feat-count {
+  direction: ltr;
+  text-align: right;
+  font: 500 12.5px Inter, sans-serif;
+  color: var(--ef-muted);
+}
+.ef-feat-empty {
+  margin: 0;
+  padding: 14px;
+  border-radius: 16px;
+  border: 1px dashed var(--ef-edge);
+  text-align: center;
+  font: 500 13px Inter, sans-serif;
+  color: var(--ef-muted);
+  direction: ltr;
+}
+.ef-feat-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ef-feat-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 20px;
+  background: var(--ef-field);
+  border: 1px solid var(--ef-line);
+  direction: rtl;
+}
+.ef-feat-row.first {
+  border-color: #8f66f0;
+}
+.ef-feat-n {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--ef-edge);
+  color: var(--ef-text);
+  display: grid;
+  place-items: center;
+  font: 700 14px Inter, sans-serif;
+}
+.ef-feat-row.first .ef-feat-n {
+  background: #8f66f0;
+  color: #fff;
+}
+.ef-feat-row img,
+.ef-feat-pick img,
+.ef-feat-noimg {
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+  border-radius: 14px;
+  object-fit: cover;
+  background: var(--ef-soft);
+}
+.ef-feat-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.ef-feat-title {
+  font: 700 14.5px/1.7 var(--font-thaana), Inter, sans-serif;
+  color: var(--ef-text);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.ef-feat-title.one {
+  -webkit-line-clamp: 1;
+}
+.ef-feat-date {
+  font: 400 12px/1.6 var(--font-thaana), Inter, sans-serif;
+  color: var(--ef-muted);
+}
+.ef-feat-move {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.ef-feat-move button {
+  width: 38px;
+  height: 32px;
+  border-radius: 10px;
+  border: 1px solid var(--ef-edge);
+  background: transparent;
+  color: var(--ef-text);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.ef-feat-move button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+.ef-feat-x {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 93, 108, 0.14);
+  color: #ff8a94;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+[data-scheme="light"] .ef-feat-x {
+  color: #c4223a;
+}
+.ef-feat-x:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.ef-feat-add {
+  height: 52px;
+  border-radius: 999px;
+  border: 2px dashed var(--ef-edge);
+  background: var(--ef-soft);
+  color: var(--ef-soft-text);
+  font: 700 14.5px Inter, sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+}
+.ef-feat-add:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.ef-feat-note {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: var(--ef-soft);
+  color: var(--ef-soft-text);
+  font: 400 12.5px/1.5 Inter, sans-serif;
+  direction: ltr;
+}
+/* The "Add to the main card" sheet (it shares the photo library's sheet). */
+.ef-feat-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 46px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid var(--ef-line);
+  color: var(--ef-muted);
+}
+.ef-feat-search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--ef-text);
+  font: 400 15px Inter, var(--font-thaana), sans-serif;
+}
+.ef-feat-pick {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 7px 2px;
+  direction: rtl;
+}
+.ef-feat-pick img,
+.ef-feat-pick .ef-feat-noimg {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+}
+.ef-feat-pick button {
+  height: 36px;
+  padding: 0 14px;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: 999px;
+  background: #8f66f0;
+  color: #fff;
+  font: 600 13px Inter, sans-serif;
+  direction: ltr;
+  cursor: pointer;
+}
+.ef-feat-pick button.added {
+  background: transparent;
+  border: 1px solid rgba(95, 211, 160, 0.45);
+  color: #3fae7d;
+}

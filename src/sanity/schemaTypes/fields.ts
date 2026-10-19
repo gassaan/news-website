@@ -1,5 +1,8 @@
 import { defineField } from "sanity";
 import { toSlug } from "../slug";
+import { formatWhen } from "../dates";
+
+export { formatWhen };
 import { BodyInput, ChoiceInput, DateTimeInput, FacebookSwitch, PhotoInput, SlugInput } from "../editor/inputs";
 
 // Category list mirrors the site's fixed categories (src/lib/articles.ts).
@@ -78,27 +81,11 @@ export const bodyField = (name = "body", title = "ލިޔުން") =>
     validation: (r) => r.required(),
   });
 
-const DHIVEHI_MONTHS = [
-  "ޖެނުއަރީ", "ފެބްރުއަރީ", "މާރިޗު", "އޭޕްރީލް", "މޭ", "ޖޫން",
-  "ޖުލައި", "އޯގަސްޓް", "ސެޕްޓެމްބަރު", "އޮކްޓޯބަރު", "ނޮވެމްބަރު", "ޑިސެމްބަރު",
-];
-
 // List subtitle: "19 އޯގަސްޓް 2026 · 20:14" in Maldives time (UTC+5). Date-only values show no time.
 // Like formatWhen, but marks items set to go live later with a clock.
 export function formatPublish(value?: string): string {
   const when = formatWhen(value);
   return value && new Date(value).getTime() > Date.now() ? `⏰ ފަހުން ނެރޭނެ: ${when}` : when;
-}
-
-export function formatWhen(value?: string): string {
-  if (!value) return "";
-  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-    const [y, m, d] = value.split("-").map(Number);
-    return `${d} ${DHIVEHI_MONTHS[m - 1]} ${y}`;
-  }
-  const mv = new Date(new Date(value).getTime() + 5 * 60 * 60 * 1000).toISOString();
-  const [y, m, d] = mv.slice(0, 10).split("-").map(Number);
-  return `${d} ${DHIVEHI_MONTHS[m - 1]} ${y} · ${mv.slice(11, 16)}`;
 }
 
 // Facebook: tick the box and publish, and the next website update also posts the link on

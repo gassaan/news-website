@@ -1,4 +1,5 @@
 import { defineType, defineField } from "sanity";
+import { FeaturedInput } from "../editor/inputs";
 
 // One document: the articles shown in the big card at the top of the home page, in this order.
 export const featuredArticles = defineType({
@@ -9,10 +10,10 @@ export const featuredArticles = defineType({
     defineField({
       name: "articles",
       title: "ލިޔުންތައް",
-      description:
-        "ހޯމްޕޭޖުގެ މަތީގައިވާ ބޮޑު ކާޑުގައި ދައްކާނީ މި ލިޔުންތަކެވެ، މި ތަރުތީބުން. ތަރުތީބު ބަދަލުކުރަން ⠿ ދަމާލައްވާ. ހުސްކޮށް ބާއްވައިފިނަމަ އެންމެ އާ 5 ޚަބަރު ދައްކާނެ.",
+      description: "ހޯމްޕޭޖުގެ މަތީގައިވާ ބޮޑު ކާޑުގައި ދައްކާނީ މި ލިޔުންތަކެވެ، މި ތަރުތީބުން.",
       type: "array",
       of: [{ type: "reference", to: [{ type: "article" }] }],
+      components: { input: FeaturedInput },
       validation: (r) => r.unique().max(8),
     }),
   ],

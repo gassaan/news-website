@@ -5,6 +5,7 @@ import {
   unset,
   useClient,
   useFormValue,
+  type ArrayOfObjectsInputProps,
   type BooleanInputProps,
   type FieldProps,
   type ObjectInputProps,
@@ -14,6 +15,7 @@ import {
   type TextInputProps,
 } from "sanity";
 import { toSlug } from "../slug";
+import { formatWhen } from "../dates";
 import "./editor.css";
 
 // Tap-friendly inputs for the editing form: round buttons instead of lists and
@@ -416,6 +418,185 @@ export function PhotoInput(props: ObjectInputProps) {
                       </button>
                     ))}
                   </div>
+                </div>
+              </section>
+            </div>
+          </div>,
+          document.body,
+        )}
+    </div>
+  );
+}
+
+// The home page's main card: the chosen articles as numbered cards (1 is the big slide),
+// moved with up/down buttons and taken off with ×. "Add an article" opens the latest
+// articles in a sheet with a search box. Empty means the 5 newest show by themselves.
+type Ref = { _key: string; _type: "reference"; _ref: string };
+type Pick = { _id: string; title?: string; publishedAt?: string; img?: string };
+const MAX_FEATURED = 8;
+const newKey = () => Array.from(crypto.getRandomValues(new Uint8Array(6)), (b) => b.toString(16).padStart(2, "0")).join("");
+
+export function FeaturedInput(props: ArrayOfObjectsInputProps) {
+  const { onChange, readOnly } = props;
+  const value = (props.value ?? []) as unknown as Ref[];
+  const client = useClient({ apiVersion: "2025-02-19" });
+  const [info, setInfo] = useState<Record<string, Pick>>({});
+  const [picker, setPicker] = useState<Pick[] | null>(null);
+  const [search, setSearch] = useState("");
+  const [scheme, setScheme] = useState("dark");
+  const ids = value.map((r) => r._ref).join(",");
+
+  // Titles, dates and pictures of the chosen articles (a draft's title if it has one).
+  useEffect(() => {
+    const list = ids ? ids.split(",") : [];
+    if (!list.length) return;
+    client
+      .fetch<Pick[]>(`*[_id in $ids]{ _id, title, publishedAt, "img": image.asset->url }`, { ids: list.concat(list.map((id) => `drafts.${id}`)) }, { perspective: "raw" })
+      .then((rows) => {
+        const next: Record<string, Pick> = {};
+        for (const r of rows) {
+          const id = r._id.replace(/^drafts\./, "");
+          if (!next[id] || r._id.startsWith("drafts.")) next[id] = { ...r, _id: id };
+        }
+        setInfo(next);
+      }, () => {});
+  }, [client, ids]);
+
+  const [error, setError] = useState("");
+  // Sanity refuses changes while the page is still connecting; say so instead of doing nothing.
+  const save = (next: Ref[]) => {
+    try {
+      onChange(next.length ? set(next) : unset());
+      setError("");
+    } catch (err) {
+      console.warn("Main card change was not saved", err);
+      setError("The page is still connecting. Wait a moment and try again.");
+    }
+  };
+  const move = (i: number, j: number) => {
+    const next = value.slice();
+    [next[i], next[j]] = [next[j], next[i]];
+    save(next);
+  };
+  const openPicker = (e: MouseEvent<HTMLElement>) => {
+    setScheme(e.currentTarget.closest("[data-scheme]")?.getAttribute("data-scheme") ?? "dark");
+    setSearch("");
+    setPicker([]);
+    client
+      .fetch<Pick[]>(`*[_type == "article" && !(_id in path("drafts.**")) && defined(publishedAt)] | order(publishedAt desc)[0...60]{ _id, title, publishedAt, "img": image.asset->url }`)
+      .then(setPicker, () => setPicker(null));
+  };
+  const add = (id: string) => {
+    setPicker(null);
+    if (value.length >= MAX_FEATURED || value.some((r) => r._ref === id)) return;
+    save([...value, { _key: newKey(), _type: "reference", _ref: id }]);
+  };
+
+  const term = search.trim().toLowerCase();
+  const choices = (picker ?? []).filter((a) => !term || (a.title ?? "").toLowerCase().includes(term));
+
+  return (
+    <div className="ef-feat">
+      <span className="ef-feat-count">
+        {value.length} of {MAX_FEATURED} · shown in this order on the home page
+      </span>
+
+      {value.length === 0 && <p className="ef-feat-empty">No articles chosen: the 5 newest show by themselves.</p>}
+
+      <div className="ef-feat-list">
+        {value.map((r, i) => {
+          const a = info[r._ref];
+          return (
+            <div key={r._key} className={`ef-feat-row${i === 0 ? " first" : ""}`}>
+              <span className="ef-feat-n">{i + 1}</span>
+              {a?.img ? (
+                // eslint-disable-next-line @next/next/no-img-element -- Sanity's own resized picture
+                <img src={`${a.img}?w=128&h=128&fit=crop&auto=format`} alt="" />
+              ) : (
+                <span className="ef-feat-noimg" aria-hidden="true" />
+              )}
+              <span className="ef-feat-text">
+                <span className="ef-feat-title">{a ? a.title?.trim() || "—" : "Article not found"}</span>
+                {a?.publishedAt && <span className="ef-feat-date">{formatWhen(a.publishedAt)}</span>}
+              </span>
+              <span className="ef-feat-move">
+                <button type="button" aria-label="Move up" disabled={readOnly || i === 0} onClick={() => move(i, i - 1)}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M6 15l6-6 6 6" />
+                  </svg>
+                </button>
+                <button type="button" aria-label="Move down" disabled={readOnly || i === value.length - 1} onClick={() => move(i, i + 1)}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M6 9l6 6 6-6" />
+                  </svg>
+                </button>
+              </span>
+              <button
+                type="button"
+                className="ef-feat-x"
+                aria-label="Take off the main card"
+                disabled={readOnly}
+                onClick={() => save(value.filter((x) => x._key !== r._key))}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true">
+                  <path d="M6 6l12 12M18 6L6 18" />
+                </svg>
+              </button>
+            </div>
+          );
+        })}
+      </div>
+
+      <button type="button" className="ef-feat-add" disabled={readOnly || value.length >= MAX_FEATURED} onClick={openPicker}>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" aria-hidden="true">
+          <path d="M12 5v14M5 12h14" />
+        </svg>
+        {value.length >= MAX_FEATURED ? "The card is full (8)" : "Add an article"}
+      </button>
+
+      {error && <p className="ef-photo-error">{error}</p>}
+      <p className="ef-feat-note">The first one is the big slide. Leave the list empty and the 5 newest articles show by themselves.</p>
+
+      {picker &&
+        createPortal(
+          <div data-scheme={scheme}>
+            <div className="ef-lib-back" onClick={() => setPicker(null)}>
+              <section className="ef-lib" role="dialog" aria-modal="true" aria-label="Add to the main card" onClick={(e) => e.stopPropagation()}>
+                <div className="ef-lib-head">
+                  <b>Add to the main card</b>
+                  <button type="button" onClick={() => setPicker(null)}>
+                    Close
+                  </button>
+                </div>
+                <label className="ef-feat-search">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                    <path d="M4 11a7 7 0 1 0 14 0a7 7 0 1 0-14 0M16 16l4 4" />
+                  </svg>
+                  <input type="search" placeholder="Search articles" value={search} onChange={(e) => setSearch(e.target.value)} />
+                </label>
+                {picker.length === 0 && <p className="ef-note">Loading articles…</p>}
+                <div className="ef-lib-scroll">
+                  {choices.map((a) => {
+                    const chosen = value.some((r) => r._ref === a._id);
+                    return (
+                      <div key={a._id} className="ef-feat-pick">
+                        {a.img ? (
+                          // eslint-disable-next-line @next/next/no-img-element -- Sanity's own resized picture
+                          <img src={`${a.img}?w=100&h=100&fit=crop&auto=format`} alt="" />
+                        ) : (
+                          <span className="ef-feat-noimg" aria-hidden="true" />
+                        )}
+                        <span className="ef-feat-text">
+                          <span className="ef-feat-title one">{a.title?.trim() || "—"}</span>
+                          <span className="ef-feat-date">{formatWhen(a.publishedAt)}</span>
+                        </span>
+                        <button type="button" className={chosen ? "added" : ""} disabled={chosen} onClick={() => add(a._id)}>
+                          {chosen ? "✓ Added" : "+ Add"}
+                        </button>
+                      </div>
+                    );
+                  })}
+                  {picker.length > 0 && choices.length === 0 && <p className="ef-note">Nothing matches your search.</p>}
                 </div>
               </section>
             </div>
