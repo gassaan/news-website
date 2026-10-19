@@ -8,11 +8,14 @@ import { studioTheme } from "./src/sanity/theme";
 import StudioLogo from "./src/sanity/StudioLogo";
 import Dashboard from "./src/sanity/dashboard/Dashboard";
 import DashboardIcon from "./src/sanity/dashboard/DashboardIcon";
+import StudioNavbar from "./src/sanity/notifications/StudioNavbar";
 
 export default defineConfig({
   name: "hulhangu",
   title: "Hulhangu",
   icon: StudioLogo,
+  // The top bar gets a notifications bell (new comments, polls ending, scheduled items going live).
+  studio: { components: { navbar: StudioNavbar } },
   theme: studioTheme,
   projectId: project.projectId || "missing",
   dataset: project.dataset,

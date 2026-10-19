@@ -1,0 +1,199 @@
+/* The notifications bell in the dashboard's top bar, and its list. */
+.nb-navbar {
+  /* The Card brings its own display; the bar must stay one row. */
+  display: flex !important;
+  align-items: stretch;
+  background: var(--card-bg-color);
+  border-bottom: 1px solid var(--card-border-color);
+}
+.nb-navbar-main {
+  flex: 1;
+  min-width: 0;
+}
+/* The bar draws its own bottom line; ours runs under the bell too. */
+.nb-navbar-main [data-testid="studio-navbar"] {
+  border-bottom: 0 !important;
+  box-shadow: none !important;
+}
+.nb-wrap {
+  display: flex;
+  align-items: center;
+  padding-inline: 2px 10px;
+}
+.nb-bell {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 0;
+  background: transparent;
+  color: var(--card-fg-color);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.nb-bell svg {
+  width: 21px;
+  height: 21px;
+}
+.nb-bell:hover,
+.nb-bell.open {
+  background: color-mix(in srgb, var(--card-fg-color) 10%, transparent);
+}
+.nb-count {
+  position: absolute;
+  top: 1px;
+  right: 0;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: #ff5d6c;
+  color: #fff;
+  font: 700 10.5px/17px Inter, sans-serif;
+  text-align: center;
+  box-shadow: 0 0 0 2px var(--card-bg-color);
+}
+
+.nb-panel {
+  position: fixed;
+  right: 10px;
+  width: min(380px, calc(100vw - 20px));
+  max-height: min(70vh, 560px);
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+  background: var(--card-bg-color);
+  color: var(--card-fg-color);
+  border: 1px solid var(--card-border-color);
+  border-radius: 18px;
+  box-shadow: 0 18px 44px rgba(10, 4, 30, 0.35);
+  overflow: hidden;
+}
+.nb-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--card-border-color);
+  font-size: 14px;
+}
+.nb-markall {
+  font: 600 12px Inter, sans-serif;
+  color: #8b5cf6;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  padding: 4px;
+}
+[data-scheme="dark"] .nb-markall {
+  color: #a882ff;
+}
+.nb-empty {
+  margin: 0;
+  padding: 18px 14px;
+  font-size: 13px;
+  color: var(--card-muted-fg-color);
+}
+.nb-list {
+  overflow-y: auto;
+}
+.nb-note {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--card-border-color);
+}
+.nb-note:last-child {
+  border-bottom: 0;
+}
+.nb-note.unread::before {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 19px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ff5d6c;
+}
+.nb-note:not(.unread) .nb-body {
+  opacity: 0.72;
+}
+.nb-ic {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+}
+.nb-ic svg {
+  width: 17px;
+  height: 17px;
+}
+.nb-ic.comment {
+  background: rgba(139, 92, 246, 0.18);
+  color: #8b5cf6;
+}
+.nb-ic.poll-ending,
+.nb-ic.poll-ended {
+  background: rgba(227, 179, 65, 0.2);
+  color: #c9900f;
+}
+.nb-ic.live {
+  background: rgba(76, 195, 138, 0.2);
+  color: #23935f;
+}
+.nb-body {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+.nb-body b {
+  font-size: 13px;
+  font-weight: 600;
+}
+.nb-dv {
+  direction: rtl;
+  text-align: right;
+  font-family: var(--font-thaana), Inter, sans-serif;
+  font-size: 13px;
+  line-height: 1.6;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.nb-on {
+  font-size: 12px;
+  color: var(--card-muted-fg-color);
+}
+.nb-body small {
+  font-size: 11px;
+  color: var(--card-muted-fg-color);
+}
+.nb-act {
+  justify-self: start;
+  margin-top: 4px;
+  font: 600 11.5px Inter, sans-serif;
+  color: #fff;
+  background: #8b5cf6;
+  border-radius: 999px;
+  padding: 4px 11px;
+  text-decoration: none;
+}
+.nb-link {
+  justify-self: start;
+  margin-top: 2px;
+  font: 600 11.5px Inter, sans-serif;
+  color: #8b5cf6;
+  text-decoration: none;
+}
+[data-scheme="dark"] .nb-act {
+  background: #a882ff;
+  color: #1a0f3d;
+}
+[data-scheme="dark"] .nb-link {
+  color: #a882ff;
+}
