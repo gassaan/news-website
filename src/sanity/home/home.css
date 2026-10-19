@@ -509,19 +509,167 @@
   overflow: hidden;
   direction: rtl;
 }
+/* Each row sits on a red strip with a Delete button; swiping the row right uncovers it. */
+.sl-swipe {
+  position: relative;
+  background: #d92f43;
+}
+.sl-swipe + .sl-swipe {
+  border-top: 1px solid var(--sh-line);
+}
+.sl-del {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 96px;
+  border: 0;
+  background: #d92f43;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font: 600 12.5px Inter, sans-serif;
+  cursor: pointer;
+}
 .sl .sl-row {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 9px 12px;
-  border-top: 1px solid var(--sh-line);
+  background: var(--sh-tile);
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  transition: transform 0.2s ease;
 }
-.sl .sl-row:first-child {
-  border-top: 0;
+.sl .sl-row.dragging {
+  transition: none;
+}
+.sl .sl-row img {
+  -webkit-user-drag: none;
 }
 .sl .sl-row:active,
 .sl .sl-row.open {
-  background: color-mix(in srgb, #8f66f0 16%, transparent);
+  background: color-mix(in srgb, #8f66f0 16%, var(--sh-tile));
+}
+
+/* "Delete this …?" sheet, rising from the bottom of the screen. */
+.sl.sl-layer {
+  padding: 0;
+  display: block;
+}
+.sl-sheet-back {
+  position: fixed;
+  inset: 0;
+  /* above everything, Sanity's own pop-ups included */
+  z-index: 2147483000;
+  background: rgba(8, 0, 24, 0.66);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.sl-sheet {
+  width: 100%;
+  max-width: 480px;
+  box-sizing: border-box;
+  padding: 22px 20px 30px;
+  border-radius: 28px 28px 0 0;
+  background: var(--sh-tile);
+  border-top: 1px solid var(--sh-line);
+  color: var(--sh-text);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  animation: sl-rise 0.2s ease-out;
+}
+@keyframes sl-rise {
+  from {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+}
+.sl-sheet-ic {
+  align-self: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(217, 47, 67, 0.18);
+  color: #ff7a86;
+  display: grid;
+  place-items: center;
+}
+[data-scheme="light"] .sl-sheet-ic {
+  color: #c4223a;
+}
+.sl-sheet h2 {
+  margin: 0;
+  text-align: center;
+  font: 700 19px Inter, sans-serif;
+}
+.sl-sheet p {
+  margin: 0;
+  text-align: center;
+  font: 400 14px/1.5 Inter, sans-serif;
+  color: var(--sh-muted);
+}
+.sl-sheet .sl-sheet-error {
+  color: #ff7a86;
+  font-weight: 600;
+}
+[data-scheme="light"] .sl-sheet .sl-sheet-error {
+  color: #c4223a;
+}
+.sl-sheet-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--sh-line) 50%, transparent);
+  direction: rtl;
+}
+.sl-sheet-item img,
+.sl-sheet-item .sl-noimg {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  object-fit: cover;
+}
+.sl-sheet-item > span:last-child {
+  flex: 1;
+  min-width: 0;
+  font: 700 14px/1.7 var(--font-thaana), Inter, sans-serif;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sl-sheet-delete,
+.sl-sheet-cancel {
+  height: 52px;
+  border-radius: 999px;
+  font: 700 15px Inter, sans-serif;
+  cursor: pointer;
+}
+.sl-sheet-delete {
+  border: 0;
+  background: #d92f43;
+  color: #fff;
+}
+.sl-sheet-cancel {
+  border: 1px solid var(--sh-line);
+  background: transparent;
+  color: var(--sh-text);
+  font-weight: 600;
+}
+.sl-sheet button:disabled {
+  opacity: 0.6;
+  cursor: default;
 }
 .sl-row img,
 .sl-noimg {

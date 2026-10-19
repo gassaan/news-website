@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type MouseEvent, type PointerEvent, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { useClient } from "sanity";
 import { IntentLink } from "sanity/router";
 import { usePaneRouter } from "sanity/structure";
@@ -8,7 +9,8 @@ import "./home.css";
 // A section's list (articles, stories, polls, …), opened from a tile on the start
 // screen: search, filter buttons for each status, items grouped by month, and for
 // articles the number of reads. Tapping an item opens it next to (or, on a phone,
-// instead of) the list.
+// instead of) the list. Swiping an item to the right shows a Delete button, which
+// asks before anything is deleted.
 
 type Kind = "draft" | "changes" | "scheduled" | "published";
 type Raw = { _id: string; title?: string; sub?: string; img?: string; date?: string; slug?: string };
@@ -79,6 +81,20 @@ const when = (value?: string) => {
 const cleanSlug = (slug?: string) => String(slug ?? "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 const short = (n: number) => (n >= 10000 ? `${Math.round(n / 1000)}k` : n >= 1000 ? `${(n / 1000).toFixed(1).replace(/\.0$/, "")}k` : String(n));
 
+const OPEN = 96; // how far a swiped row stays open, the width of its Delete button
+
+// What the delete question says, by item and status.
+function deleteText(type: string, kind: Kind) {
+  if (type === "comment") {
+    return kind === "draft"
+      ? "It hasn't been approved, so it isn't on the website."
+      : "It is on the website now. Deleting removes it at the next update (about 10 minutes).";
+  }
+  if (kind === "draft") return "This draft isn't on the website.";
+  if (kind === "scheduled") return "It is scheduled to go live. Deleting cancels that.";
+  return "It is on the website now. Deleting removes it from the site at the next update (about 10 minutes).";
+}
+
 export default function SectionList(props: { options?: { type?: string } }) {
   const type = props.options?.type ?? "article";
   const cfg = CONFIG[type] ?? CONFIG.article;
@@ -89,6 +105,15 @@ export default function SectionList(props: { options?: { type?: string } }) {
   const [show, setShow] = useState<Kind | "all">("all");
   const [search, setSearch] = useState("");
   const [now, setNow] = useState(0);
+  // Swipe to delete: the row left open, the row being dragged, and the item being asked about.
+  const [swiped, setSwiped] = useState<string | null>(null);
+  const [drag, setDrag] = useState<{ id: string; dx: number } | null>(null);
+  const [confirm, setConfirm] = useState<Item | null>(null);
+  const [scheme, setScheme] = useState("dark"); // the sheet sits outside the dashboard, so it carries light/dark itself
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
+  const start = useRef<{ id: string; x: number; y: number; base: number; moved: boolean } | null>(null);
+  const justDragged = useRef(false);
 
   const query = `*[_type == $type]{ _id, ${cfg.fields}${cfg.date ? `, "date": ${cfg.date}` : ""}${cfg.views ? `, "slug": slug.current` : ""} }`;
   const refresh = useCallback(() => {
@@ -181,10 +206,92 @@ export default function SectionList(props: { options?: { type?: string } }) {
   }
 
   const openId = routerPanesState[groupIndex + 1]?.[0]?.id;
-  const Link = ChildLink as unknown as (p: { childId: string; className: string; children: ReactNode }) => ReactNode;
+  const Link = ChildLink as unknown as (p: {
+    childId: string;
+    className: string;
+    style?: CSSProperties;
+    draggable?: boolean;
+    onPointerDown?: (e: PointerEvent<HTMLElement>) => void;
+    onPointerMove?: (e: PointerEvent<HTMLElement>) => void;
+    onPointerUp?: (e: PointerEvent<HTMLElement>) => void;
+    onPointerCancel?: (e: PointerEvent<HTMLElement>) => void;
+    children: ReactNode;
+  }) => ReactNode;
   const Back = BackLink as unknown as (p: { className: string; "aria-label": string; children: ReactNode }) => ReactNode;
   const label = (k: Kind) => cfg.labels?.[k] ?? LABELS[k];
   const chips = CHIPS.filter((c) => c.kind === "all" || c.kind === "published" || counts[c.kind]);
+
+  // A sideways drag moves the row; an up-and-down one is left to scrolling.
+  const down = (e: PointerEvent<HTMLElement>, id: string) => {
+    justDragged.current = false; // phones send no tap after a swipe, so clear it here
+    start.current = { id, x: e.clientX, y: e.clientY, base: swiped === id ? OPEN : 0, moved: false };
+  };
+  const move = (e: PointerEvent<HTMLElement>, id: string) => {
+    const s = start.current;
+    if (!s || s.id !== id) return;
+    const dx = e.clientX - s.x;
+    const dy = e.clientY - s.y;
+    if (!s.moved) {
+      if (Math.abs(dy) > 8 && Math.abs(dy) > Math.abs(dx)) {
+        start.current = null;
+        return;
+      }
+      if (Math.abs(dx) < 8) return;
+      s.moved = true;
+      e.currentTarget.setPointerCapture?.(e.pointerId);
+    }
+    setDrag({ id, dx: Math.max(0, Math.min(OPEN + 54, s.base + dx)) });
+  };
+  const up = (id: string) => {
+    const s = start.current;
+    start.current = null;
+    if (!s || s.id !== id || !s.moved) return;
+    justDragged.current = true;
+    const dx = drag?.id === id ? drag.dx : s.base;
+    setDrag(null);
+    setSwiped(dx > OPEN / 2 ? id : null);
+  };
+  // After a drag, or while a row is open, a tap closes it instead of opening the item.
+  const clickCapture = (e: MouseEvent, id: string) => {
+    const onDelete = (e.target as HTMLElement).closest(".sl-del");
+    if (onDelete) return;
+    if (justDragged.current) {
+      // the tap that ends a swipe
+      e.preventDefault();
+      e.stopPropagation();
+      justDragged.current = false;
+    } else if (swiped === id) {
+      e.preventDefault();
+      e.stopPropagation();
+      setSwiped(null);
+    }
+  };
+
+  const remove = async () => {
+    if (!confirm) return;
+    setDeleting(true);
+    setDeleteError("");
+    try {
+      await client.transaction().delete(confirm.id).delete(`drafts.${confirm.id}`).commit();
+      setConfirm(null);
+      setSwiped(null);
+      refresh();
+    } catch (err) {
+      const message = String((err as Error)?.message ?? err);
+      setDeleteError(
+        /reference/i.test(message)
+          ? "It is still used somewhere else (for example the home page's main card or breaking news). Remove it there first."
+          : "It couldn't be deleted. Check the connection and try again.",
+      );
+    } finally {
+      setDeleting(false);
+    }
+  };
+  const close = () => {
+    if (deleting) return;
+    setConfirm(null);
+    setDeleteError("");
+  };
 
   return (
     <div className="sl">
@@ -240,42 +347,112 @@ export default function SectionList(props: { options?: { type?: string } }) {
         <section key={`${g.name}-${gi}`} className="sl-group">
           {g.name && <h2>{g.name}</h2>}
           <div className="sl-box">
-            {g.items.map((i) => (
-              <Link key={i.id} childId={i.id} className={`sl-row${openId === i.id ? " open" : ""}`}>
-                {i.img ? (
-                  // eslint-disable-next-line @next/next/no-img-element -- the CMS loads Sanity's own resized pictures
-                  <img src={`${i.img}?w=120&h=120&fit=crop&auto=format`} alt="" loading="lazy" />
-                ) : (
-                  <span className={`sl-noimg ${type}`}>
+            {g.items.map((i) => {
+              const dx = drag?.id === i.id ? drag.dx : swiped === i.id ? OPEN : 0;
+              return (
+                <div key={i.id} className="sl-swipe" onClickCapture={(e) => clickCapture(e, i.id)}>
+                  <button
+                    type="button"
+                    className="sl-del"
+                    tabIndex={swiped === i.id ? 0 : -1}
+                    aria-hidden={swiped !== i.id}
+                    onClick={(e) => {
+                      setScheme(e.currentTarget.closest("[data-scheme]")?.getAttribute("data-scheme") ?? "dark");
+                      setConfirm(i);
+                    }}
+                  >
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <path d={ICONS[cfg.icon]} />
+                      <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" />
                     </svg>
-                  </span>
-                )}
-                <span className="sl-text">
-                  <span className="sl-t">{i.title}</span>
-                  {i.sub && <span className="sl-sub">{i.sub}</span>}
-                  {(i.date || i.kind !== "published") && (
-                    <span className="sl-meta">
-                      <span className={`sl-dot ${i.kind}`} />
-                      {i.date && <span className="sl-date">{when(i.date)}</span>}
-                      {i.kind !== "published" && <span className={`sl-kind ${i.kind}`}>{label(i.kind)}</span>}
+                    Delete
+                  </button>
+                  <Link
+                    childId={i.id}
+                    className={`sl-row${openId === i.id ? " open" : ""}${drag?.id === i.id ? " dragging" : ""}`}
+                    style={{ transform: dx ? `translateX(${dx}px)` : undefined }}
+                    draggable={false}
+                    onPointerDown={(e) => down(e, i.id)}
+                    onPointerMove={(e) => move(e, i.id)}
+                    onPointerUp={() => up(i.id)}
+                    onPointerCancel={() => up(i.id)}
+                  >
+                  {i.img ? (
+                    // eslint-disable-next-line @next/next/no-img-element -- the CMS loads Sanity's own resized pictures
+                    <img src={`${i.img}?w=120&h=120&fit=crop&auto=format`} alt="" loading="lazy" />
+                  ) : (
+                    <span className={`sl-noimg ${type}`}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <path d={ICONS[cfg.icon]} />
+                      </svg>
                     </span>
                   )}
-                </span>
-                {cfg.views && i.slug && views[cleanSlug(i.slug)] !== undefined && (
-                  <span className="sl-views" aria-label={`${views[cleanSlug(i.slug)]} reads`}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                      <path d="M12 5C6.5 5 2.7 9.4 1.5 12c1.2 2.6 5 7 10.5 7s9.3-4.4 10.5-7C21.3 9.4 17.5 5 12 5zm0 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8z" />
-                    </svg>
-                    {short(views[cleanSlug(i.slug)])}
+                  <span className="sl-text">
+                    <span className="sl-t">{i.title}</span>
+                    {i.sub && <span className="sl-sub">{i.sub}</span>}
+                    {(i.date || i.kind !== "published") && (
+                      <span className="sl-meta">
+                        <span className={`sl-dot ${i.kind}`} />
+                        {i.date && <span className="sl-date">{when(i.date)}</span>}
+                        {i.kind !== "published" && <span className={`sl-kind ${i.kind}`}>{label(i.kind)}</span>}
+                      </span>
+                    )}
                   </span>
-                )}
-              </Link>
-            ))}
+                  {cfg.views && i.slug && views[cleanSlug(i.slug)] !== undefined && (
+                    <span className="sl-views" aria-label={`${views[cleanSlug(i.slug)]} reads`}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d="M12 5C6.5 5 2.7 9.4 1.5 12c1.2 2.6 5 7 10.5 7s9.3-4.4 10.5-7C21.3 9.4 17.5 5 12 5zm0 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8z" />
+                      </svg>
+                      {short(views[cleanSlug(i.slug)])}
+                    </span>
+                  )}
+                  </Link>
+                </div>
+              );
+            })}
           </div>
         </section>
       ))}
+
+      {/* The question goes on the page itself, above Sanity's own pop-ups. */}
+      {confirm &&
+        createPortal(
+          <div data-scheme={scheme}>
+            <div className="sl sl-layer">
+              <div className="sl-sheet-back" onClick={close} onKeyDown={(e) => e.key === "Escape" && close()}>
+                <section className="sl-sheet" role="dialog" aria-modal="true" aria-labelledby="sl-sheet-title" onClick={(e) => e.stopPropagation()}>
+                  <span className="sl-sheet-ic" aria-hidden="true">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" />
+                    </svg>
+                  </span>
+                  <h2 id="sl-sheet-title">Delete this {confirm.kind === "draft" && type !== "comment" ? "draft" : cfg.unit[0]}?</h2>
+                  <p>{deleteText(type, confirm.kind)} This can&apos;t be undone.</p>
+                  <div className="sl-sheet-item">
+                    {confirm.img ? (
+                      // eslint-disable-next-line @next/next/no-img-element -- the CMS loads Sanity's own resized pictures
+                      <img src={`${confirm.img}?w=96&h=96&fit=crop&auto=format`} alt="" />
+                    ) : (
+                      <span className={`sl-noimg ${type}`}>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <path d={ICONS[cfg.icon]} />
+                        </svg>
+                      </span>
+                    )}
+                    <span>{confirm.title}</span>
+                  </div>
+                  {deleteError && <p className="sl-sheet-error">{deleteError}</p>}
+                  <button type="button" className="sl-sheet-delete" disabled={deleting} onClick={remove}>
+                    {deleting ? "Deleting…" : `Delete ${confirm.kind === "draft" && type !== "comment" ? "draft" : cfg.unit[0]}`}
+                  </button>
+                  <button type="button" className="sl-sheet-cancel" disabled={deleting} onClick={close} autoFocus>
+                    Cancel
+                  </button>
+                </section>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }
