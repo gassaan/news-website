@@ -1,6 +1,6 @@
 import { defineField } from "sanity";
 import { toSlug } from "../slug";
-import { BodyInput, DateTimeInput, SlugInput } from "../editor/inputs";
+import { BodyInput, ChoiceInput, DateTimeInput, FacebookSwitch, SlugInput } from "../editor/inputs";
 
 // Category list mirrors the site's fixed categories (src/lib/articles.ts).
 export const CATEGORY_OPTIONS = [
@@ -123,6 +123,7 @@ export const facebookFields = ({ withPicture = false } = {}) => [
     type: "boolean",
     initialValue: false,
     options: { layout: "switch" },
+    components: { input: FacebookSwitch },
     fieldset: "facebook",
     readOnly: ({ document }) => posted(document),
   }),
@@ -139,6 +140,7 @@ export const facebookFields = ({ withPicture = false } = {}) => [
             ],
             layout: "radio",
           },
+          components: { input: ChoiceInput },
           initialValue: "photo",
           fieldset: "facebook",
           hidden: ({ document }) => !ticked(document),

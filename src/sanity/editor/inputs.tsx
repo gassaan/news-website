@@ -4,6 +4,7 @@ import {
   unset,
   useClient,
   useFormValue,
+  type BooleanInputProps,
   type FieldProps,
   type ReferenceInputProps,
   type SlugInputProps,
@@ -29,12 +30,14 @@ export function CardField(props: FieldProps) {
   return <div className={`ef-card ef-${props.name}`}>{props.renderDefault(props)}</div>;
 }
 
-// Category: one round button per choice.
+// Category: one round button per choice. Long choices (like the Facebook picture)
+// get a full-width button each.
 export function ChoiceInput(props: StringInputProps) {
   const { value, onChange, readOnly, schemaType } = props;
   const list = (schemaType.options?.list ?? []) as { title?: string; value?: string }[];
+  const wide = list.some((o) => (o.title ?? "").length > 14);
   return (
-    <div className="ef-chips ef-choices" role="radiogroup">
+    <div className={`ef-chips ${wide ? "ef-choices-wide" : "ef-choices"}`} role="radiogroup">
       {list.map((o) => {
         const on = value === o.value;
         return (
@@ -217,6 +220,38 @@ export function BodyInput(props: TextInputProps) {
           </span>
         </div>
       )}
+    </div>
+  );
+}
+
+// Facebook sharing: one card with the Facebook mark, a line saying what will
+// happen and a big on/off switch, like the breaking news card on the start screen.
+export function FacebookSwitch(props: BooleanInputProps) {
+  const { value, onChange, readOnly, schemaType } = props;
+  const on = Boolean(value);
+  const status = readOnly && on ? "Already posted on Facebook" : on ? "Posts when the website updates" : "Not shared on Facebook";
+  return (
+    <div className={`ef-fb${on ? " on" : ""}`}>
+      <span className="ef-fb-ic" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M14 8h3V4h-3c-2.8 0-4 1.8-4 4.3V10H7v4h3v8h4v-8h3l1-4h-4V8.6c0-.4.2-.6.6-.6z" />
+        </svg>
+      </span>
+      <span className="ef-fb-text">
+        <span className="ef-fb-t">{schemaType.title}</span>
+        <span className="ef-fb-s">{status}</span>
+      </span>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={on}
+        aria-label={schemaType.title ?? "Share on Facebook"}
+        className="ef-switch"
+        disabled={readOnly}
+        onClick={() => onChange(set(!on))}
+      >
+        <span />
+      </button>
     </div>
   );
 }

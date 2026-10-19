@@ -42,21 +42,21 @@
   gap: 14px !important;
 }
 /* Help text: smaller and softer, so the card leads with the field itself. */
-.ef-card [data-ui="fieldHeaderContentBox"] [id^="desc_"],
-.ef-card [data-ui="fieldHeaderContentBox"] [id^="desc_"] > span {
+:is(.ef-card, [data-testid="fieldset-facebook"]) [data-ui="fieldHeaderContentBox"] [id^="desc_"],
+:is(.ef-card, [data-testid="fieldset-facebook"]) [data-ui="fieldHeaderContentBox"] [id^="desc_"] > span {
   font-size: 13px !important;
   line-height: 1.8 !important;
 }
 /* The field's comment and "…" buttons sit on the card without their own dark box,
    level with the field name. (The name keeps Sanity's room above it: Thaana marks
    over the letters need it, so the card's own top padding is the smaller one.) */
-.ef-card [data-ui="fieldHeaderContentBox"] + [data-ui="Card"] {
+:is(.ef-card, [data-testid="fieldset-facebook"]) [data-ui="fieldHeaderContentBox"] + [data-ui="Card"] {
   background: transparent !important;
   top: 17px !important;
   bottom: auto !important;
 }
 /* Field names in the site's soft purple, a little smaller inside cards. */
-.ef-card [data-ui="fieldHeaderContentBox"] label[data-ui="Text"] {
+:is(.ef-card, [data-testid="fieldset-facebook"]) [data-ui="fieldHeaderContentBox"] label[data-ui="Text"] {
   color: var(--ef-label) !important;
   font-size: 15px !important;
 }
@@ -330,4 +330,114 @@
   margin-top: -4px;
   font: 400 13px/1.8 var(--font-thaana), Inter, sans-serif;
   color: var(--ef-muted);
+}
+
+/* Facebook sharing: the group becomes one card like the start screen's breaking news
+   card (the group's own name and side line are left out; the switch names it). */
+[data-testid="form-view"] [data-testid="fieldset-facebook"] {
+  padding: 14px 16px;
+  gap: 14px;
+}
+[data-testid="fieldset-facebook"] > [data-ui="Flex"]:first-child {
+  display: none !important;
+}
+[data-testid="fieldset-facebook"] > [data-ui="Box"] {
+  border-left: 0 !important;
+  border-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+/* With sharing on, the picture choice and post text follow, a little closer together. */
+[data-testid="fieldset-facebook"] [data-ui="Grid"] > [data-ui="VStack"] {
+  gap: 20px !important;
+}
+[data-testid="form-view"] [data-testid="fieldset-facebook"]:has(.ef-fb.on) {
+  background: rgba(24, 119, 242, 0.12);
+  border-color: rgba(24, 119, 242, 0.45);
+}
+.ef-fb {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.ef-fb-ic {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: rgba(24, 119, 242, 0.18);
+  color: #5ea2ff;
+}
+.ef-fb.on .ef-fb-ic {
+  background: #1877f2;
+  color: #fff;
+}
+[data-scheme="light"] .ef-fb-ic {
+  color: #1464cc;
+}
+[data-scheme="light"] .ef-fb.on .ef-fb-ic {
+  color: #fff;
+}
+.ef-fb-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.ef-fb-t {
+  font: 700 16px/1.8 var(--font-thaana), Inter, sans-serif;
+  color: var(--ef-text);
+}
+.ef-fb-s {
+  direction: ltr;
+  text-align: right;
+  font: 500 12px/1.4 Inter, sans-serif;
+  color: var(--ef-muted);
+}
+.ef-switch {
+  width: 50px;
+  height: 30px;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: 999px;
+  padding: 3px;
+  background: var(--ef-edge);
+  display: flex;
+  direction: ltr;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.ef-switch span {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(8, 0, 24, 0.3);
+  transition: transform 0.2s;
+}
+.ef-switch[aria-checked="true"] {
+  background: #1877f2;
+}
+.ef-switch[aria-checked="true"] span {
+  transform: translateX(20px);
+}
+.ef-switch:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.ef-switch:focus-visible {
+  outline: 2px solid #a882ff;
+  outline-offset: 2px;
+}
+/* Long choices: one full-width button each, text at the start. */
+.ef-choices-wide {
+  grid-template-columns: minmax(0, 1fr);
+}
+.ef-choices-wide .ef-chip {
+  justify-content: flex-start;
+  padding: 6px 16px;
+  border-radius: 16px;
+  text-align: start;
 }
