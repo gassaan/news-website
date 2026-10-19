@@ -1,3 +1,4 @@
+import { PhotoInput } from "../editor/inputs";
 import { defineType, defineField } from "sanity";
 import { slugField } from "./fields";
 
@@ -10,7 +11,7 @@ export const author = defineType({
     slugField(),
     defineField({ name: "role", title: "މަޤާމު", type: "string", initialValue: "ރިޕޯޓަރު" }),
     defineField({ name: "bio", title: "ތައާރަފު", type: "text", rows: 4 }),
-    defineField({ name: "photo", title: "ފޮޓޯ", type: "image", options: { hotspot: true } }),
+    defineField({ name: "photo", title: "ފޮޓޯ", type: "image", options: { hotspot: true }, components: { input: PhotoInput } }),
   ],
   preview: { select: { title: "title", subtitle: "role", media: "photo" } },
 });

@@ -1,4 +1,5 @@
-import { useEffect, useState, type MouseEvent } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
+import { createPortal } from "react-dom";
 import {
   set,
   unset,
@@ -6,6 +7,7 @@ import {
   useFormValue,
   type BooleanInputProps,
   type FieldProps,
+  type ObjectInputProps,
   type ReferenceInputProps,
   type SlugInputProps,
   type StringInputProps,
@@ -252,6 +254,174 @@ export function FacebookSwitch(props: BooleanInputProps) {
       >
         <span />
       </button>
+    </div>
+  );
+}
+
+// Photos: two big buttons (from the phone, or from photos already uploaded); once
+// there is a photo, Change, Focus point and Remove underneath. The focus point is
+// the part the website keeps in view when it crops the photo for small cards.
+type Photo = { asset?: { _ref?: string }; hotspot?: { x: number; y: number; width?: number; height?: number } };
+type Asset = { _id: string; url: string };
+
+function photoUrl(ref: string, projectId: string, dataset: string, width: number) {
+  const [, id, size, ext] = ref.split("-");
+  return `https://cdn.sanity.io/images/${projectId}/${dataset}/${id}-${size}.${ext}?w=${width}&auto=format`;
+}
+
+export function PhotoInput(props: ObjectInputProps) {
+  const { onChange, readOnly } = props;
+  const value = props.value as Photo | undefined;
+  const client = useClient({ apiVersion: "2025-02-19" });
+  const { projectId = "", dataset = "" } = client.config();
+  const file = useRef<HTMLInputElement>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [choosing, setChoosing] = useState(false); // "Change": the two buttons again
+  const [focusing, setFocusing] = useState(false);
+  const [library, setLibrary] = useState<Asset[] | null>(null);
+  const [scheme, setScheme] = useState("dark");
+  const ref = value?.asset?._ref;
+
+  // Sanity refuses changes while the page is still connecting; say so instead of doing nothing.
+  const save = (patch: Parameters<typeof onChange>[0]) => {
+    try {
+      onChange(patch);
+      setError("");
+      return true;
+    } catch (err) {
+      console.warn("Photo change was not saved", err);
+      setError("The page is still connecting. Wait a moment and try again.");
+      return false;
+    }
+  };
+  const choose = (assetId: string) => {
+    setChoosing(false);
+    setLibrary(null);
+    save(set({ _type: "image", asset: { _type: "reference", _ref: assetId } }));
+  };
+  const upload = async (f: File | undefined) => {
+    if (!f) return;
+    setBusy(true);
+    setError("");
+    try {
+      const asset = await client.assets.upload("image", f, { filename: f.name });
+      choose(asset._id);
+    } catch {
+      setError("The photo couldn't be uploaded. Check the connection and try again.");
+    } finally {
+      setBusy(false);
+      if (file.current) file.current.value = "";
+    }
+  };
+  const openLibrary = (e: MouseEvent<HTMLElement>) => {
+    setScheme(e.currentTarget.closest("[data-scheme]")?.getAttribute("data-scheme") ?? "dark");
+    setLibrary([]);
+    client
+      .fetch<Asset[]>(`*[_type == "sanity.imageAsset"] | order(_createdAt desc)[0...60]{ _id, url }`)
+      .then(setLibrary, () => setError("The photo library couldn't be loaded."));
+  };
+  const setFocus = (e: MouseEvent<HTMLElement>) => {
+    // measured on the picture itself, which is shown whole (not cropped)
+    const box = (e.currentTarget.querySelector("img") ?? e.currentTarget).getBoundingClientRect();
+    const x = Math.min(1, Math.max(0, (e.clientX - box.left) / box.width));
+    const y = Math.min(1, Math.max(0, (e.clientY - box.top) / box.height));
+    const h = value?.hotspot;
+    setFocusing(false);
+    save(set({ _type: "sanity.imageHotspot", x, y, width: h?.width ?? 0.3, height: h?.height ?? 0.3 }, ["hotspot"]));
+  };
+
+  const buttons = (
+    <div className="ef-photo-pick">
+      <button type="button" className="ef-photo-phone" disabled={readOnly || busy} onClick={() => file.current?.click()}>
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M12 16V4M7 9l5-5 5 5M4 16v4h16v-4" />
+        </svg>
+        <b>{busy ? "Uploading…" : "From phone"}</b>
+        <small>Photos or camera</small>
+      </button>
+      <button type="button" className="ef-photo-lib" disabled={readOnly || busy} onClick={openLibrary}>
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M3 7h4l2-2h6l2 2h4v12H3zM8 14l3-3 3 3 2-2 3 3" />
+        </svg>
+        <b>From library</b>
+        <small>Photos already used</small>
+      </button>
+    </div>
+  );
+
+  return (
+    <div className="ef-photo">
+      <input ref={file} type="file" accept="image/*" hidden onChange={(e) => upload(e.target.files?.[0])} />
+      {!ref || choosing ? (
+        <>
+          {buttons}
+          {choosing && (
+            <button type="button" className="ef-photo-link" onClick={() => setChoosing(false)}>
+              Keep the current photo
+            </button>
+          )}
+        </>
+      ) : (
+        <>
+          <button
+            type="button"
+            className={`ef-photo-view${focusing ? " focusing" : ""}`}
+            aria-label={focusing ? "Tap the most important part of the photo" : "Photo"}
+            disabled={!focusing}
+            onClick={setFocus}
+          >
+            <span className="ef-photo-frame">
+              {/* eslint-disable-next-line @next/next/no-img-element -- Sanity's own resized picture */}
+              <img src={photoUrl(ref, projectId, dataset, 900)} alt="" />
+              {value?.hotspot && (
+                <span className="ef-photo-ring" style={{ left: `${value.hotspot.x * 100}%`, top: `${value.hotspot.y * 100}%` }} />
+              )}
+            </span>
+            {focusing && <span className="ef-photo-hint">Tap the most important part</span>}
+          </button>
+          <div className="ef-photo-actions">
+            <button type="button" disabled={readOnly} onClick={() => setChoosing(true)}>
+              Change
+            </button>
+            <button type="button" disabled={readOnly} aria-pressed={focusing} onClick={() => setFocusing((f) => !f)}>
+              {focusing ? "Cancel" : "Focus point"}
+            </button>
+            <button type="button" className="ef-photo-remove" disabled={readOnly} onClick={() => save(unset())}>
+              Remove
+            </button>
+          </div>
+        </>
+      )}
+      {error && <p className="ef-photo-error">{error}</p>}
+
+      {library &&
+        createPortal(
+          <div data-scheme={scheme}>
+            <div className="ef-lib-back" onClick={() => setLibrary(null)}>
+              <section className="ef-lib" role="dialog" aria-modal="true" aria-label="Choose a photo" onClick={(e) => e.stopPropagation()}>
+                <div className="ef-lib-head">
+                  <b>Choose a photo</b>
+                  <button type="button" onClick={() => setLibrary(null)}>
+                    Close
+                  </button>
+                </div>
+                {library.length === 0 && <p className="ef-note">Loading photos…</p>}
+                <div className="ef-lib-scroll">
+                  <div className="ef-lib-grid">
+                    {library.map((a) => (
+                      <button key={a._id} type="button" aria-label="Use this photo" onClick={() => choose(a._id)}>
+                        {/* eslint-disable-next-line @next/next/no-img-element -- Sanity's own resized picture */}
+                        <img src={`${a.url}?w=240&h=240&fit=crop&auto=format`} alt="" loading="lazy" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </section>
+            </div>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }

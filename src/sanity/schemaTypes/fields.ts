@@ -1,6 +1,6 @@
 import { defineField } from "sanity";
 import { toSlug } from "../slug";
-import { BodyInput, ChoiceInput, DateTimeInput, FacebookSwitch, SlugInput } from "../editor/inputs";
+import { BodyInput, ChoiceInput, DateTimeInput, FacebookSwitch, PhotoInput, SlugInput } from "../editor/inputs";
 
 // Category list mirrors the site's fixed categories (src/lib/articles.ts).
 export const CATEGORY_OPTIONS = [
@@ -62,6 +62,7 @@ export const photoField = (name = "image", title = "ފޮޓޯ", required = false)
     type: "image",
     description: "ފޮޓޯ އަޕްލޯޑް ކުރުމަށްފަހު، މުހިންމު ބައި ބާއްވަން ބޭނުންވާ ތަނަށް ތިކި ޖައްސަވާ.",
     options: { hotspot: true },
+    components: { input: PhotoInput },
     validation: required ? (r) => r.required() : undefined,
   });
 

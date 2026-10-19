@@ -441,3 +441,237 @@
   border-radius: 16px;
   text-align: start;
 }
+
+/* Photos: two big buttons when empty; the photo with Change / Focus point / Remove after. */
+.ef-photo {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ef-photo-pick {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  direction: ltr;
+}
+.ef-photo-pick button {
+  height: 150px;
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  font-family: Inter, sans-serif;
+}
+.ef-photo-pick b {
+  font-size: 15px;
+}
+.ef-photo-pick small {
+  font-size: 11.5px;
+  opacity: 0.85;
+}
+.ef-photo-phone {
+  border: 0;
+  background: #8f66f0;
+  color: #fff;
+}
+.ef-photo-lib {
+  border: 1px solid var(--ef-edge);
+  background: var(--ef-soft);
+  color: var(--ef-text);
+}
+.ef-photo-lib svg {
+  color: var(--ef-soft-text);
+}
+.ef-photo-pick button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.ef-photo-view {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 18px;
+  overflow: hidden;
+  background: var(--ef-field);
+}
+.ef-photo-view:disabled {
+  cursor: default;
+}
+.ef-photo-view.focusing {
+  cursor: crosshair;
+  box-shadow: 0 0 0 3px #8f66f0;
+}
+.ef-photo-view {
+  display: flex;
+  justify-content: center;
+}
+/* The whole photo, so the focus ring sits exactly where it will on the website. */
+.ef-photo-frame {
+  position: relative;
+  display: block;
+  line-height: 0;
+}
+.ef-photo-view img {
+  display: block;
+  max-width: 100%;
+  max-height: 320px;
+  width: auto;
+  height: auto;
+}
+.ef-photo-ring {
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  margin: -16px 0 0 -16px;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 2px rgba(14, 4, 38, 0.5);
+  pointer-events: none;
+}
+.ef-photo-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font: 600 12.5px Inter, sans-serif;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(14, 4, 38, 0.82);
+  color: #fff;
+  pointer-events: none;
+}
+.ef-photo-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  direction: ltr;
+}
+.ef-photo-actions button {
+  height: 44px;
+  border-radius: 999px;
+  border: 1px solid var(--ef-edge);
+  background: transparent;
+  color: var(--ef-text);
+  font: 600 13px Inter, sans-serif;
+  cursor: pointer;
+}
+.ef-photo-actions button[aria-pressed="true"] {
+  background: #8f66f0;
+  border-color: #8f66f0;
+  color: #fff;
+}
+.ef-photo-actions .ef-photo-remove {
+  border-color: rgba(255, 93, 108, 0.45);
+  color: #ff8a94;
+}
+[data-scheme="light"] .ef-photo-actions .ef-photo-remove {
+  color: #c4223a;
+}
+.ef-photo-actions button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.ef-photo-link {
+  align-self: center;
+  border: 0;
+  background: none;
+  color: var(--ef-soft-text);
+  font: 600 13px Inter, sans-serif;
+  padding: 6px;
+  cursor: pointer;
+}
+.ef-photo-error {
+  margin: 0;
+  font: 600 13px Inter, sans-serif;
+  color: #ff7a86;
+  direction: ltr;
+  text-align: right;
+}
+
+/* "Choose a photo": the photos already uploaded, in a sheet from the bottom. */
+.ef-lib-back {
+  --ef-card: #150735;
+  --ef-line: #270e61;
+  --ef-text: #fbf8ff;
+  --ef-muted: #b7a6e6;
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  background: rgba(8, 0, 24, 0.66);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+[data-scheme="light"] .ef-lib-back {
+  --ef-card: #fff;
+  --ef-line: rgba(62, 33, 128, 0.13);
+  --ef-text: #1a0f3d;
+  --ef-muted: #5b4691;
+}
+.ef-lib {
+  width: 100%;
+  max-width: 560px;
+  max-height: 80vh;
+  box-sizing: border-box;
+  padding: 16px 16px 28px;
+  border-radius: 28px 28px 0 0;
+  background: var(--ef-card);
+  color: var(--ef-text);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-family: Inter, sans-serif;
+}
+.ef-lib-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.ef-lib-head b {
+  font-size: 17px;
+}
+.ef-lib-head button {
+  height: 38px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid var(--ef-line);
+  background: transparent;
+  color: var(--ef-text);
+  font: 600 13px Inter, sans-serif;
+  cursor: pointer;
+}
+/* The photos scroll inside the sheet; the grid keeps its square tiles. */
+.ef-lib-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+.ef-lib-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.ef-lib-grid button {
+  padding: 0;
+  border: 0;
+  border-radius: 14px;
+  overflow: hidden;
+  aspect-ratio: 1;
+  cursor: pointer;
+  background: var(--ef-line);
+}
+.ef-lib-grid img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.ef-lib .ef-note {
+  color: var(--ef-muted);
+}
