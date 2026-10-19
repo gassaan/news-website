@@ -10,6 +10,7 @@ import Dashboard from "./src/sanity/dashboard/Dashboard";
 import DashboardIcon from "./src/sanity/dashboard/DashboardIcon";
 import StudioNavbar from "./src/sanity/notifications/StudioNavbar";
 import StudioHome from "./src/sanity/home/StudioHome";
+import SectionList from "./src/sanity/home/SectionList";
 
 export default defineConfig({
   name: "hulhangu",
@@ -25,11 +26,15 @@ export default defineConfig({
   plugins: [
     structureTool({
       // The start screen (StudioHome) shows a tile for each section; tapping one opens
-      // the list or form below. Every list shows the newest item first.
+      // the list or form below.
       structure: (S) => {
         const single = (type: string) => S.document().schemaType(type).documentId(type);
-        const list = (type: string, field: string) =>
-          S.documentTypeList(type).defaultOrdering([{ field, direction: field === "title" ? "asc" : "desc" }]);
+        // A section's list (SectionList): search, status filters, month groups; items open beside it.
+        const list = (type: string) =>
+          S.component(SectionList)
+            .id(type)
+            .options({ type })
+            .child((id) => S.document().documentId(id).schemaType(type));
         const children: Record<string, () => ReturnType<typeof single> | ReturnType<typeof list>> = {
           // Single documents: the red breaking news strip, the home page's big top card and the site pages.
           breakingNews: () => single("breakingNews"),
@@ -37,13 +42,13 @@ export default defineConfig({
           contactInfo: () => single("contactInfo"),
           privacyPolicy: () => single("privacyPolicy"),
           termsOfUse: () => single("termsOfUse"),
-          article: () => list("article", "publishedAt"),
-          story: () => list("story", "publishedAt"),
-          author: () => list("author", "title"),
-          photoAlbum: () => list("photoAlbum", "date"),
-          graphic: () => list("graphic", "date"),
-          poll: () => list("poll", "publishedAt"),
-          comment: () => list("comment", "submittedAt"),
+          article: () => list("article"),
+          story: () => list("story"),
+          author: () => list("author"),
+          photoAlbum: () => list("photoAlbum"),
+          graphic: () => list("graphic"),
+          poll: () => list("poll"),
+          comment: () => list("comment"),
         };
         return S.component(StudioHome)
           .id("root")
