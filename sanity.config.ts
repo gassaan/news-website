@@ -9,6 +9,7 @@ import StudioLogo from "./src/sanity/StudioLogo";
 import Dashboard from "./src/sanity/dashboard/Dashboard";
 import DashboardIcon from "./src/sanity/dashboard/DashboardIcon";
 import StudioNavbar from "./src/sanity/notifications/StudioNavbar";
+import StudioHome from "./src/sanity/home/StudioHome";
 
 export default defineConfig({
   name: "hulhangu",
@@ -23,52 +24,31 @@ export default defineConfig({
   basePath: `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/studio`,
   plugins: [
     structureTool({
-      // Every list shows the newest item first.
-      structure: (S) =>
-        S.list()
-          .title("Hulhangu")
-          .items([
-            // A single document: the red breaking news strip on article pages.
-            S.listItem()
-              .title("އަވަސް ޚަބަރު")
-              .id("breakingNews")
-              .child(S.document().schemaType("breakingNews").documentId("breakingNews")),
-            // A single document: the articles in the home page's big top card.
-            S.listItem()
-              .title("މައި ކާޑުގެ ލިޔުންތައް")
-              .id("featuredArticles")
-              .child(S.document().schemaType("featuredArticles").documentId("featuredArticles")),
-            S.divider(),
-            ...[
-              ["article", "publishedAt"],
-              ["story", "publishedAt"],
-              ["author", "title"],
-              ["photoAlbum", "date"],
-              ["graphic", "date"],
-              ["poll", "publishedAt"],
-              ["comment", "submittedAt"],
-            ].map(([type, field]) =>
-              S.documentTypeListItem(type).child(
-                S.documentTypeList(type).defaultOrdering([
-                  { field, direction: field === "title" ? "asc" : "desc" },
-                ]),
-              ),
-            ),
-            S.divider(),
-            // A single document: the details on the Contact Us page.
-            S.listItem()
-              .title("ގުޅުއްވުމަށް")
-              .id("contactInfo")
-              .child(S.document().schemaType("contactInfo").documentId("contactInfo")),
-            S.listItem()
-              .title("ޕްރައިވެސީ ޕޮލިސީ")
-              .id("privacyPolicy")
-              .child(S.document().schemaType("privacyPolicy").documentId("privacyPolicy")),
-            S.listItem()
-              .title("ބޭނުންކުރުމުގެ ޝަރުތުތައް")
-              .id("termsOfUse")
-              .child(S.document().schemaType("termsOfUse").documentId("termsOfUse")),
-          ]),
+      // The start screen (StudioHome) shows a tile for each section; tapping one opens
+      // the list or form below. Every list shows the newest item first.
+      structure: (S) => {
+        const single = (type: string) => S.document().schemaType(type).documentId(type);
+        const list = (type: string, field: string) =>
+          S.documentTypeList(type).defaultOrdering([{ field, direction: field === "title" ? "asc" : "desc" }]);
+        const children: Record<string, () => ReturnType<typeof single> | ReturnType<typeof list>> = {
+          // Single documents: the red breaking news strip, the home page's big top card and the site pages.
+          breakingNews: () => single("breakingNews"),
+          featuredArticles: () => single("featuredArticles"),
+          contactInfo: () => single("contactInfo"),
+          privacyPolicy: () => single("privacyPolicy"),
+          termsOfUse: () => single("termsOfUse"),
+          article: () => list("article", "publishedAt"),
+          story: () => list("story", "publishedAt"),
+          author: () => list("author", "title"),
+          photoAlbum: () => list("photoAlbum", "date"),
+          graphic: () => list("graphic", "date"),
+          poll: () => list("poll", "publishedAt"),
+          comment: () => list("comment", "submittedAt"),
+        };
+        return S.component(StudioHome)
+          .id("root")
+          .child((id) => children[id]?.());
+      },
     }),
   ],
   // The editors' dashboard: views, waiting comments, polls and readers.

@@ -33,27 +33,8 @@ function Icon({ kind }: { kind: Notice["kind"] }) {
   );
 }
 
-// Labels on the dashboard menu (comments waiting, poll ending, scheduled items), drawn
-// with CSS on the menu links so the dashboard's own list is left untouched.
-function menuLabels(counts: ReturnType<typeof useNotifications>["counts"], now: number): string {
-  const rule = (type: string, text: string, tone: string) =>
-    `a[href$="/structure/${type}"] [data-testid="compact-preview__header"] [data-ui="Text"] > span > span::after{content:${JSON.stringify(text)};` +
-    `display:inline-block;vertical-align:middle;margin:0 8px;font:700 11px/1.6 Inter,sans-serif;direction:ltr;` +
-    `padding:1px 8px;border-radius:999px;${tone}}`;
-  const rules: string[] = [];
-  if (counts.waiting) rules.push(rule("comment", `${counts.waiting} new`, "background:#ff5d6c;color:#fff"));
-  if (counts.pollEndsAt !== null) {
-    const h = Math.max(0, counts.pollEndsAt - now) / HOUR;
-    rules.push(rule("poll", h < 1 ? "ends soon" : `ends in ${Math.round(h)}h`, "background:rgba(227,179,65,.2);color:#d9a521"));
-  }
-  for (const [type, n] of Object.entries(counts.scheduled)) {
-    rules.push(rule(type, `${n} scheduled`, "background:rgba(168,130,255,.22);color:#9a6dff"));
-  }
-  return rules.join("\n");
-}
-
 export default function NotificationBell() {
-  const { notices, counts, unread, seen, markAllRead, now } = useNotifications();
+  const { notices, unread, seen, markAllRead, now } = useNotifications();
   const [open, setOpen] = useState(false);
   const [top, setTop] = useState(60);
   const wrap = useRef<HTMLDivElement>(null);
@@ -70,7 +51,6 @@ export default function NotificationBell() {
 
   return (
     <div className="nb-wrap" ref={wrap}>
-      <style>{menuLabels(counts, now)}</style>
       <button
         type="button"
         className={`nb-bell${open ? " open" : ""}`}

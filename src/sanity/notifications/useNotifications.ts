@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useClient } from "sanity";
 import { API_URL } from "../../lib/api";
 
-// What needs the editors' attention, for the bell and the menu labels: comments
+// What needs the editors' attention, for the bell and the start screen's tile labels: comments
 // waiting for approval, polls ending soon or just ended, and scheduled articles or
 // stories that have just gone live. Checked every minute and when the CMS is reopened.
 
