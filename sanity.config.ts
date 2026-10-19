@@ -17,7 +17,7 @@ export default defineConfig({
   name: "hulhangu",
   title: "Hulhangu",
   icon: StudioLogo,
-  // The top bar gets a notifications bell (new comments, polls ending, scheduled items going live).
+  // Our own top bar: logo and name, search, the notifications bell and the editor's menu.
   studio: { components: { navbar: StudioNavbar } },
   theme: studioTheme,
   projectId: project.projectId || "missing",

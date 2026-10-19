@@ -1,0 +1,342 @@
+/* The dashboard's top bar (StudioNavbar.tsx): logo and name, then round Search, the
+   bell and the editor's circle with its menu. Colours follow light/dark through the Card. */
+.hn-bar {
+  --hn-tile: color-mix(in srgb, var(--card-fg-color) 8%, var(--card-bg-color));
+  --hn-line: var(--card-border-color);
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  height: 64px;
+  padding: 0 12px 0 14px;
+  border-bottom: 1px solid var(--hn-line);
+  font-family: Inter, var(--font-thaana), sans-serif;
+  color: var(--card-fg-color);
+}
+.hn-brand {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.hn-logo {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  display: block;
+}
+.hn-name {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+  min-width: 0;
+}
+.hn-name b {
+  font-size: 16px;
+  font-weight: 700;
+}
+.hn-name small {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--card-muted-fg-color);
+}
+.hn-round,
+.hn-bar .nb-bell {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--hn-tile);
+  color: var(--card-fg-color);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.hn-bar .nb-wrap {
+  padding: 0;
+}
+.hn-bar .nb-count {
+  top: 3px;
+  right: 2px;
+}
+.hn-round:hover,
+.hn-bar .nb-bell:hover,
+.hn-bar .nb-bell.open {
+  background: color-mix(in srgb, var(--card-fg-color) 14%, var(--card-bg-color));
+}
+
+/* The editor's own circle, with a purple ring */
+.hn-me {
+  position: relative;
+  flex-shrink: 0;
+}
+.hn-avatar {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #8f66f0;
+  color: #fff;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 0 0 2px var(--card-bg-color), 0 0 0 4px #8f66f0;
+  margin-left: 4px;
+}
+.hn-avatar.small {
+  width: 36px;
+  height: 36px;
+  box-shadow: none;
+  margin: 0;
+}
+.hn-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.hn-avatar-letter {
+  font: 700 15px Inter, sans-serif;
+}
+
+/* The menu under the circle */
+.hn-menu {
+  position: fixed;
+  top: 70px;
+  right: 10px;
+  z-index: 1000;
+  width: min(270px, calc(100vw - 20px));
+  padding: 8px;
+  border-radius: 22px;
+  background: var(--card-bg-color);
+  border: 1px solid var(--hn-line);
+  box-shadow: 0 18px 44px rgba(8, 0, 24, 0.45);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.hn-menu-me {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px 12px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--hn-line);
+}
+.hn-menu-me > span:last-child {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.hn-menu-me b {
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.hn-menu-me small {
+  font-size: 12px;
+  color: var(--card-muted-fg-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.hn-menu > button,
+.hn-menu > a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 46px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
+  color: var(--card-fg-color);
+  font: 600 14px Inter, sans-serif;
+  text-decoration: none;
+  text-align: left;
+  cursor: pointer;
+}
+.hn-menu > button:hover,
+.hn-menu > a:hover {
+  background: var(--hn-tile);
+}
+.hn-menu > .on {
+  background: rgba(143, 102, 240, 0.18);
+}
+.hn-menu > .hn-out {
+  color: #e5394b;
+}
+[data-scheme="dark"] .hn-menu > .hn-out {
+  color: #ff8a94;
+}
+.hn-grow {
+  flex: 1;
+}
+.hn-switch {
+  width: 40px;
+  height: 24px;
+  border-radius: 999px;
+  padding: 2px;
+  box-sizing: border-box;
+  background: var(--hn-line);
+  display: flex;
+  transition: background 0.2s;
+}
+.hn-switch span {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.2s;
+}
+[aria-checked="true"] > .hn-switch {
+  background: #8f66f0;
+}
+[aria-checked="true"] > .hn-switch span {
+  transform: translateX(16px);
+}
+
+/* Search, as a sheet from the top */
+.hn-sheet-back {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  background: rgba(8, 0, 24, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+.hn-search {
+  width: 100%;
+  max-width: 560px;
+  max-height: 85vh;
+  box-sizing: border-box;
+  padding: 12px 12px 16px;
+  border-radius: 0 0 26px 26px;
+  background: var(--card-bg-color);
+  color: var(--card-fg-color);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-family: Inter, var(--font-thaana), sans-serif;
+}
+.hn-search-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.hn-search-box {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 48px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: var(--hn-tile);
+  border: 1px solid var(--hn-line);
+  color: var(--card-muted-fg-color);
+}
+.hn-search-box:focus-within {
+  border-color: #8f66f0;
+}
+.hn-search-box input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--card-fg-color);
+  font: 400 16px Inter, var(--font-thaana), sans-serif;
+}
+.hn-text-btn {
+  height: 44px;
+  padding: 0 12px;
+  border: 0;
+  background: none;
+  color: #8f66f0;
+  font: 600 14px Inter, sans-serif;
+  cursor: pointer;
+}
+[data-scheme="dark"] .hn-text-btn {
+  color: #c0a6ff;
+}
+.hn-search-label {
+  padding: 0 8px;
+  font: 600 11.5px Inter, sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--card-muted-fg-color);
+}
+.hn-search-note {
+  margin: 0;
+  padding: 0 8px;
+  font-size: 13px;
+  color: var(--card-muted-fg-color);
+}
+.hn-search-list {
+  overflow-y: auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.hn-hit {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  border-radius: 16px;
+  color: inherit;
+  text-decoration: none;
+  direction: rtl;
+}
+.hn-hit:hover,
+.hn-hit:focus-visible {
+  background: var(--hn-tile);
+}
+.hn-hit img,
+.hn-hit-noimg {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  object-fit: cover;
+  background: rgba(143, 102, 240, 0.2);
+}
+.hn-hit-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.hn-hit-title {
+  font: 700 15px/1.75 var(--font-thaana), Inter, sans-serif;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.hn-hit-type {
+  direction: ltr;
+  text-align: right;
+  font: 500 11.5px Inter, sans-serif;
+  color: var(--card-muted-fg-color);
+}
+.hn-bar :is(button, a, input):focus-visible {
+  outline: 2px solid #a882ff;
+  outline-offset: 2px;
+}
+/* The search box's purple edge already shows it is active. */
+.hn-bar .hn-search-box input:focus-visible {
+  outline: none;
+}

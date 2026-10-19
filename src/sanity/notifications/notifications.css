@@ -1,20 +1,4 @@
 /* The notifications bell in the dashboard's top bar, and its list. */
-.nb-navbar {
-  /* The Card brings its own display; the bar must stay one row. */
-  display: flex !important;
-  align-items: stretch;
-  background: var(--card-bg-color);
-  border-bottom: 1px solid var(--card-border-color);
-}
-.nb-navbar-main {
-  flex: 1;
-  min-width: 0;
-}
-/* The bar draws its own bottom line; ours runs under the bell too. */
-.nb-navbar-main [data-testid="studio-navbar"] {
-  border-bottom: 0 !important;
-  box-shadow: none !important;
-}
 .nb-wrap {
   display: flex;
   align-items: center;
