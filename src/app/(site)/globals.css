@@ -1836,7 +1836,8 @@ section {
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 40px;
-  padding: clamp(20px, 2.6vw, 32px);
+  /* Room on every side so the question and answers sit clear of the rounded corners. */
+  padding: clamp(28px, 3.4vw, 48px);
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: clamp(20px, 3vw, 40px);
