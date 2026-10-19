@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Poll } from "@/lib/articles";
 import { apiGet, apiOn, apiPost, remember, voterId } from "@/lib/api";
+import { cmsImage } from "@/lib/cmsImages";
 import ArticleImage from "./ArticleImage";
 
 // "2 ދުވަސް 5 ގަޑިއިރު" style time left until voting ends.
@@ -95,9 +96,15 @@ export default function PollCard({ poll }: { poll: Poll }) {
     setPicked(selection);
   }
 
+  // No photo uploaded for this poll: the question and answers take the whole card.
+  const hasImage = Boolean(cmsImage(poll.id));
+
   return (
-    <form className={`poll ${done ? "done" : ""} ${closed ? "closed" : ""}`} onSubmit={submit}>
-      <ArticleImage slug={poll.id} alt="" className="poll-img" />
+    <form
+      className={`poll ${hasImage ? "" : "no-img"} ${done ? "done" : ""} ${closed ? "closed" : ""}`}
+      onSubmit={submit}
+    >
+      {hasImage && <ArticleImage slug={poll.id} alt="" className="poll-img" />}
       <div className="poll-body">
         <h2>{poll.question}</h2>
         {poll.options.map((text, i) => {
