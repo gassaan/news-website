@@ -110,8 +110,10 @@ export default function PollCard({ poll }: { poll: Poll }) {
         {poll.options.map((text, i) => {
           const pct = total ? Math.round((votes[i] / total) * 100) : 0;
           const winner = closed && total > 0 && votes[i] === top;
+          // The answer this reader voted for stays marked next to the results.
+          const mine = picked === i;
           return (
-            <label className={`opt ${winner ? "winner" : ""}`} key={i}>
+            <label className={`opt ${winner ? "winner" : ""} ${mine ? "mine" : ""}`} key={i}>
               <input
                 type="radio"
                 name={poll.id}
@@ -122,7 +124,10 @@ export default function PollCard({ poll }: { poll: Poll }) {
               />
               <span className="dot" />
               <span className="bar" style={done ? { width: `${pct}%` } : undefined} />
-              <span className="txt">{text}</span>
+              <span className="txt">
+                {text}
+                {mine && <span className="mine-tag">ތިބާގެ ވޯޓު</span>}
+              </span>
               <span className="pct">{done ? `${pct}%` : ""}</span>
             </label>
           );
