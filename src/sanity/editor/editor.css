@@ -47,9 +47,15 @@
   font-size: 13px !important;
   line-height: 1.8 !important;
 }
-/* The field's comment and "…" buttons sit on the card without their own dark box. */
+/* The field's comment and "…" buttons sit on the card without their own dark box,
+   level with the field name, and the name starts right at the top of the card. */
 .ef-card [data-ui="fieldHeaderContentBox"] + [data-ui="Card"] {
   background: transparent !important;
+  top: 9px !important;
+  bottom: auto !important;
+}
+.ef-card [data-ui="fieldHeaderContentBox"] {
+  padding-top: 0 !important;
 }
 /* Field names in the site's soft purple, a little smaller inside cards. */
 .ef-card [data-ui="fieldHeaderContentBox"] label[data-ui="Text"] {
@@ -67,21 +73,28 @@
   line-height: 1.95 !important;
 }
 
-/* Round choice buttons (category, writer) */
+/* Round choice buttons (category, writer), in even columns */
 .ef-chips {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
   gap: 8px;
 }
+.ef-choices {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.ef-people {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
 .ef-chip {
-  min-height: 42px;
-  padding: 0 16px;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 10px;
   border-radius: 999px;
   border: 1px solid var(--ef-edge);
   background: transparent;
   color: var(--ef-text);
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   font: 700 14.5px/1.7 var(--font-thaana), Inter, sans-serif;
   cursor: pointer;
@@ -91,20 +104,34 @@
   border-color: #8f66f0;
   color: #fff;
 }
+/* Writer: photo at the start (the right, in Dhivehi), name beside it. */
 .ef-chip.ef-person {
-  min-height: 50px;
-  padding: 0 16px 0 5px;
-  gap: 9px;
+  min-height: 52px;
+  padding-block: 0;
+  padding-inline: 6px 12px;
+  justify-content: flex-start;
+  gap: 8px;
+  text-align: start;
 }
 .ef-chip.ef-person[aria-checked="true"] {
   background: rgba(143, 102, 240, 0.22);
   color: var(--ef-text);
   box-shadow: inset 0 0 0 1px #8f66f0;
 }
+.ef-name {
+  min-width: 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
 .ef-person img,
 .ef-avatar {
   width: 38px;
   height: 38px;
+  flex-shrink: 0;
   border-radius: 50%;
   object-fit: cover;
   background: var(--ef-soft);
@@ -114,34 +141,53 @@
   cursor: default;
 }
 
-/* Date and time */
+/* Date and time: the two pickers side by side, "Now" underneath */
 .ef-when {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 8px;
+}
+.ef-when-row {
+  display: flex;
   align-items: center;
   gap: 8px;
 }
+.ef-when-row .ef-pill {
+  flex: 1;
+}
 .ef-pill {
   position: relative;
+  min-width: 0;
   height: 46px;
-  padding: 0 14px;
+  padding: 0 12px;
   border-radius: 999px;
   border: 1px solid var(--ef-edge);
   background: var(--ef-field);
   color: var(--ef-label);
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 8px;
 }
+.ef-pill svg {
+  flex-shrink: 0;
+}
+/* The phone's picker opens on a tap anywhere in the pill; the browser's own small
+   calendar and clock icons are hidden so the date has room. */
+.ef-pill input::-webkit-calendar-picker-indicator {
+  display: none;
+}
 .ef-pill input {
+  flex: 1;
+  width: 100%;
   border: 0;
   outline: 0;
   background: transparent;
   color: var(--ef-text);
-  font: 600 15px Inter, sans-serif;
+  font: 600 14.5px Inter, sans-serif;
   direction: ltr;
   min-width: 0;
   color-scheme: dark;
+  cursor: pointer;
 }
 [data-scheme="light"] .ef-pill input {
   color-scheme: light;
@@ -270,4 +316,19 @@
 .ef-pill:focus-within {
   outline: 2px solid #a882ff;
   outline-offset: 2px;
+}
+.ef-slug-box input::placeholder {
+  color: var(--ef-muted);
+  opacity: 0.6;
+}
+
+/* The date field's own name and help text (Sanity leaves them to the picker). */
+.ef-label {
+  font: 700 15px/1.85 var(--font-thaana), Inter, sans-serif;
+  color: var(--ef-label);
+}
+.ef-desc {
+  margin-top: -4px;
+  font: 400 13px/1.8 var(--font-thaana), Inter, sans-serif;
+  color: var(--ef-muted);
 }

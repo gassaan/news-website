@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import {
   set,
   unset,
@@ -34,7 +34,7 @@ export function ChoiceInput(props: StringInputProps) {
   const { value, onChange, readOnly, schemaType } = props;
   const list = (schemaType.options?.list ?? []) as { title?: string; value?: string }[];
   return (
-    <div className="ef-chips" role="radiogroup">
+    <div className="ef-chips ef-choices" role="radiogroup">
       {list.map((o) => {
         const on = value === o.value;
         return (
@@ -69,7 +69,7 @@ export function WriterInput(props: ReferenceInputProps) {
   }, [client]);
   if (!writers) return <p className="ef-note">Loading writers…</p>;
   return (
-    <div className="ef-chips" role="radiogroup">
+    <div className="ef-chips ef-people" role="radiogroup">
       {writers.map((w) => {
         const on = value?._ref === w._id;
         return (
@@ -88,7 +88,7 @@ export function WriterInput(props: ReferenceInputProps) {
             ) : (
               <span className="ef-avatar" aria-hidden="true" />
             )}
-            {w.title ?? "—"}
+            <span className="ef-name">{w.title ?? "—"}</span>
           </button>
         );
       })}
@@ -108,27 +108,42 @@ export function DateTimeInput(props: StringInputProps) {
     if (!nd) return onChange(unset());
     onChange(set(new Date(`${nd}T${nt || "00:00"}`).toISOString()));
   };
+  // Sanity draws a date field's name inside its own picker, so this input shows it.
+  const { title, description } = props.schemaType;
+  const open = (e: MouseEvent<HTMLInputElement>) => {
+    try {
+      e.currentTarget.showPicker?.();
+    } catch {
+      // older browsers: the field still takes typing
+    }
+  };
   return (
     <div className="ef-when">
-      <label className="ef-pill">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-          <path d="M4 6h16v14H4zM4 10h16M9 3v4M15 3v4" />
-        </svg>
-        <span className="ef-sr">Date</span>
-        <input type="date" value={date} disabled={readOnly} onChange={(e) => save(e.target.value, time)} />
-      </label>
-      <label className="ef-pill">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-          <path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0-18 0M12 7v5l3 2" />
-        </svg>
-        <span className="ef-sr">Time</span>
-        <input type="time" value={time} disabled={readOnly || !date} onChange={(e) => save(date, e.target.value)} />
-      </label>
-      <button type="button" className="ef-soft" disabled={readOnly} onClick={() => onChange(set(new Date().toISOString()))}>
-        Now
-      </button>
-      {/* A new item starts at "now", a moment after the form opens: only later times count. */}
-      {d && d.getTime() > openedAt + 60000 && <span className="ef-tag">Scheduled</span>}
+      {title && <span className="ef-label">{title}</span>}
+      {typeof description === "string" && <span className="ef-desc">{description}</span>}
+      <div className="ef-when-row">
+        <label className="ef-pill">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+            <path d="M4 6h16v14H4zM4 10h16M9 3v4M15 3v4" />
+          </svg>
+          <span className="ef-sr">Date</span>
+          <input type="date" value={date} disabled={readOnly} onClick={open} onChange={(e) => save(e.target.value, time)} />
+        </label>
+        <label className="ef-pill">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+            <path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0-18 0M12 7v5l3 2" />
+          </svg>
+          <span className="ef-sr">Time</span>
+          <input type="time" value={time} disabled={readOnly || !date} onClick={open} onChange={(e) => save(date, e.target.value)} />
+        </label>
+      </div>
+      <div className="ef-when-row">
+        <button type="button" className="ef-soft" disabled={readOnly} onClick={() => onChange(set(new Date().toISOString()))}>
+          Now
+        </button>
+        {/* A new item starts at "now", a moment after the form opens: only later times count. */}
+        {d && d.getTime() > openedAt + 60000 && <span className="ef-tag">Scheduled</span>}
+      </div>
     </div>
   );
 }
@@ -150,6 +165,7 @@ export function SlugInput(props: SlugInputProps) {
           <input
             {...elementProps}
             value={current}
+            placeholder="majlis-vote-2026"
             readOnly={readOnly}
             spellCheck={false}
             autoCapitalize="none"

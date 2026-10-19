@@ -21,7 +21,7 @@ export const slugField = () =>
     name: "slug",
     title: "ލިންކް (Slug)",
     type: "slug",
-    description: "ސައިޓުގެ ލިންކުގައި ބޭނުންކުރާ އިނގިރޭސި ނަން. އިނގިރޭސި އަކުރު، ނަމްބަރު އަދި - އެކަނި. މިސާލު: majlis-vote-2026",
+    description: "ސައިޓުގެ ލިންކުގައި ބޭނުންކުރާ އިނގިރޭސި ނަން. އިނގިރޭސި އަކުރު، ނަމްބަރު އަދި - އެކަނި.",
     options: { source: "title", maxLength: 80, slugify: toSlug },
     components: { input: SlugInput },
     validation: (r) =>
