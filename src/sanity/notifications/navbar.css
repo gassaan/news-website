@@ -7,7 +7,10 @@
   align-items: center;
   gap: 8px;
   height: 64px;
-  padding: 0 12px 0 14px;
+  /* Sanity's own card styles would otherwise take the side spacing away, leaving the
+     logo and the editor's circle against the screen edges (iPhone safe edges respected). */
+  padding: 0 max(14px, env(safe-area-inset-right)) 0 max(14px, env(safe-area-inset-left)) !important;
+  box-sizing: border-box;
   border-bottom: 1px solid var(--hn-line);
   font-family: Inter, var(--font-thaana), sans-serif;
   color: var(--card-fg-color);
@@ -90,7 +93,7 @@
   overflow: hidden;
   cursor: pointer;
   box-shadow: 0 0 0 2px var(--card-bg-color), 0 0 0 4px #8f66f0;
-  margin-left: 4px;
+  margin: 0 4px 0 6px;
 }
 .hn-avatar.small {
   width: 36px;
