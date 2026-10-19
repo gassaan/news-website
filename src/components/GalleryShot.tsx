@@ -27,7 +27,7 @@ export default function GalleryShot({
       <ArticleImage
         slug={albumPhotoSlug(album.slug, 0)}
         alt=""
-        sizes={featured ? "(max-width: 720px) 92vw, 1210px" : "(max-width: 720px) 75vw, 580px"}
+        sizes={featured ? "(max-width: 720px) 92vw, 1210px" : "(max-width: 720px) 46vw, 300px"}
       />
       {thumbs > 0 && (
         <div className="shot-thumbs" aria-hidden="true">

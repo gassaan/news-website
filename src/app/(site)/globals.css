@@ -1147,9 +1147,6 @@ section {
 }
 
 /* ---------- Gallery ---------- */
-.gallery .track {
-  grid-auto-columns: calc((100% - 30px) / 2);
-}
 /* Album cards: the news card, plus small round photos on the cover's edge. */
 .shot-thumbs {
   position: relative;
@@ -2971,6 +2968,10 @@ a.contact-card:hover {
     margin: 14px 14px 0;
     padding-block: 4px 16px;
   }
+  /* Album dates stay on the card's bottom edge when names take one line or two. */
+  .gallery .shot-card .meta {
+    margin-top: auto;
+  }
   :is(.news-grid, .news-track) .date-stamp b {
     font-size: 22px;
   }
@@ -3211,9 +3212,6 @@ footer .logo {
   .track {
     grid-auto-columns: calc((100% - 15px) / 2);
     gap: 15px;
-  }
-  .gallery .track {
-    grid-auto-columns: 85%;
   }
   .shot-feature > .ph {
     aspect-ratio: 4 / 3;
@@ -3458,12 +3456,13 @@ footer .logo {
     padding: 5px;
   }
   .shot-thumbs {
-    margin: -24px 12px 0;
+    margin: -20px 10px 0;
   }
   .card .shot-thumb {
-    width: 44px;
-    height: 44px;
-    margin-inline-start: -12px;
+    width: 36px;
+    height: 36px;
+    border-width: 2px;
+    margin-inline-start: -10px;
   }
   .shot-more {
     font-size: 13px;

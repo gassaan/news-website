@@ -107,8 +107,8 @@ export default function Home() {
           </Link>
         </div>
         <div className="carousel">
-          <div className="track">
-            {getPhotoAlbums().slice(0, 4).map((album) => (
+          <div className="track news-track">
+            {getPhotoAlbums().slice(0, 8).map((album) => (
               <GalleryShot key={album.slug} album={album} />
             ))}
           </div>
