@@ -1,4 +1,5 @@
 import { defineType, defineField, defineArrayMember } from "sanity";
+import { WriterInput } from "../editor/inputs";
 import { bodyField, dateTimeField, FACEBOOK_FIELDSET, facebookFields, formatPublish, photoField, slugField, titleField } from "./fields";
 
 export const story = defineType({
@@ -14,6 +15,7 @@ export const story = defineType({
       title: "ލިޔުންތެރިޔާ",
       type: "reference",
       to: [{ type: "author" }],
+      components: { input: WriterInput },
       validation: (r) => r.required(),
     }),
     dateTimeField(),

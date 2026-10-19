@@ -1,0 +1,273 @@
+/* The editing form (inputs.tsx): each field in a rounded card, tap buttons instead of
+   lists and pickers. Dark purple by default, white cards in light mode. */
+[data-testid="form-view"] {
+  --ef-card: #150735;
+  --ef-line: #270e61;
+  --ef-edge: #3e2a72;
+  --ef-field: #0e0426;
+  --ef-text: #fbf8ff;
+  --ef-label: #c9b6f5;
+  --ef-muted: #b7a6e6;
+  --ef-soft: rgba(168, 130, 255, 0.2);
+  --ef-soft-text: #d6c5ff;
+  --ef-ok: #5fd3a0;
+}
+[data-scheme="light"] [data-testid="form-view"],
+[data-scheme="light"][data-testid="form-view"] {
+  --ef-card: #fff;
+  --ef-line: rgba(62, 33, 128, 0.13);
+  --ef-edge: rgba(62, 33, 128, 0.22);
+  --ef-field: #f7f2ff;
+  --ef-text: #1a0f3d;
+  --ef-label: #5b4691;
+  --ef-muted: #5b4691;
+  --ef-soft: rgba(143, 102, 240, 0.14);
+  --ef-soft-text: #5f40a8;
+  --ef-ok: #17774c;
+}
+
+/* Cards */
+.ef-card,
+[data-testid="form-view"] [data-testid="fieldset-facebook"] {
+  padding: 14px 16px 16px;
+  border-radius: 20px;
+  background: var(--ef-card);
+  border: 1px solid var(--ef-line);
+}
+[data-testid="form-view"] [data-testid="fieldset-facebook"] {
+  box-sizing: border-box;
+}
+/* Cards sit closer together than Sanity's plain fields did. */
+[data-testid="form-view"] [data-ui="VStack"]:has(> [data-ui="VStack"] > .ef-card) {
+  gap: 14px !important;
+}
+/* Help text: smaller and softer, so the card leads with the field itself. */
+.ef-card [data-ui="fieldHeaderContentBox"] [id^="desc_"],
+.ef-card [data-ui="fieldHeaderContentBox"] [id^="desc_"] > span {
+  font-size: 13px !important;
+  line-height: 1.8 !important;
+}
+/* The field's comment and "…" buttons sit on the card without their own dark box. */
+.ef-card [data-ui="fieldHeaderContentBox"] + [data-ui="Card"] {
+  background: transparent !important;
+}
+/* Field names in the site's soft purple, a little smaller inside cards. */
+.ef-card [data-ui="fieldHeaderContentBox"] label[data-ui="Text"] {
+  color: var(--ef-label) !important;
+  font-size: 15px !important;
+}
+/* The headline is typed big and bold, like it appears on the site. */
+.ef-title input {
+  font-size: 20px !important;
+  font-weight: 700 !important;
+  line-height: 1.8 !important;
+}
+.ef-body textarea {
+  font-size: 18px !important;
+  line-height: 1.95 !important;
+}
+
+/* Round choice buttons (category, writer) */
+.ef-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ef-chip {
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid var(--ef-edge);
+  background: transparent;
+  color: var(--ef-text);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: 700 14.5px/1.7 var(--font-thaana), Inter, sans-serif;
+  cursor: pointer;
+}
+.ef-chip[aria-checked="true"] {
+  background: #8f66f0;
+  border-color: #8f66f0;
+  color: #fff;
+}
+.ef-chip.ef-person {
+  min-height: 50px;
+  padding: 0 16px 0 5px;
+  gap: 9px;
+}
+.ef-chip.ef-person[aria-checked="true"] {
+  background: rgba(143, 102, 240, 0.22);
+  color: var(--ef-text);
+  box-shadow: inset 0 0 0 1px #8f66f0;
+}
+.ef-person img,
+.ef-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--ef-soft);
+}
+.ef-chip:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* Date and time */
+.ef-when {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.ef-pill {
+  position: relative;
+  height: 46px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--ef-edge);
+  background: var(--ef-field);
+  color: var(--ef-label);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.ef-pill input {
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--ef-text);
+  font: 600 15px Inter, sans-serif;
+  direction: ltr;
+  min-width: 0;
+  color-scheme: dark;
+}
+[data-scheme="light"] .ef-pill input {
+  color-scheme: light;
+}
+.ef-soft {
+  height: 46px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 0;
+  background: var(--ef-soft);
+  color: var(--ef-soft-text);
+  font: 600 13.5px Inter, sans-serif;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.ef-soft:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.ef-tag {
+  font: 700 11.5px/1 Inter, sans-serif;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(168, 130, 255, 0.22);
+  color: var(--ef-soft-text);
+}
+.ef-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+/* Web address */
+.ef-slug {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ef-slug-row {
+  display: flex;
+  gap: 8px;
+  direction: ltr;
+}
+.ef-slug-box {
+  flex: 1;
+  min-width: 0;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  border-radius: 14px;
+  background: var(--ef-field);
+  border: 1px solid var(--ef-edge);
+  font: 400 15px Inter, sans-serif;
+}
+.ef-slug-box:focus-within {
+  border-color: #8f66f0;
+}
+.ef-slug-pre {
+  color: var(--ef-muted);
+  white-space: nowrap;
+}
+.ef-slug-box input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--ef-text);
+  font: inherit;
+  direction: ltr !important;
+  text-align: left !important;
+}
+.ef-ok {
+  align-self: flex-end;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  direction: ltr;
+  font: 600 12px Inter, sans-serif;
+  color: var(--ef-ok);
+}
+
+/* Counters under the summary and the text */
+.ef-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ef-count {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  direction: ltr;
+  font: 600 12px Inter, sans-serif;
+  color: var(--ef-muted);
+}
+.ef-count > span:last-child {
+  margin-left: auto;
+}
+.ef-bar {
+  flex: 1;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--ef-line);
+  overflow: hidden;
+}
+.ef-bar span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: #8f66f0;
+}
+.ef-bar span.over {
+  background: #e3b341;
+}
+.ef-note {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ef-muted);
+}
+.ef-chip:focus-visible,
+.ef-soft:focus-visible,
+.ef-pill:focus-within {
+  outline: 2px solid #a882ff;
+  outline-offset: 2px;
+}

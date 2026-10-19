@@ -11,6 +11,7 @@ import DashboardIcon from "./src/sanity/dashboard/DashboardIcon";
 import StudioNavbar from "./src/sanity/notifications/StudioNavbar";
 import StudioHome from "./src/sanity/home/StudioHome";
 import SectionList from "./src/sanity/home/SectionList";
+import { CardField } from "./src/sanity/editor/inputs";
 
 export default defineConfig({
   name: "hulhangu",
@@ -59,4 +60,6 @@ export default defineConfig({
   // The editors' dashboard: views, waiting comments, polls and readers.
   tools: (prev) => [...prev, { name: "dashboard", title: "Dashboard", icon: DashboardIcon, component: Dashboard }],
   schema: { types: schemaTypes },
+  // The editing form: every field in its own rounded card.
+  form: { components: { field: CardField } },
 });

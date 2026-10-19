@@ -1,5 +1,6 @@
 import { defineField } from "sanity";
-import speakingurl from "speakingurl";
+import { toSlug } from "../slug";
+import { BodyInput, DateTimeInput, SlugInput } from "../editor/inputs";
 
 // Category list mirrors the site's fixed categories (src/lib/articles.ts).
 export const CATEGORY_OPTIONS = [
@@ -14,17 +15,7 @@ export const CATEGORY_OPTIONS = [
 export const titleField = (title = "ސުރުޚީ") =>
   defineField({ name: "title", title, type: "string", validation: (r) => r.required() });
 
-// Web address part, filled from the title with one click ("Generate").
-// Only a-z, 0-9 and "-" are allowed: a "/" would point to a page that doesn't exist.
-// Thaana titles are spelled out in Latin letters first (as Sanity does by default).
-const toSlug = (input: string) =>
-  speakingurl(input, { truncate: 80, symbols: true })
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 80);
-
+// Web address part, filled from the title with one click ("From title").
 export const slugField = () =>
   defineField({
     name: "slug",
@@ -32,6 +23,7 @@ export const slugField = () =>
     type: "slug",
     description: "ސައިޓުގެ ލިންކުގައި ބޭނުންކުރާ އިނގިރޭސި ނަން. އިނގިރޭސި އަކުރު، ނަމްބަރު އަދި - އެކަނި. މިސާލު: majlis-vote-2026",
     options: { source: "title", maxLength: 80, slugify: toSlug },
+    components: { input: SlugInput },
     validation: (r) =>
       r.required().custom((value?: { current?: string }) => {
         const current = value?.current ?? "";
@@ -50,6 +42,7 @@ export const dateTimeField = (name = "publishedAt", title = "ތާރީޚާއި ގ
     type: "datetime",
     initialValue: () => new Date().toISOString(),
     options: { timeStep: 5 },
+    components: { input: DateTimeInput },
     validation: (r) => r.required(),
   });
 
@@ -80,6 +73,7 @@ export const bodyField = (name = "body", title = "ލިޔުން") =>
     type: "text",
     rows: 16,
     description: "ކޮންމެ ޕެރެގްރާފަކަށްފަހު Enter ފިއްތަވާ.",
+    components: { input: BodyInput },
     validation: (r) => r.required(),
   });
 
@@ -128,7 +122,7 @@ export const facebookFields = ({ withPicture = false } = {}) => [
       "ޓިކް ޖައްސަވައި ޕަބްލިޝް ކުރައްވައިފިނަމަ، ވެބްސައިޓަށް އެރުމާއެކު ފޭސްބުކް ޕޭޖަށްވެސް އަމިއްލައަށް ޕޯސްޓްވާނެ.",
     type: "boolean",
     initialValue: false,
-    options: { layout: "checkbox" },
+    options: { layout: "switch" },
     fieldset: "facebook",
     readOnly: ({ document }) => posted(document),
   }),

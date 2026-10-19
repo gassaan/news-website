@@ -1,4 +1,5 @@
 import { defineType, defineField } from "sanity";
+import { ChoiceInput, SummaryInput, WriterInput } from "../editor/inputs";
 import { CATEGORY_OPTIONS, FACEBOOK_FIELDSET, facebookFields, bodyField, dateTimeField, formatPublish, photoField, slugField, titleField } from "./fields";
 
 export const article = defineType({
@@ -14,6 +15,7 @@ export const article = defineType({
       title: "ކެޓެގަރީ",
       type: "string",
       options: { list: CATEGORY_OPTIONS, layout: "radio" },
+      components: { input: ChoiceInput },
       validation: (r) => r.required(),
     }),
     defineField({
@@ -21,6 +23,7 @@ export const article = defineType({
       title: "ލިޔުންތެރިޔާ",
       type: "reference",
       to: [{ type: "author" }],
+      components: { input: WriterInput },
       validation: (r) => r.required(),
     }),
     dateTimeField(),
@@ -33,6 +36,7 @@ export const article = defineType({
         "ހޯމްޕޭޖުގެ މައި ޚަބަރާއި، ޝެއާ ކުރާ ފޮޓޯގައި ދައްކާނީ މިއެވެ. ފޮޓޯގައި ފުރިހަމައަށް ފެންނާނީ ގާތްގަނޑަކަށް 250 އަކުރު.",
       type: "text",
       rows: 3,
+      components: { input: SummaryInput },
       validation: (r) =>
         r.max(250).warning("250 އަކުރަށް ވުރެ ދިގު. ޝެއާ ކުރާ ފޮޓޯގައި ފަހަތު ބައި ކެނޑިގެންދާނެ."),
     }),
