@@ -29,7 +29,7 @@
 /* Cards */
 .ef-card,
 [data-testid="form-view"] [data-testid="fieldset-facebook"] {
-  padding: 14px 16px 16px;
+  padding: 8px 16px 16px;
   border-radius: 20px;
   background: var(--ef-card);
   border: 1px solid var(--ef-line);
@@ -48,14 +48,12 @@
   line-height: 1.8 !important;
 }
 /* The field's comment and "…" buttons sit on the card without their own dark box,
-   level with the field name, and the name starts right at the top of the card. */
+   level with the field name. (The name keeps Sanity's room above it: Thaana marks
+   over the letters need it, so the card's own top padding is the smaller one.) */
 .ef-card [data-ui="fieldHeaderContentBox"] + [data-ui="Card"] {
   background: transparent !important;
-  top: 9px !important;
+  top: 17px !important;
   bottom: auto !important;
-}
-.ef-card [data-ui="fieldHeaderContentBox"] {
-  padding-top: 0 !important;
 }
 /* Field names in the site's soft purple, a little smaller inside cards. */
 .ef-card [data-ui="fieldHeaderContentBox"] label[data-ui="Text"] {
@@ -324,6 +322,7 @@
 
 /* The date field's own name and help text (Sanity leaves them to the picker). */
 .ef-label {
+  margin-top: 12px;
   font: 700 15px/1.85 var(--font-thaana), Inter, sans-serif;
   color: var(--ef-label);
 }
