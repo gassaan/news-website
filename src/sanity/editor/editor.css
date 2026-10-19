@@ -877,3 +877,37 @@
   border: 1px solid rgba(95, 211, 160, 0.45);
   color: #3fae7d;
 }
+
+/* Poll under the article: one full-width button per poll, question then details. */
+.ef-polls {
+  grid-template-columns: minmax(0, 1fr);
+}
+.ef-chip.ef-poll {
+  min-height: 52px;
+  padding: 8px 16px;
+  border-radius: 18px;
+  justify-content: flex-start;
+  gap: 10px;
+  text-align: start;
+}
+.ef-chip.ef-poll svg {
+  flex-shrink: 0;
+}
+.ef-poll-text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.ef-poll-q {
+  font-size: 14.5px;
+  line-height: 1.75;
+}
+.ef-poll-meta {
+  direction: ltr;
+  text-align: right;
+  font: 500 12px/1.5 Inter, sans-serif;
+  color: var(--ef-muted);
+}
+.ef-chip.ef-poll[aria-checked="true"] .ef-poll-meta {
+  color: rgba(255, 255, 255, 0.82);
+}

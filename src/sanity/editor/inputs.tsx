@@ -606,3 +606,60 @@ export function FeaturedInput(props: ArrayOfObjectsInputProps) {
     </div>
   );
 }
+
+// Poll under the article: one round button per poll still taking votes, plus
+// "no poll". A chosen poll that has since ended stays listed so the choice is visible.
+type PollRow = { _id: string; title?: string; closesAt?: string; answers?: number };
+function pollMeta(p: PollRow, now: number) {
+  const answers = `${p.answers ?? 0} answers`;
+  if (!p.closesAt) return `${answers} · no end time`;
+  const ms = Date.parse(p.closesAt) - now;
+  if (ms <= 0) return `${answers} · voting ended`;
+  const h = Math.ceil(ms / 3600000);
+  return `${answers} · ends in ${h < 48 ? `${h} hour${h === 1 ? "" : "s"}` : `${Math.round(h / 24)} days`}`;
+}
+export function PollPickInput(props: ReferenceInputProps) {
+  const { value, onChange, readOnly } = props;
+  const client = useClient({ apiVersion: "2025-02-19" });
+  const [polls, setPolls] = useState<PollRow[] | null>(null);
+  const [now] = useState(() => Date.now());
+  const [error, setError] = useState("");
+  useEffect(() => {
+    client
+      .fetch<PollRow[]>(`*[_type == "poll" && !(_id in path("drafts.**"))] | order(_createdAt desc){ _id, title, closesAt, "answers": count(options) }`)
+      .then(setPolls, () => setPolls([]));
+  }, [client]);
+  if (!polls) return <p className="ef-note">Loading polls…</p>;
+  const shown = polls.filter((p) => p._id === value?._ref || !p.closesAt || Date.parse(p.closesAt) > now);
+  // Sanity refuses changes while the page is still connecting; say so instead of doing nothing.
+  const pick = (id: string | null) => {
+    try {
+      onChange(id ? set({ _type: "reference", _ref: id, _weak: true }) : unset());
+      setError("");
+    } catch {
+      setError("The page is still connecting. Wait a moment and try again.");
+    }
+  };
+  return (
+    <div className="ef-chips ef-polls" role="radiogroup">
+      <button type="button" role="radio" aria-checked={!value?._ref} className="ef-chip ef-poll" disabled={readOnly} onClick={() => value?._ref && pick(null)}>
+        {!value?._ref && <Check />}
+        <span className="ef-poll-q">ޕޯލެއް ނުދައްކާ</span>
+      </button>
+      {shown.map((p) => {
+        const on = value?._ref === p._id;
+        return (
+          <button key={p._id} type="button" role="radio" aria-checked={on} className="ef-chip ef-poll" disabled={readOnly} onClick={() => !on && pick(p._id)}>
+            {on && <Check />}
+            <span className="ef-poll-text">
+              <span className="ef-poll-q">{p.title ?? "—"}</span>
+              <span className="ef-poll-meta">{pollMeta(p, now)}</span>
+            </span>
+          </button>
+        );
+      })}
+      {shown.length === 0 && <p className="ef-note">No poll is taking votes right now. Make one under ޕޯލްސް first.</p>}
+      {error && <p className="ef-photo-error">{error}</p>}
+    </div>
+  );
+}

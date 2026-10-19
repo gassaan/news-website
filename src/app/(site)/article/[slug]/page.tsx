@@ -4,7 +4,7 @@ import {
   articles,
   getArticle,
   getCategory,
-  getPolls,
+  getPoll,
   getRelatedArticles,
   getSampleComments,
   viewCount,
@@ -52,11 +52,8 @@ export default async function ArticlePage({
   }
 
   const category = getCategory(article.category);
-  // Articles show a poll that is still taking votes when there is one.
-  const allPolls = getPolls();
-  const openPolls = allPolls.filter((p) => !p.closed);
-  const polls = openPolls.length ? openPolls : allPolls;
-  const poll = polls[Math.abs(slug.length) % polls.length];
+  // The poll picked for this article in the dashboard, if any.
+  const poll = article.poll ? getPoll(article.poll) : undefined;
   const related = getRelatedArticles(article);
   const breaking = getBreakingNews();
 
@@ -114,9 +111,11 @@ export default async function ArticlePage({
 
       <AdSlot />
 
-      <section className="wrap narrow">
-        <PollCard poll={poll} />
-      </section>
+      {poll && (
+        <section className="wrap narrow">
+          <PollCard poll={poll} />
+        </section>
+      )}
 
       <CommentSection initialComments={getSampleComments()} target={article.slug} />
 

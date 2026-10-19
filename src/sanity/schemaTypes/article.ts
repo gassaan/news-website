@@ -1,5 +1,5 @@
 import { defineType, defineField } from "sanity";
-import { ChoiceInput, SummaryInput, WriterInput } from "../editor/inputs";
+import { ChoiceInput, PollPickInput, SummaryInput, WriterInput } from "../editor/inputs";
 import { CATEGORY_OPTIONS, FACEBOOK_FIELDSET, facebookFields, bodyField, dateTimeField, formatPublish, photoField, slugField, titleField } from "./fields";
 
 export const article = defineType({
@@ -41,6 +41,16 @@ export const article = defineType({
         r.max(250).warning("250 އަކުރަށް ވުރެ ދިގު. ޝެއާ ކުރާ ފޮޓޯގައި ފަހަތު ބައި ކެނޑިގެންދާނެ."),
     }),
     bodyField(),
+    defineField({
+      name: "poll",
+      title: "ލިޔުމުގެ ތިރީގައި ޕޯލް",
+      description: "ލިޔުމުގެ ތިރީގައި ދައްކާނީ މި ޕޯލެވެ. \"ޕޯލެއް ނުދައްކާ\" ހޮވައިފިނަމަ ޕޯލެއް ނުދައްކާނެ.",
+      type: "reference",
+      to: [{ type: "poll" }],
+      // Weak, so a poll can still be deleted after an article has used it.
+      weak: true,
+      components: { input: PollPickInput },
+    }),
     ...facebookFields({ withPicture: true }),
     defineField({
       name: "featured",

@@ -25,6 +25,8 @@ export type Article = {
   // "HH:MM" Maldives time, from the dashboard. Sample articles use pseudoTime().
   time?: string;
   featured?: boolean;
+  // The poll picked in the dashboard to show under the article.
+  poll?: string;
   episodes?: Episode[];
 };
 
