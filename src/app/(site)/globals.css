@@ -1940,7 +1940,7 @@ section {
 .poll.done .dot {
   display: none;
 }
-/* The reader's own vote keeps its filled circle, an outline and a small tag. */
+/* The reader's own vote keeps its filled circle and an outline. */
 .poll.done .opt.mine .dot {
   display: block;
 }
@@ -1951,18 +1951,6 @@ section {
 .opt.mine .txt {
   font-weight: 700;
   color: var(--text);
-}
-.mine-tag {
-  display: inline-block;
-  margin-inline-start: 10px;
-  padding: 0 10px;
-  border-radius: 999px;
-  background: #8f66f0;
-  color: #fff;
-  font-size: 0.72em;
-  font-weight: 700;
-  line-height: 1.9;
-  vertical-align: middle;
 }
 /* Voting has ended: the most-voted answer stands out. */
 .poll.closed .opt .bar {

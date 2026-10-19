@@ -124,10 +124,7 @@ export default function PollCard({ poll }: { poll: Poll }) {
               />
               <span className="dot" />
               <span className="bar" style={done ? { width: `${pct}%` } : undefined} />
-              <span className="txt">
-                {text}
-                {mine && <span className="mine-tag">ތިބާގެ ވޯޓު</span>}
-              </span>
+              <span className="txt">{text}</span>
               <span className="pct">{done ? `${pct}%` : ""}</span>
             </label>
           );
