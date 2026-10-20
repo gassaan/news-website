@@ -1135,7 +1135,7 @@
   font: 500 12px Inter, sans-serif;
   color: var(--ef-muted);
 }
-/* The toolbar above the phone's keyboard */
+/* Phones: the toolbar pinned to the top of the screen while typing */
 .re-bar {
   position: fixed;
   left: 0;
@@ -1144,14 +1144,16 @@
   display: flex;
   justify-content: space-between;
   gap: 4px;
-  padding: 6px max(10px, env(safe-area-inset-right)) 6px max(10px, env(safe-area-inset-left));
+  padding: calc(6px + env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) 6px max(10px, env(safe-area-inset-left));
   background: #1c0c45;
-  border-top: 1px solid #3e2a72;
+  border-bottom: 1px solid #3e2a72;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
   color: #e9e0ff;
 }
 [data-scheme="light"] .re-bar {
   background: #fff;
-  border-top-color: rgba(62, 33, 128, 0.15);
+  border-bottom-color: rgba(62, 33, 128, 0.15);
+  box-shadow: 0 6px 18px rgba(62, 33, 128, 0.12);
   color: #1a0f3d;
 }
 .re-tb {
@@ -1347,4 +1349,5 @@
   padding: 5px;
   border: 1px solid var(--ef-edge);
   border-radius: 16px;
+  box-shadow: none;
 }

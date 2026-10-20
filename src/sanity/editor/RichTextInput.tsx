@@ -19,8 +19,8 @@ import { parseBlocks, parseInline, photoSrc, plainText, videoEmbed } from "@/lib
 import { RichBlock } from "@/components/RichBlocks";
 import { photoUrl } from "./inputs";
 
-// The article text: written like on the website, with a toolbar above the phone's
-// keyboard (bold, sub-heading, quote, list, link, undo), a + button for photos,
+// The article text: written like on the website, with a toolbar at the top of the
+// phone's screen while typing (bold, sub-heading, quote, list, link, undo), a + button for photos,
 // videos and the rest, and a Preview of the finished article. It is saved as lines
 // of text with a few marks (see src/lib/richText.ts), so older text needs no change.
 
@@ -283,7 +283,7 @@ export function RichTextInput(props: TextInputProps) {
   const [sheet, setSheet] = useState<Sheet>(null);
   const [scheme, setScheme] = useState("dark");
   const [focused, setFocused] = useState(false);
-  const [barBottom, setBarBottom] = useState(0);
+  const [barTop, setBarTop] = useState(0);
   const [busy, setBusy] = useState(false);
   const [url, setUrl] = useState("");
   const [touch] = useState(() => typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches);
@@ -326,7 +326,12 @@ export function RichTextInput(props: TextInputProps) {
       FactBox,
     ],
     content: toHtml(value ?? ""),
-    editorProps: { attributes: { dir: "rtl", class: "re-doc" } },
+    editorProps: {
+      attributes: { dir: "rtl", class: "re-doc" },
+      // Keep the line being typed clear of the toolbar at the top.
+      scrollMargin: { top: 90, bottom: 40, left: 0, right: 0 },
+      scrollThreshold: { top: 90, bottom: 40, left: 0, right: 0 },
+    },
     onUpdate: ({ editor: ed }) => {
       const next = toText(ed.getJSON());
       setText(next);
@@ -367,11 +372,12 @@ export function RichTextInput(props: TextInputProps) {
   // Save what's typed before leaving the page.
   useEffect(() => () => flush(), []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // The toolbar sits right above the phone's keyboard (the bottom of the screen on computers).
+  // Phones: the toolbar is pinned to the top of what's visible while typing. The bottom,
+  // above the keyboard, is where iPhone Safari puts its own bar and the address pill.
   useEffect(() => {
     if (!focused) return;
     const vv = window.visualViewport;
-    const place = () => setBarBottom(vv ? Math.max(0, window.innerHeight - vv.offsetTop - vv.height) : 0);
+    const place = () => setBarTop(vv ? Math.max(0, vv.offsetTop) : 0);
     place();
     vv?.addEventListener("resize", place);
     vv?.addEventListener("scroll", place);
@@ -458,12 +464,12 @@ export function RichTextInput(props: TextInputProps) {
     { key: "b", dv: "ފެކްޓް ބޮކްސް", en: "Fact box", icon: ICONS.box, on: state?.box, act: () => run((ed) => ed.chain().focus().setParagraph().toggleWrap("factBox").run()) },
   ];
 
-  // Phones: the toolbar floats above the keyboard while typing. Computers: it sits on
-  // top of the text, so it never covers the Publish button.
+  // Phones: the toolbar floats at the top of the screen while typing. Computers: it sits
+  // on top of the text, so it never covers the Publish button.
   const toolbar = (
     <div
       className={touch ? "re-bar" : "re-bar re-bar-inline"}
-      style={touch ? { bottom: barBottom, paddingBottom: barBottom ? 6 : "max(6px, env(safe-area-inset-bottom))" } : undefined}
+      style={touch ? { top: barTop } : undefined}
       role="toolbar"
       aria-label="Formatting"
     >
