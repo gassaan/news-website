@@ -1796,6 +1796,90 @@ section {
   font-weight: 900;
   line-height: 2.3;
 }
+/* Formatting from the dashboard's editor: quotes, fact boxes, lists, photos, videos. */
+.art-body .rt-quote {
+  padding-inline-start: 0.9em;
+  border-inline-start: 4px solid var(--accent);
+  break-inside: avoid;
+}
+.art-body .rt-quote p,
+.art-body .rt-box p {
+  margin: 0;
+  -webkit-text-stroke: 0;
+}
+.art-body strong {
+  font-family: var(--font-head);
+  font-weight: 900;
+  color: var(--text);
+}
+.art-body a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.35em;
+}
+.rt-box {
+  margin: 0 0 1.4em;
+  padding: 0.7em 1em;
+  border-radius: 24px;
+  background: var(--panel-in);
+  border: 1px solid var(--line);
+  break-inside: avoid;
+}
+.rt-list {
+  margin: 0 0 1.4em;
+  padding-inline-start: 1.3em;
+  list-style: disc;
+}
+ol.rt-list {
+  list-style: decimal;
+}
+.rt-list li {
+  margin-bottom: 0.2em;
+}
+.rt-list li::marker {
+  color: var(--accent);
+  font-family: var(--font-latin);
+}
+.rt-fig {
+  margin: 0 0 1.4em;
+  break-inside: avoid;
+}
+.rt-fig img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 24px;
+}
+.rt-fig figcaption {
+  margin-top: 0.5em;
+  font-size: 0.7em;
+  line-height: 1.9;
+  color: var(--body-ink);
+  opacity: 0.8;
+}
+.rt-video {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  margin: 0 0 1.4em;
+  border-radius: 24px;
+  overflow: hidden;
+  background: var(--panel-in);
+  break-inside: avoid;
+}
+.rt-video iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+.rt-hr {
+  margin: 0 auto 1.4em;
+  width: 40%;
+  border: 0;
+  border-top: 2px dotted var(--accent);
+}
 .in-ad {
   margin: 0 0 1.6em;
   break-inside: avoid;

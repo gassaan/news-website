@@ -4,7 +4,9 @@ import { Fragment, useState } from "react";
 import Link from "next/link";
 import { getAuthorSlug } from "@/lib/articles";
 import { getAuthorPhoto } from "@/lib/authorPhotos";
+import { parseBlocks } from "@/lib/richText";
 import ArticleImage from "./ArticleImage";
+import { RichBlock } from "./RichBlocks";
 
 export default function ArticleBody({
   slug,
@@ -17,6 +19,10 @@ export default function ArticleBody({
 }) {
   const [scale, setScale] = useState(1);
   const authorSlug = getAuthorSlug(author);
+  // Lines from the dashboard, with their sub-headings, quotes, lists, photos and videos.
+  const blocks = parseBlocks(paragraphs);
+  // The advert goes after the first paragraph, wherever it is.
+  const firstText = Math.max(0, blocks.findIndex((b) => b.type === "p"));
 
   return (
     <>
@@ -54,10 +60,10 @@ export default function ArticleBody({
       </div>
 
       <div className="art-body" id="artBody" style={{ fontSize: `calc(var(--fs) * ${scale})` }}>
-        {paragraphs.map((paragraph, index) => (
+        {blocks.map((block, index) => (
           <Fragment key={index}>
-            <p>{paragraph}</p>
-            {index === 0 && (
+            <RichBlock block={block} />
+            {index === firstText && (
               <figure className="in-ad">
                 <ArticleImage slug={`${slug}-ad`} alt="" sizes="(max-width: 720px) 92vw, 570px" />
                 <small>Sponsored</small>

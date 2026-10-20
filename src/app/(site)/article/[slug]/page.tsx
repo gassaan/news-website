@@ -24,6 +24,7 @@ import AdSlot from "@/components/AdSlot";
 import NewsTicker from "@/components/NewsTicker";
 import { getBreakingNews } from "@/lib/breaking";
 import { shareMetadata } from "@/lib/share";
+import { plainText } from "@/lib/richText";
 
 export function generateStaticParams() {
   return [...articles, ...reports].map((article) => ({ slug: article.slug }));
@@ -102,7 +103,7 @@ export default async function ArticlePage({
             <ArticleActions
               title={article.title}
               slug={article.slug}
-              summary={article.excerpt.trim() || article.body.join(" ").slice(0, 600)}
+              summary={article.excerpt.trim() || plainText(article.body).slice(0, 600)}
               date={formatDhivehiDate(article.publishedAt)}
             />
           </div>

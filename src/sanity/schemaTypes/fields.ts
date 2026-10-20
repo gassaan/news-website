@@ -3,7 +3,8 @@ import { toSlug } from "../slug";
 import { formatWhen } from "../dates";
 
 export { formatWhen };
-import { BodyInput, ChoiceInput, DateTimeInput, FacebookSwitch, PhotoInput, SlugInput } from "../editor/inputs";
+import { ChoiceInput, DateTimeInput, FacebookSwitch, PhotoInput, SlugInput } from "../editor/inputs";
+import { RichTextInput } from "../editor/RichTextInput";
 
 // Category list mirrors the site's fixed categories (src/lib/articles.ts).
 export const CATEGORY_OPTIONS = [
@@ -76,8 +77,9 @@ export const bodyField = (name = "body", title = "ލިޔުން") =>
     title,
     type: "text",
     rows: 16,
-    description: "ކޮންމެ ޕެރެގްރާފަކަށްފަހު Enter ފިއްތަވާ.",
-    components: { input: BodyInput },
+    description: "ލިޔުއްވާއިރު ކީބޯޑުގެ މަތީގައިވާ ބަޓަންތަކުން ބޯލްޑް، ސަބް ހެޑިންގ، ކޯޓް، ލިސްޓް، ލިންކް ލެއްވޭނެ. ފޮޓޯ، ވީޑިއޯ އަދި އެހެން ބައިތައް ލައްވަން + ފިއްތަވާ.",
+    // Saved as lines of text with a few marks (src/lib/richText.ts), shown on the site with the formatting.
+    components: { input: RichTextInput },
     validation: (r) => r.required(),
   });
 

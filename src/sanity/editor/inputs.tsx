@@ -211,23 +211,6 @@ export function SummaryInput(props: TextInputProps) {
   );
 }
 
-// Article text: the normal box with the number of words and reading time.
-export function BodyInput(props: TextInputProps) {
-  const words = (props.value ?? "").trim().split(/\s+/).filter(Boolean).length;
-  return (
-    <div className="ef-stack">
-      {props.renderDefault(props)}
-      {words > 0 && (
-        <div className="ef-count">
-          <span>
-            {words} word{words === 1 ? "" : "s"} · {Math.max(1, Math.round(words / 200))} min read
-          </span>
-        </div>
-      )}
-    </div>
-  );
-}
-
 // Facebook sharing: one card with the Facebook mark, a line saying what will
 // happen and a big on/off switch, like the breaking news card on the start screen.
 export function FacebookSwitch(props: BooleanInputProps) {
@@ -266,7 +249,7 @@ export function FacebookSwitch(props: BooleanInputProps) {
 type Photo = { asset?: { _ref?: string }; hotspot?: { x: number; y: number; width?: number; height?: number } };
 type Asset = { _id: string; url: string };
 
-function photoUrl(ref: string, projectId: string, dataset: string, width: number) {
+export function photoUrl(ref: string, projectId: string, dataset: string, width: number) {
   const [, id, size, ext] = ref.split("-");
   return `https://cdn.sanity.io/images/${projectId}/${dataset}/${id}-${size}.${ext}?w=${width}&auto=format`;
 }
