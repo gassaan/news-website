@@ -380,6 +380,26 @@ header.site {
   background: var(--nav-bg);
   border-bottom: 1px solid var(--nav-line);
 }
+/* Article pages: how much of the text has been read, a glowing line along the
+   bar's bottom edge that fills from right to left (ReadProgress.tsx). */
+.read-progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 4px;
+  background: rgba(143, 102, 240, 0.15);
+  pointer-events: none;
+}
+.read-progress span {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to left, #8f66f0, #c0a6ff);
+  border-radius: 999px 0 0 999px;
+  box-shadow: 0 0 10px rgba(168, 130, 255, 0.8);
+}
 /* Fill the space above the bar with its colour, so the page never shows
    behind Safari's floating address bar while scrolling. */
 header.site::before {

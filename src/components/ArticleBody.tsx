@@ -7,6 +7,7 @@ import { getAuthorPhoto } from "@/lib/authorPhotos";
 import { parseBlocks } from "@/lib/richText";
 import ArticleImage from "./ArticleImage";
 import { RichBlock } from "./RichBlocks";
+import ReadProgress from "./ReadProgress";
 
 export default function ArticleBody({
   slug,
@@ -59,6 +60,7 @@ export default function ArticleBody({
         </div>
       </div>
 
+      <ReadProgress targetId="artBody" />
       <div className="art-body" id="artBody" style={{ fontSize: `calc(var(--fs) * ${scale})` }}>
         {blocks.map((block, index) => (
           <Fragment key={index}>
