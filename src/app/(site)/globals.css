@@ -387,8 +387,8 @@ header.site {
   left: 0;
   right: 0;
   bottom: -1px;
-  height: 4px;
-  background: rgba(143, 102, 240, 0.15);
+  height: 2px;
+  background: rgba(143, 102, 240, 0.12);
   pointer-events: none;
 }
 .read-progress span {
@@ -398,7 +398,7 @@ header.site {
   bottom: 0;
   background: linear-gradient(to left, #8f66f0, #c0a6ff);
   border-radius: 999px 0 0 999px;
-  box-shadow: 0 0 10px rgba(168, 130, 255, 0.8);
+  box-shadow: 0 0 6px rgba(168, 130, 255, 0.6);
 }
 /* Fill the space above the bar with its colour, so the page never shows
    behind Safari's floating address bar while scrolling. */
