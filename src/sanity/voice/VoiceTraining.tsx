@@ -6,16 +6,24 @@ import "./voice.css";
 
 // Voice training: one sentence at a time, taken from Hulhangu's own published
 // articles and stories, read aloud and saved. The recordings (and the sentences they
-// read) are kept in one hidden document, ready to train a voice that sounds like
-// the reader, so articles can later be read out automatically.
+// read) are kept ready to train a voice that sounds like the reader, so articles can
+// later be read out automatically.
+//
+// The recordings are private: they go to their own dataset ("voice") that only
+// logged-in CMS users can read, never to the public dataset the website reads from.
+// The page makes that dataset the first time, and moves anything recorded before
+// out of the public dataset.
 
 const DOC = "voiceTraining";
+const VOICE = "voice";
 // About an hour of clear recordings is a good amount for training a voice.
 const GOAL_MINUTES = 60;
 
 type Clip = { _key: string; text: string; seconds: number; url?: string };
 type Loaded = { clips: Clip[] | null; texts: { body?: string | null; eps?: (string | null)[] | null }[] };
 type Step = "ready" | "recording" | "check" | "saving";
+type Setup = "checking" | "ready" | "failed";
+type OldClip = { _key: string; text: string; seconds: number; assetId?: string; url?: string };
 
 const newKey = () => Array.from(crypto.getRandomValues(new Uint8Array(6)), (b) => b.toString(16).padStart(2, "0")).join("");
 
@@ -51,6 +59,8 @@ function sentencesFrom(bodies: (string | null)[]): string[] {
 
 export default function VoiceTraining() {
   const client = useClient({ apiVersion: "2025-02-19" });
+  const voice = useMemo(() => client.withConfig({ dataset: VOICE }), [client]);
+  const [setup, setSetup] = useState<Setup>("checking");
   const [loaded, setLoaded] = useState<Loaded | null>(null);
   const [clips, setClips] = useState<Clip[]>([]);
   const [skipped, setSkipped] = useState<string[]>([]);
@@ -64,21 +74,66 @@ export default function VoiceTraining() {
   const started = useRef(0);
 
   useEffect(() => {
-    client
-      .fetch<Loaded>(
-        `{
-          "clips": *[_id == "${DOC}"][0].clips[]{ _key, text, seconds, "url": audio.asset->url },
-          "texts": *[_type in ["article", "story"] && !(_id in path("drafts.**"))] | order(publishedAt desc) { body, "eps": episodes[].body }
-        }`,
-      )
-      .then(
-        (data) => {
-          setLoaded(data);
-          setClips((data.clips ?? []).slice().reverse());
-        },
-        () => setError("The sentences couldn't be loaded. Check the connection and open this page again."),
-      );
-  }, [client]);
+    let gone = false;
+    (async () => {
+      // 1. The private dataset for the recordings (made once).
+      try {
+        const found = (await client.datasets.list()).find((d) => d.name === VOICE);
+        if (!found) await client.datasets.create(VOICE, { aclMode: "private" });
+        else if (found.aclMode !== "private") await client.datasets.edit(VOICE, { aclMode: "private" });
+      } catch {
+        if (!gone) setSetup("failed");
+        return;
+      }
+      // 2. Recordings made before this, in the public dataset: copy them over, then delete them there.
+      try {
+        const old = await client.fetch<OldClip[] | null>(
+          `*[_id == "${DOC}"][0].clips[]{ _key, text, seconds, "assetId": audio.asset._ref, "url": audio.asset->url }`,
+        );
+        if (old?.length) {
+          const have = new Set(await voice.fetch<string[]>(`coalesce(*[_id == "${DOC}"][0].clips[]._key, [])`));
+          const moved = [];
+          for (const c of old) {
+            if (!c.url || have.has(c._key)) continue;
+            const blob = await (await fetch(c.url)).blob();
+            const asset = await voice.assets.upload("file", blob, { filename: c.url.split("/").pop(), contentType: blob.type });
+            moved.push({ _key: c._key, text: c.text, seconds: c.seconds, audio: { _type: "file", asset: { _type: "reference", _ref: asset._id } } });
+          }
+          await voice.createIfNotExists({ _id: DOC, _type: DOC });
+          if (moved.length) await voice.patch(DOC).setIfMissing({ clips: [] }).append("clips", moved).commit();
+        }
+        if (old) {
+          await client.delete(DOC);
+          for (const c of old) if (c.assetId) await client.delete(c.assetId).catch(() => undefined);
+        }
+        // Leftover recordings in the public dataset that nothing uses (from earlier tries).
+        const loose = await client.fetch<string[]>(
+          `*[_type == "sanity.fileAsset" && originalFilename match "voice-*" && count(*[references(^._id)]) == 0]._id`,
+        );
+        for (const id of loose) await client.delete(id).catch(() => undefined);
+      } catch {
+        if (!gone) setError("Older recordings couldn't be moved to private storage yet. Open this page again to finish.");
+      }
+      // 3. Your recordings (private) and the sentences (from the published articles).
+      try {
+        const [mine, texts] = await Promise.all([
+          voice.fetch<Clip[] | null>(`*[_id == "${DOC}"][0].clips[]{ _key, text, seconds, "url": audio.asset->url }`),
+          client.fetch<Loaded["texts"]>(
+            `*[_type in ["article", "story"] && !(_id in path("drafts.**"))] | order(publishedAt desc) { body, "eps": episodes[].body }`,
+          ),
+        ]);
+        if (gone) return;
+        setLoaded({ clips: mine, texts });
+        setClips((mine ?? []).slice().reverse());
+        setSetup("ready");
+      } catch {
+        if (!gone) setError("The sentences couldn't be loaded. Check the connection and open this page again.");
+      }
+    })();
+    return () => {
+      gone = true;
+    };
+  }, [client, voice]);
 
   // The microphone stays on while this page is open, so it only asks once.
   useEffect(
@@ -136,10 +191,10 @@ export default function VoiceTraining() {
     setError("");
     try {
       const ext = take.blob.type.includes("webm") ? "webm" : "m4a";
-      const asset = await client.assets.upload("file", take.blob, { filename: `voice-${clips.length + 1}.${ext}`, contentType: take.blob.type });
+      const asset = await voice.assets.upload("file", take.blob, { filename: `voice-${clips.length + 1}.${ext}`, contentType: take.blob.type });
       const clip = { _key: newKey(), text: sentence, seconds: Math.round(take.seconds * 10) / 10 };
-      await client.createIfNotExists({ _id: DOC, _type: DOC });
-      await client
+      await voice.createIfNotExists({ _id: DOC, _type: DOC });
+      await voice
         .patch(DOC)
         .setIfMissing({ clips: [] })
         .append("clips", [{ ...clip, audio: { _type: "file", asset: { _type: "reference", _ref: asset._id } } }])
@@ -156,7 +211,7 @@ export default function VoiceTraining() {
   const remove = async (key: string) => {
     setError("");
     try {
-      await client.patch(DOC).unset([`clips[_key=="${key}"]`]).commit();
+      await voice.patch(DOC).unset([`clips[_key=="${key}"]`]).commit();
       setClips((c) => c.filter((x) => x._key !== key));
     } catch {
       setError("That recording couldn't be deleted. Try again.");
@@ -176,6 +231,12 @@ export default function VoiceTraining() {
       <header className="vt-head">
         <h1>Voice training</h1>
         <p>Read each sentence aloud in your normal news voice. About an hour of recordings is enough to train a voice that sounds like you.</p>
+        <p className="vt-private">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M6 11h12v9H6zM8.5 11V8a3.5 3.5 0 0 1 7 0v3" />
+          </svg>
+          Private: kept apart from the website. Only people logged in to this CMS can open them.
+        </p>
       </header>
 
       <section className="vt-progress" aria-label="Progress">
@@ -204,8 +265,18 @@ export default function VoiceTraining() {
       </details>
 
       <section className={`vt-card ${step}`} aria-live="polite">
-        {!loaded ? (
-          <p className="vt-note">{error ? "" : "Loading sentences…"}</p>
+        {setup === "failed" ? (
+          <div className="vt-note">
+            <p>
+              <b>Recording is paused to keep your voice private.</b> The private storage for recordings couldn&apos;t be set up from here.
+            </p>
+            <p>
+              Fix: on sanity.io/manage open the Hulhangu project → Datasets → Add dataset, name it <b>voice</b> and choose <b>Private</b>. Then open this page
+              again.
+            </p>
+          </div>
+        ) : !loaded ? (
+          <p className="vt-note">{error ? "" : "Setting up private storage…"}</p>
         ) : !sentence ? (
           <p className="vt-note">All sentences are done. New ones come with each new article.</p>
         ) : (

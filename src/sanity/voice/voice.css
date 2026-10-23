@@ -212,3 +212,17 @@
   font: 700 18px Inter, sans-serif;
   cursor: pointer;
 }
+.vt-private {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px !important;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(95, 211, 160, 0.12);
+  color: var(--sh-teal) !important;
+  font-weight: 600;
+}
+.vt-note p {
+  margin: 0 0 8px;
+}
