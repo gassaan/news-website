@@ -717,7 +717,8 @@ export function AudioInput(props: ObjectInputProps) {
         setTake({ blob, url: URL.createObjectURL(blob) });
         setRecorder(null);
       };
-      rec.start(1000);
+      // One piece at the end: iPhone Safari can't play back a recording saved in slices.
+      rec.start();
       setSeconds(0);
       setTake(null);
       setRecorder(rec);

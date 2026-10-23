@@ -122,7 +122,8 @@ export default function VoiceTraining() {
       started.current = Date.now();
       setSeconds(0);
       setTake(null);
-      rec.start(500);
+      // One piece at the end: iPhone Safari can't play back a recording saved in slices.
+      rec.start();
       setStep("recording");
     } catch {
       setError("The microphone couldn't be used. Allow microphone access for this site and try again.");
