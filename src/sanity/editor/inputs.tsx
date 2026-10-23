@@ -649,7 +649,7 @@ export function PollPickInput(props: ReferenceInputProps) {
 
 // Audio of the article read aloud: record it with the phone's microphone or pick a
 // sound file. The website shows a play button on the photo when there is one.
-export const AUDIO_TYPES = ["audio/mp4;codecs=mp4a.40.2", "audio/mp4", "audio/webm;codecs=opus", "audio/webm"];
+export const AUDIO_TYPES = ["audio/mp4", "audio/webm;codecs=opus", "audio/webm"];
 export const clock = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 
 function fileUrl(ref: string, projectId: string, dataset: string) {

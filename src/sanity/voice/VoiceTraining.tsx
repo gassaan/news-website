@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useClient } from "sanity";
-import { AUDIO_TYPES, clock } from "../editor/inputs";
+import { clock } from "../editor/inputs";
+import { recordWav, type WavRecording } from "./wavRecorder";
 import "../home/home.css";
 import "./voice.css";
 
@@ -69,8 +70,7 @@ export default function VoiceTraining() {
   const [take, setTake] = useState<{ blob: Blob; url: string; seconds: number } | null>(null);
   const [error, setError] = useState("");
   const [showAll, setShowAll] = useState(false);
-  const stream = useRef<MediaStream | null>(null);
-  const recorder = useRef<MediaRecorder | null>(null);
+  const recorder = useRef<WavRecording | null>(null);
   const started = useRef(0);
 
   useEffect(() => {
@@ -135,10 +135,10 @@ export default function VoiceTraining() {
     };
   }, [client, voice]);
 
-  // The microphone stays on while this page is open, so it only asks once.
+  // Leaving the page mid-recording switches the microphone off.
   useEffect(
     () => () => {
-      stream.current?.getTracks().forEach((t) => t.stop());
+      recorder.current?.stop().catch(() => undefined);
     },
     [],
   );
@@ -163,25 +163,28 @@ export default function VoiceTraining() {
   const record = async () => {
     setError("");
     try {
-      stream.current ??= await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: true, autoGainControl: false } });
-      const type = AUDIO_TYPES.find((t) => MediaRecorder.isTypeSupported(t)) ?? "";
-      const rec = new MediaRecorder(stream.current, type ? { mimeType: type } : undefined);
-      const parts: Blob[] = [];
-      rec.ondataavailable = (e) => e.data.size && parts.push(e.data);
-      rec.onstop = () => {
-        const blob = new Blob(parts, { type: rec.mimeType || "audio/mp4" });
-        setTake({ blob, url: URL.createObjectURL(blob), seconds: (Date.now() - started.current) / 1000 });
-        setStep("check");
-      };
-      recorder.current = rec;
+      setTake(null);
+      recorder.current = await recordWav();
       started.current = Date.now();
       setSeconds(0);
-      setTake(null);
-      // One piece at the end: iPhone Safari can't play back a recording saved in slices.
-      rec.start();
       setStep("recording");
     } catch {
       setError("The microphone couldn't be used. Allow microphone access for this site and try again.");
+    }
+  };
+
+  const stop = async () => {
+    const rec = recorder.current;
+    recorder.current = null;
+    if (!rec) return;
+    try {
+      const { blob, seconds: length } = await rec.stop();
+      if (length < 0.5) throw new Error("too short");
+      setTake({ blob, url: URL.createObjectURL(blob), seconds: length });
+      setStep("check");
+    } catch {
+      setError("Nothing was recorded. Check the microphone and try again.");
+      setStep("ready");
     }
   };
 
@@ -190,8 +193,7 @@ export default function VoiceTraining() {
     setStep("saving");
     setError("");
     try {
-      const ext = take.blob.type.includes("webm") ? "webm" : "m4a";
-      const asset = await voice.assets.upload("file", take.blob, { filename: `voice-${clips.length + 1}.${ext}`, contentType: take.blob.type });
+      const asset = await voice.assets.upload("file", take.blob, { filename: `voice-${clips.length + 1}.wav`, contentType: "audio/wav" });
       const clip = { _key: newKey(), text: sentence, seconds: Math.round(take.seconds * 10) / 10 };
       await voice.createIfNotExists({ _id: DOC, _type: DOC });
       await voice
@@ -302,7 +304,7 @@ export default function VoiceTraining() {
 
             {step === "recording" && (
               <div className="vt-actions">
-                <button type="button" className="vt-rec on" onClick={() => recorder.current?.stop()} aria-label="Stop">
+                <button type="button" className="vt-rec on" onClick={stop} aria-label="Stop">
                   <span className="vt-stop" />
                 </button>
                 <span className="vt-time">{clock(seconds)}</span>
