@@ -226,3 +226,8 @@
 .vt-note p {
   margin: 0 0 8px;
 }
+.vt-credit {
+  margin: -6px 4px 0;
+  font-size: 11.5px;
+  color: var(--sh-muted);
+}

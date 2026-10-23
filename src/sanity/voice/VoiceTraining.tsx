@@ -5,10 +5,13 @@ import { recordWav, type WavRecording } from "./wavRecorder";
 import "../home/home.css";
 import "./voice.css";
 
-// Voice training: one sentence at a time, taken from Hulhangu's own published
-// articles and stories, read aloud and saved. The recordings (and the sentences they
-// read) are kept ready to train a voice that sounds like the reader, so articles can
-// later be read out automatically.
+// Voice training: one sentence at a time, read aloud and saved. The recordings (and
+// the sentences they read) are kept ready to train a voice that sounds like the
+// reader, so articles can later be read out automatically.
+//
+// The sentences are Mozilla Common Voice's Dhivehi sentences (sentences-dv.json):
+// written and checked by Dhivehi speakers for training voice technology, and public
+// domain (CC0). Copied once from common-voice/server/data/dv, keeping 12–180 letters of Thaana only, in a fixed mixed order.
 //
 // The recordings are private: they go to their own dataset ("voice") that only
 // logged-in CMS users can read, never to the public dataset the website reads from.
@@ -21,48 +24,17 @@ const VOICE = "voice";
 const GOAL_MINUTES = 60;
 
 type Clip = { _key: string; text: string; seconds: number; url?: string };
-type Loaded = { clips: Clip[] | null; texts: { body?: string | null; eps?: (string | null)[] | null }[] };
 type Step = "ready" | "recording" | "check" | "saving";
 type Setup = "checking" | "ready" | "failed";
 type OldClip = { _key: string; text: string; seconds: number; assetId?: string; url?: string };
 
 const newKey = () => Array.from(crypto.getRandomValues(new Uint8Array(6)), (b) => b.toString(16).padStart(2, "0")).join("");
 
-// Plain sentences from the article text: no photos, videos or formatting marks,
-// 25–180 letters long so each is one comfortable breath.
-function sentencesFrom(bodies: (string | null)[]): string[] {
-  const seen = new Set<string>();
-  const out: string[] = [];
-  for (const body of bodies) {
-    for (const raw of (body ?? "").split("\n")) {
-      if (/^\s*(!\[|@\[|---)/.test(raw)) continue;
-      const line = raw
-        .trim()
-        .replace(/^(\\|## |>\s?|::\s?|-\s+|\d+\.\s+)/, "")
-        .replace(/\*\*/g, "")
-        .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1");
-      for (const s of line.split(/(?<=[.!?؟])\s+/)) {
-        const t = s.replace(/\s+/g, " ").trim();
-        if (t.length < 25 || t.length > 180 || !/[ހ-޿]/.test(t) || seen.has(t)) continue;
-        seen.add(t);
-        out.push(t);
-      }
-    }
-  }
-  // Mixed order, the same every time, so neighbouring sentences come from different articles.
-  const hash = (t: string) => {
-    let h = 2166136261;
-    for (const ch of t) h = Math.imul(h ^ ch.charCodeAt(0), 16777619);
-    return h >>> 0;
-  };
-  return out.sort((a, b) => hash(a) - hash(b));
-}
-
 export default function VoiceTraining() {
   const client = useClient({ apiVersion: "2025-02-19" });
   const voice = useMemo(() => client.withConfig({ dataset: VOICE }), [client]);
   const [setup, setSetup] = useState<Setup>("checking");
-  const [loaded, setLoaded] = useState<Loaded | null>(null);
+  const [loaded, setLoaded] = useState<{ sentences: string[] } | null>(null);
   const [clips, setClips] = useState<Clip[]>([]);
   const [skipped, setSkipped] = useState<string[]>([]);
   const [step, setStep] = useState<Step>("ready");
@@ -114,16 +86,14 @@ export default function VoiceTraining() {
       } catch {
         if (!gone) setError("Older recordings couldn't be moved to private storage yet. Open this page again to finish.");
       }
-      // 3. Your recordings (private) and the sentences (from the published articles).
+      // 3. Your recordings (private) and the sentences (loaded only on this page).
       try {
-        const [mine, texts] = await Promise.all([
+        const [mine, list] = await Promise.all([
           voice.fetch<Clip[] | null>(`*[_id == "${DOC}"][0].clips[]{ _key, text, seconds, "url": audio.asset->url }`),
-          client.fetch<Loaded["texts"]>(
-            `*[_type in ["article", "story"] && !(_id in path("drafts.**"))] | order(publishedAt desc) { body, "eps": episodes[].body }`,
-          ),
+          import("./sentences-dv.json"),
         ]);
         if (gone) return;
-        setLoaded({ clips: mine, texts });
+        setLoaded({ sentences: list.default as string[] });
         setClips((mine ?? []).slice().reverse());
         setSetup("ready");
       } catch {
@@ -154,7 +124,7 @@ export default function VoiceTraining() {
     [take],
   );
 
-  const sentences = useMemo(() => (loaded ? sentencesFrom(loaded.texts.flatMap((t) => [t.body ?? null, ...(t.eps ?? [])])) : []), [loaded]);
+  const sentences = loaded?.sentences ?? [];
   const done = useMemo(() => new Set(clips.map((c) => c.text)), [clips]);
   const left = sentences.filter((s) => !done.has(s) && !skipped.includes(s));
   const sentence = left[0];
@@ -265,6 +235,7 @@ export default function VoiceTraining() {
           <li>Short sessions are fine: 10–15 minutes a day adds up quickly.</li>
         </ul>
       </details>
+      <p className="vt-credit">Sentences: Mozilla Common Voice, written and checked by Dhivehi speakers (public domain).</p>
 
       <section className={`vt-card ${step}`} aria-live="polite">
         {setup === "failed" ? (
