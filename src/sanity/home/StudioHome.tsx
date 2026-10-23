@@ -27,6 +27,7 @@ const ICONS = {
   shield: "M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z",
   doc: "M7 3h7l5 5v13H7zM14 3v5h5M10 13h6M10 17h4",
   plus: "M12 5v14M5 12h14",
+  mic: "M9 5a3 3 0 0 1 6 0v6a3 3 0 0 1-6 0zM5 11a7 7 0 0 0 14 0M12 18v3",
 };
 type IconName = keyof typeof ICONS;
 
@@ -228,6 +229,14 @@ export default function StudioHome() {
             {p.title}
           </Link>
         ))}
+      </div>
+
+      <h2 className="sh-label">Tools</h2>
+      <div className="sh-pages">
+        <Link childId="voiceTraining" className={cls("sh-page", "voiceTraining")}>
+          <Icon name="mic" size={16} />
+          އަޑު ތަމްރީނު · Voice training
+        </Link>
       </div>
     </div>
   );
