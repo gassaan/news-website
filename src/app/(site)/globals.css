@@ -1718,6 +1718,71 @@ section {
   background: var(--line);
   margin-bottom: clamp(16px, 2vw, 26px);
 }
+/* Listen to the article (ArticleListen.tsx): a round play button on the photo's
+   edge, and a sound-wave strip under the headline that fills right to left. */
+.listen-btn {
+  position: absolute;
+  top: -30px;
+  inset-inline-end: clamp(18px, 4vw, 60px);
+  z-index: 3;
+  width: 60px;
+  height: 60px;
+  border: 4px solid var(--ground);
+  border-radius: 50%;
+  background: #8f66f0;
+  color: #fff;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 8px 20px rgba(8, 0, 24, 0.45);
+  cursor: pointer;
+}
+/* Articles with audio: the photo's caption and view count sit a little higher,
+   clear of the play button. */
+.story-page:has(.listen-btn) .lead-hero figcaption {
+  bottom: calc(var(--sheet-overlap) + 44px);
+}
+.listen-btn:active {
+  transform: scale(0.95);
+}
+.listen-wave {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: min(100%, 460px);
+  margin-top: clamp(14px, 1.6vw, 22px);
+}
+.listen-bars {
+  flex: 1;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2px;
+  cursor: pointer;
+  touch-action: none;
+}
+.listen-bars span {
+  flex: 1;
+  max-width: 4px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--accent) 28%, transparent);
+  transition: background 0.2s;
+}
+.listen-bars span.on {
+  background: var(--accent);
+}
+.listen-bars:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 6px;
+}
+.listen-time {
+  direction: ltr;
+  white-space: nowrap;
+  font-size: 13px;
+  color: var(--body-ink);
+  opacity: 0.85;
+}
 /* Headline letters fade from the text colour into purple (article and album pages). */
 .art-head .headline,
 .album-head .headline {

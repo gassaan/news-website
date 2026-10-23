@@ -1,5 +1,5 @@
 import { defineType, defineField } from "sanity";
-import { ChoiceInput, PollPickInput, SummaryInput, WriterInput } from "../editor/inputs";
+import { AudioInput, ChoiceInput, PollPickInput, SummaryInput, WriterInput } from "../editor/inputs";
 import { CATEGORY_OPTIONS, FACEBOOK_FIELDSET, facebookFields, bodyField, dateTimeField, formatPublish, photoField, slugField, titleField } from "./fields";
 
 export const article = defineType({
@@ -28,6 +28,15 @@ export const article = defineType({
     }),
     dateTimeField(),
     photoField("image", "މައި ފޮޓޯ", true),
+    defineField({
+      name: "audio",
+      title: "ލިޔުން ކިޔާދީފައިވާ އަޑު",
+      // Optional: with audio, the website shows a play button on the main photo.
+      description: "ބޭނުންނަމަ ލިޔުން ކިޔާ އަޑު ރެކޯޑްކުރައްވާ، ނުވަތަ އަޑުގެ ފައިލެއް ލައްވާ. ސައިޓުގައި ފޮޓޯގެ މަތީގައި ޕްލޭ ބަޓަނެއް ފެންނާނެ.",
+      type: "file",
+      options: { accept: "audio/*" },
+      components: { input: AudioInput },
+    }),
     defineField({
       name: "excerpt",
       title: "ކުރު ޚުލާސާ",

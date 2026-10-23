@@ -31,7 +31,7 @@ const DUE = `count(*[_type in ["article", "story"] && publishedAt <= now()])`;
 const QUERY = `{
   "authors": *[_type == "author" && defined(slug.current)] { "slug": slug.current, "name": title, role, bio, "photo": photo ${img} },
   "articles": *[_type == "article" && defined(slug.current) && publishedAt <= now()] | order(publishedAt desc) {
-    "slug": slug.current, title, excerpt, body, category, "author": author->title, publishedAt, _createdAt, featured, "poll": poll._ref, "image": image ${img} },
+    "slug": slug.current, title, excerpt, body, category, "author": author->title, publishedAt, _createdAt, featured, "poll": poll._ref, "audio": audio.asset->url, "image": image ${img} },
   "stories": *[_type == "story" && defined(slug.current) && publishedAt <= now()] | order(publishedAt desc) {
     "slug": slug.current, title, excerpt, "author": author->title, publishedAt, _createdAt, "poster": poster ${img}, episodes[] { title, body, "image": image ${img} } },
   "polls": *[_type == "poll"] | order(publishedAt desc) { _id, title, options, closesAt, "image": image ${img} },
@@ -111,6 +111,7 @@ const toArticle = (a) => {
     time,
     ...(a.featured ? { featured: true } : {}),
     ...(a.poll ? { poll: a.poll } : {}),
+    ...(a.audio ? { audio: a.audio } : {}),
   };
 };
 const news = r.articles.filter((a) => a.category !== "report");

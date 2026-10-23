@@ -1351,3 +1351,51 @@
   border-radius: 16px;
   box-shadow: none;
 }
+
+/* Article audio: record or upload; a player with Change / Remove after. */
+.ef-audio-player {
+  width: 100%;
+}
+.ef-audio-actions {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.ef-rec {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 8px 12px;
+  padding: 16px;
+  border-radius: 18px;
+  background: var(--ef-field);
+  border: 1px solid var(--ef-edge);
+}
+.ef-rec-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #ff5d6c;
+  animation: ef-rec 1s infinite;
+}
+@keyframes ef-rec {
+  50% {
+    opacity: 0.3;
+  }
+}
+.ef-rec-time {
+  font: 700 28px Inter, sans-serif;
+  color: var(--ef-text);
+  font-variant-numeric: tabular-nums;
+}
+.ef-rec .ef-note {
+  grid-column: 1 / -1;
+}
+.ef-rec-stop {
+  grid-column: 1 / -1;
+  height: 48px;
+  border: 0;
+  border-radius: 999px;
+  background: #ff5d6c;
+  color: #fff;
+  font: 700 15px Inter, sans-serif;
+  cursor: pointer;
+}

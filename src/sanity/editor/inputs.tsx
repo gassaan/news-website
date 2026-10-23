@@ -646,3 +646,173 @@ export function PollPickInput(props: ReferenceInputProps) {
     </div>
   );
 }
+
+// Audio of the article read aloud: record it with the phone's microphone or pick a
+// sound file. The website shows a play button on the photo when there is one.
+const AUDIO_TYPES = ["audio/mp4;codecs=mp4a.40.2", "audio/mp4", "audio/webm;codecs=opus", "audio/webm"];
+const clock = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+
+function fileUrl(ref: string, projectId: string, dataset: string) {
+  const [, id, ext] = ref.split("-");
+  return `https://cdn.sanity.io/files/${projectId}/${dataset}/${id}.${ext}`;
+}
+
+export function AudioInput(props: ObjectInputProps) {
+  const { onChange, readOnly } = props;
+  const ref = (props.value as { asset?: { _ref?: string } } | undefined)?.asset?._ref;
+  const client = useClient({ apiVersion: "2025-02-19" });
+  const { projectId = "", dataset = "" } = client.config();
+  const [fileInput, setFileInput] = useState<HTMLInputElement | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [changing, setChanging] = useState(false);
+  // Recording: the live recorder, seconds so far, and the finished take to check first.
+  const [recorder, setRecorder] = useState<MediaRecorder | null>(null);
+  const [seconds, setSeconds] = useState(0);
+  const [take, setTake] = useState<{ blob: Blob; url: string } | null>(null);
+
+  useEffect(() => {
+    if (!recorder) return;
+    const started = Date.now();
+    const tick = setInterval(() => setSeconds((Date.now() - started) / 1000), 250);
+    return () => clearInterval(tick);
+  }, [recorder]);
+  useEffect(
+    () => () => {
+      if (take) URL.revokeObjectURL(take.url);
+    },
+    [take],
+  );
+
+  const upload = async (file: Blob, name: string) => {
+    setBusy(true);
+    setError("");
+    try {
+      const asset = await client.assets.upload("file", file, { filename: name, contentType: file.type });
+      try {
+        onChange(set({ _type: "file", asset: { _type: "reference", _ref: asset._id } }));
+        setTake(null);
+        setChanging(false);
+      } catch {
+        setError("The page is still connecting. Wait a moment and try again.");
+      }
+    } catch {
+      setError("The audio couldn't be uploaded. Check the connection and try again.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const record = async () => {
+    setError("");
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const type = AUDIO_TYPES.find((t) => MediaRecorder.isTypeSupported(t)) ?? "";
+      const rec = new MediaRecorder(stream, type ? { mimeType: type } : undefined);
+      const parts: Blob[] = [];
+      rec.ondataavailable = (e) => e.data.size && parts.push(e.data);
+      rec.onstop = () => {
+        stream.getTracks().forEach((t) => t.stop());
+        const blob = new Blob(parts, { type: rec.mimeType || "audio/mp4" });
+        setTake({ blob, url: URL.createObjectURL(blob) });
+        setRecorder(null);
+      };
+      rec.start(1000);
+      setSeconds(0);
+      setTake(null);
+      setRecorder(rec);
+    } catch {
+      setError("The microphone couldn't be used. Allow microphone access for this site and try again.");
+    }
+  };
+
+  const pick = (
+    <div className="ef-photo-pick">
+      <button type="button" className="ef-photo-phone" disabled={readOnly || busy} onClick={record}>
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M9 5a3 3 0 0 1 6 0v6a3 3 0 0 1-6 0zM5 11a7 7 0 0 0 14 0M12 18v3" />
+        </svg>
+        <b>Record</b>
+        <small>Read the article aloud</small>
+      </button>
+      <button type="button" className="ef-photo-lib" disabled={readOnly || busy} onClick={() => fileInput?.click()}>
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M9 18V6l11-2v12M9 18a3 3 0 1 1-6 0a3 3 0 0 1 6 0zM20 16a3 3 0 1 1-6 0a3 3 0 0 1 6 0z" />
+        </svg>
+        <b>{busy ? "Uploading…" : "From phone"}</b>
+        <small>A sound file</small>
+      </button>
+    </div>
+  );
+
+  return (
+    <div className="ef-photo ef-audio">
+      <input
+        ref={setFileInput}
+        type="file"
+        accept="audio/*"
+        hidden
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          if (f) upload(f, f.name);
+          e.target.value = "";
+        }}
+      />
+      {recorder ? (
+        <div className="ef-rec">
+          <span className="ef-rec-dot" aria-hidden="true" />
+          <b className="ef-rec-time">{clock(seconds)}</b>
+          <span className="ef-note">Recording… read the article, then tap Stop.</span>
+          <button type="button" className="ef-rec-stop" onClick={() => recorder.stop()}>
+            Stop
+          </button>
+        </div>
+      ) : take ? (
+        <>
+          <audio className="ef-audio-player" controls src={take.url} />
+          <div className="ef-photo-actions ef-audio-actions">
+            <button type="button" disabled={busy} onClick={record}>
+              Record again
+            </button>
+            <button type="button" aria-pressed="true" disabled={busy} onClick={() => upload(take.blob, `article-audio.${take.blob.type.includes("webm") ? "webm" : "m4a"}`)}>
+              {busy ? "Uploading…" : "Use this"}
+            </button>
+          </div>
+        </>
+      ) : ref && !changing ? (
+        <>
+          <audio className="ef-audio-player" controls preload="metadata" src={fileUrl(ref, projectId, dataset)} />
+          <div className="ef-photo-actions ef-audio-actions">
+            <button type="button" disabled={readOnly} onClick={() => setChanging(true)}>
+              Change
+            </button>
+            <button
+              type="button"
+              className="ef-photo-remove"
+              disabled={readOnly}
+              onClick={() => {
+                try {
+                  onChange(unset());
+                } catch {
+                  setError("The page is still connecting. Wait a moment and try again.");
+                }
+              }}
+            >
+              Remove
+            </button>
+          </div>
+        </>
+      ) : (
+        <>
+          {pick}
+          {changing && (
+            <button type="button" className="ef-photo-link" onClick={() => setChanging(false)}>
+              Keep the current audio
+            </button>
+          )}
+        </>
+      )}
+      {error && <p className="ef-photo-error">{error}</p>}
+    </div>
+  );
+}

@@ -13,6 +13,7 @@ import {
 } from "@/lib/articles";
 import ArticleImage from "@/components/ArticleImage";
 import ArticleBody from "@/components/ArticleBody";
+import ArticleListen from "@/components/ArticleListen";
 import DateStamp from "@/components/DateStamp";
 import ArticleActions from "@/components/ArticleActions";
 import PollCard from "@/components/PollCard";
@@ -25,6 +26,7 @@ import NewsTicker from "@/components/NewsTicker";
 import { getBreakingNews } from "@/lib/breaking";
 import { shareMetadata } from "@/lib/share";
 import { plainText } from "@/lib/richText";
+import { cmsImage } from "@/lib/cmsImages";
 
 export function generateStaticParams() {
   return [...articles, ...reports].map((article) => ({ slug: article.slug }));
@@ -96,6 +98,9 @@ export default async function ArticlePage({
             )}
             <h1 className="headline">{article.title}</h1>
             <DateStamp className="art-date" date={article.publishedAt} />
+            {article.audio && (
+              <ArticleListen src={article.audio} title={article.title} image={cmsImage(article.slug)?.src} />
+            )}
           </header>
 
           <div className="wrap">

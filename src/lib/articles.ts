@@ -27,6 +27,8 @@ export type Article = {
   featured?: boolean;
   // The poll picked in the dashboard to show under the article.
   poll?: string;
+  // The article read aloud, recorded or uploaded in the dashboard.
+  audio?: string;
   episodes?: Episode[];
 };
 
