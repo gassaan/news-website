@@ -1783,6 +1783,11 @@ section {
   color: var(--body-ink);
   opacity: 0.85;
 }
+/* Article page headline in Mv MAG Round; letters it lacks fall back to the usual heading font. */
+.art-head .art-headline {
+  font-family: var(--font-mag-round), var(--font-head);
+  font-weight: 700;
+}
 /* Headline letters fade from the text colour into purple (article and album pages). */
 .art-head .headline,
 .album-head .headline {

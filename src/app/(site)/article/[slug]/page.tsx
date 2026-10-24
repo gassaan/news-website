@@ -96,7 +96,7 @@ export default async function ArticlePage({
                 {category.name}
               </Link>
             )}
-            <h1 className="headline">{article.title}</h1>
+            <h1 className="headline art-headline">{article.title}</h1>
             <DateStamp className="art-date" date={article.publishedAt} />
             {article.audio && (
               <ArticleListen src={article.audio} title={article.title} image={cmsImage(article.slug)?.src} />

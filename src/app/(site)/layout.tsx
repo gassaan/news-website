@@ -29,6 +29,15 @@ const democratsAkuruRegular = localFont({
   display: "swap",
 });
 
+// Article page headlines (Mv MAG Round). Not preloaded: only article pages use it,
+// so other pages never download it.
+const magRound = localFont({
+  src: "../../fonts/Mv-MAG-Round-XBold.woff2",
+  weight: "700",
+  variable: "--font-mag-round",
+  display: "swap",
+  preload: false,
+});
 // Inter (Latin) is kept in the project rather than fetched from Google Fonts at
 // build time, so a Google hiccup can't stop the site from updating.
 const inter = localFont({
@@ -59,7 +68,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="dv"
       dir="rtl"
       suppressHydrationWarning
-      className={`${democratsAkBlack.variable} ${democratsAkuruBold.variable} ${democratsAkuruRegular.variable} ${inter.variable} h-full antialiased`}
+      className={`${democratsAkBlack.variable} ${democratsAkuruBold.variable} ${democratsAkuruRegular.variable} ${magRound.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="bg-ground text-text font-body flex min-h-full flex-col font-bold">
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
