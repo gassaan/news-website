@@ -1993,12 +1993,26 @@ ol.rt-list {
 /* Computers: all the text in one column on the right; the advert on the left stays
    in view just under the top bar while reading, and scrolls away when the text ends. */
 @media (min-width: 981px) {
+  /* Width of the advert column and the gap beside the text, shared by the parts below. */
+  :root {
+    --art-side: clamp(280px, 26vw, 360px);
+    --art-side-gap: clamp(40px, 5vw, 90px);
+  }
   .art-body {
     column-count: auto;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) clamp(280px, 26vw, 360px);
-    column-gap: clamp(40px, 5vw, 90px);
+    grid-template-columns: minmax(0, 1fr) var(--art-side);
+    column-gap: var(--art-side-gap);
     align-items: start;
+  }
+  /* The share buttons and the banner after the article line up with the text column. */
+  /* (A left margin, not "inline-end": the Sponsored strip is set left-to-right.) */
+  .story-page .art-actions,
+  .art-end-ad > * {
+    margin-left: calc(var(--art-side) + var(--art-side-gap));
+  }
+  .art-end-ad .slot {
+    height: clamp(110px, 18vw, 250px);
   }
   .art-body > * {
     grid-column: 1;

@@ -115,7 +115,7 @@ export default async function ArticlePage({
         </div>
       </article>
 
-      <AdSlot />
+      <AdSlot className="art-end-ad" />
 
       {poll && (
         <section className="wrap narrow">
