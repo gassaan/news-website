@@ -1657,6 +1657,19 @@ section {
   z-index: 0;
   margin-top: 0;
 }
+/* Computers: the photo spans the whole window, like the bar above and the card
+   below it, at a height that leaves room to see the headline; it's cropped to fit
+   (around the photo's focus point). */
+@media (min-width: 981px) {
+  .lead-hero {
+    max-width: none;
+  }
+  .lead-hero .lead-img {
+    aspect-ratio: auto;
+    width: 100%;
+    height: clamp(360px, 42vw, 640px);
+  }
+}
 .lead-hero figcaption {
   position: absolute;
   inset-inline: 12px;
