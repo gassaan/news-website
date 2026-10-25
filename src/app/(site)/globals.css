@@ -2043,6 +2043,14 @@ ol.rt-list {
   .art-end-ad .slot {
     height: clamp(110px, 18vw, 250px);
   }
+  /* Comments under an article: the same column as the text, not the wider page. */
+  main:has(#artBody) .comments-wrap {
+    max-width: var(--wrap, 1260px);
+  }
+  main:has(#artBody) .comments-wrap > * {
+    width: auto;
+    margin-left: calc(var(--art-side) + var(--art-side-gap));
+  }
   .art-body > * {
     grid-column: 1;
   }
