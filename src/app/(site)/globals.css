@@ -1976,6 +1976,38 @@ ol.rt-list {
   margin: 0 0 1.6em;
   break-inside: avoid;
 }
+/* Tablets: one column of text, the advert after the first paragraph (as on phones). */
+@media (max-width: 980px) {
+  .art-body {
+    column-count: 1;
+  }
+  .in-ad {
+    max-width: 420px;
+    margin-inline: auto;
+  }
+}
+/* Computers: all the text in one column on the right; the advert on the left stays
+   in view just under the top bar while reading, and scrolls away when the text ends. */
+@media (min-width: 981px) {
+  .art-body {
+    column-count: auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) clamp(280px, 26vw, 360px);
+    column-gap: clamp(40px, 5vw, 90px);
+    align-items: start;
+  }
+  .art-body > * {
+    grid-column: 1;
+  }
+  .art-body > .in-ad {
+    grid-column: 2;
+    grid-row: 1 / span var(--rows, 1);
+    align-self: start;
+    position: sticky;
+    top: calc(env(safe-area-inset-top, 0px) + 76px + 24px);
+    margin: 0;
+  }
+}
 .in-ad .ph {
   aspect-ratio: 1/1;
   border-radius: 24px 24px 0 0;

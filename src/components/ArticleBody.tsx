@@ -61,7 +61,12 @@ export default function ArticleBody({
       </div>
 
       <ReadProgress targetId="artBody" />
-      <div className="art-body" id="artBody" style={{ fontSize: `calc(var(--fs) * ${scale})` }}>
+      <div
+        className="art-body"
+        id="artBody"
+        // --rows: on computers the advert sits beside every row of text (globals.css).
+        style={{ fontSize: `calc(var(--fs) * ${scale})`, ["--rows" as string]: blocks.length }}
+      >
         {blocks.map((block, index) => (
           <Fragment key={index}>
             <RichBlock block={block} />
