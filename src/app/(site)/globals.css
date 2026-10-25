@@ -793,8 +793,15 @@ section {
 .ticker.breaking .ticker-row span::after {
   background: #fff;
 }
-/* Computers: a slimmer breaking strip. */
+/* Computers: the scrolling news strip is as tall as the top bar (76px), and the
+   breaking strip slimmer still. */
 @media (min-width: 981px) {
+  .ticker {
+    height: 76px;
+  }
+  .ticker-row span {
+    font-size: 23px;
+  }
   .ticker.breaking {
     height: 52px;
   }
