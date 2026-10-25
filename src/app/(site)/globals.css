@@ -1673,17 +1673,23 @@ section {
   z-index: 0;
   margin-top: 0;
 }
-/* Computers: the photo spans the whole window, like the bar above and the card
-   below it, at a height that leaves room to see the headline; it's cropped to fit
-   (around the photo's focus point). */
+/* Computers: the photo is framed at the page's content width with rounded corners,
+   at a height that leaves room to see the headline; it's cropped to fit (around the
+   photo's focus point). The article card still slides up over it. */
 @media (min-width: 981px) {
   .lead-hero {
-    max-width: none;
+    max-width: 1140px;
+    padding-inline: 16px;
+    margin-top: 28px;
   }
   .lead-hero .lead-img {
     aspect-ratio: auto;
     width: 100%;
-    height: clamp(360px, 42vw, 640px);
+    height: clamp(300px, 32vw, 500px);
+    border-radius: 30px;
+  }
+  .lead.lead-hero figcaption {
+    inset-inline: 30px;
   }
 }
 .lead-hero figcaption {
