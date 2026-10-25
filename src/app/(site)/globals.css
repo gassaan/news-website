@@ -2040,6 +2040,37 @@ ol.rt-list {
     height: clamp(110px, 18vw, 250px);
   }
 }
+/* Wider computer screens: the text stays in the middle; the square advert sits in the
+   empty space on the left, stays just under the top bar while reading, and scrolls
+   away when the text ends. (Narrower screens keep it after the first paragraph.) */
+@media (min-width: 1200px) {
+  .art-sheet > .wrap:has(#artBody) {
+    max-width: none;
+  }
+  .art-body {
+    max-width: none;
+    display: grid;
+    grid-template-columns: 1fr minmax(0, var(--art-col)) 1fr;
+    column-gap: 0;
+    column-rule: none;
+    align-items: start;
+  }
+  .art-body > * {
+    grid-column: 2;
+  }
+  .art-body > .in-ad {
+    /* The page reads right to left, so the third column is the one on the left. */
+    grid-column: 3;
+    grid-row: 1 / span var(--rows, 1);
+    align-self: start;
+    justify-self: center;
+    width: min(340px, calc(100% - 48px));
+    max-width: none;
+    margin: 0;
+    position: sticky;
+    top: calc(env(safe-area-inset-top, 0px) + 76px + 24px);
+  }
+}
 .in-ad .ph {
   aspect-ratio: 1/1;
   /* Square corners on every screen size. */
