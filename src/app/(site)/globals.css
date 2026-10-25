@@ -371,6 +371,13 @@ main {
 html {
   scroll-padding-top: 90px;
 }
+/* Computers (wide screen and a mouse): the whole site at 80% size. Tablets and
+   phones keep the full size. */
+@media (min-width: 981px) and (hover: hover) and (pointer: fine) {
+  html {
+    zoom: 0.8;
+  }
+}
 header.site {
   position: fixed;
   top: env(safe-area-inset-top, 0px);
