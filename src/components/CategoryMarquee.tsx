@@ -1,16 +1,38 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import CategoryTile from "./CategoryTile";
 import { Category } from "@/lib/articles";
 
-const SPEED_PX_PER_SEC = 28;
+const SPEED_PX_PER_SEC = 40;
 const RESUME_DELAY_MS = 250;
 
 export default function CategoryMarquee({ categories }: { categories: Category[] }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const pausedRef = useRef(false);
   const posRef = useRef(0);
+  // How many copies of the row to draw: enough that the screen never runs past the end
+  // of the cards (wide computer screens need three or more), so the loop never stalls.
+  const [copies, setCopies] = useState(2);
+  const setWidthRef = useRef(0);
+
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    function measure() {
+      const el = trackRef.current;
+      const first = el?.children[0] as HTMLElement | undefined;
+      const repeat = el?.children[categories.length] as HTMLElement | undefined;
+      if (!el || !first || !repeat) return;
+      const set = Math.abs(repeat.offsetLeft - first.offsetLeft);
+      setWidthRef.current = set;
+      if (set > 0) setCopies(Math.max(2, Math.ceil(el.clientWidth / set) + 1));
+    }
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(track);
+    return () => ro.disconnect();
+  }, [categories.length, copies]);
 
   useEffect(() => {
     const track = trackRef.current;
@@ -30,10 +52,10 @@ export default function CategoryMarquee({ categories }: { categories: Category[]
       last = now;
 
       if (!pausedRef.current) {
-        const half = el.scrollWidth / 2;
+        const set = setWidthRef.current || el.scrollWidth / 2;
         posRef.current -= SPEED_PX_PER_SEC * dt;
-        if (posRef.current <= -half) {
-          posRef.current += half;
+        while (posRef.current <= -set) {
+          posRef.current += set;
         }
         programmaticScroll = true;
         el.scrollLeft = posRef.current;
@@ -82,7 +104,7 @@ export default function CategoryMarquee({ categories }: { categories: Category[]
 
   return (
     <div className="cats" ref={trackRef}>
-      {[...categories, ...categories].map((category, index) => (
+      {Array.from({ length: copies }, () => categories).flat().map((category, index) => (
         <CategoryTile key={`${category.slug}-${index}`} category={category} />
       ))}
     </div>
