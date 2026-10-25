@@ -1698,7 +1698,11 @@ section {
   /* Same rounded top and thin edge line as the footer. */
   border-top: 1px solid var(--foot-rule);
   border-radius: 32px 32px 0 0;
-  box-shadow: 0 -22px 30px -18px rgba(8, 0, 24, 0.45);
+  /* The second shadow paints 2px of page colour under the sheet: on screens scaled to
+     125% or 150% the photo pinned behind it otherwise peeks through as a thin line. */
+  box-shadow:
+    0 -22px 30px -18px rgba(8, 0, 24, 0.45),
+    0 2px 0 0 var(--ground);
   /* Keep inner margins inside the painted background (no see-through gaps). */
   display: flow-root;
 }
