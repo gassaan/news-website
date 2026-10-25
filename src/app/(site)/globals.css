@@ -3329,12 +3329,13 @@ footer .logo {
 .m-only {
   display: none;
 }
-/* Links sit in a box split by thin lines (the 1px gaps show the rule colour). */
+/* Links sit in a two-by-two box split by thin lines (the 1px gaps show the rule
+   colour), the same on computers and phones. */
 .flinks {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1px;
-  max-width: 760px;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  max-width: 420px;
   margin-inline: auto;
   background: var(--foot-rule);
   border: 1px solid var(--foot-rule);
@@ -3353,6 +3354,18 @@ footer .logo {
   transition:
     color 0.15s,
     background 0.15s;
+}
+.flinks a:nth-child(1) {
+  order: 1;
+}
+.flinks a:nth-child(4) {
+  order: 2;
+}
+.flinks a:nth-child(2) {
+  order: 3;
+}
+.flinks a:nth-child(3) {
+  order: 4;
 }
 .flinks a:hover {
   color: var(--foot-accent);
@@ -3622,23 +3635,9 @@ footer .logo {
     text-transform: uppercase;
   }
   .flinks {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    gap: 1px;
     max-width: 340px;
-    margin-inline: auto;
     font-size: 14px;
-  }
-  .flinks a:nth-child(1) {
-    order: 1;
-  }
-  .flinks a:nth-child(4) {
-    order: 2;
-  }
-  .flinks a:nth-child(2) {
-    order: 3;
-  }
-  .flinks a:nth-child(3) {
-    order: 4;
   }
   .m-only {
     display: inline;
