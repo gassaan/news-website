@@ -793,6 +793,15 @@ section {
 .ticker.breaking .ticker-row span::after {
   background: #fff;
 }
+/* Computers: a slimmer breaking strip. */
+@media (min-width: 981px) {
+  .ticker.breaking {
+    height: 52px;
+  }
+  .ticker.breaking .ticker-row span {
+    font-size: 21px;
+  }
+}
 
 /* ---------- Carousels ---------- */
 .carousel {
