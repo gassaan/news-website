@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import SearchResults from "@/components/SearchResults";
+import SkeletonCard from "@/components/SkeletonCard";
 import {
   Article,
   articles,
@@ -21,6 +22,24 @@ function categoryName(slug: string): string {
   return categories.find((c) => c.slug === slug)?.name ?? "";
 }
 
+// Shown until the search box and results are ready (they need the address's ?q=).
+function SearchSkeleton() {
+  return (
+    <div className="wrap cat-page search-page" role="status" aria-label="ލޯޑުވަނީ">
+      <div className="page-head">
+        <span className="back" aria-hidden="true" />
+        <h1 className="page-title">ހޯދުން</h1>
+      </div>
+      <span className="skel search-skel-box" />
+      <div className="cat-grid">
+        {[0, 1, 2, 3, 4, 5].map((i) => (
+          <SkeletonCard key={i} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function SearchPage() {
   const news = [...articles, ...reports]
     .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))
@@ -34,7 +53,7 @@ export default function SearchPage() {
   }));
 
   return (
-    <Suspense>
+    <Suspense fallback={<SearchSkeleton />}>
       <SearchResults news={news} stories={tales} />
     </Suspense>
   );

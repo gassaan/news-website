@@ -13,6 +13,7 @@
   --text: #fafafa;
   --muted: #34235b;
   --ph-base: #1d0c46;
+  --skel-shine: rgba(225, 213, 255, 0.1);
   --img-shadow: 0 7px 20px rgba(0, 0, 0, 0.25);
   --card-shadow: 0 0 17px rgba(43, 43, 139, 0.32);
   --ripple: rgba(168, 130, 255, 0.28);
@@ -60,6 +61,7 @@
     --text: #3e2180;
     --muted: #dacafd;
     --ph-base: #dbcbfd;
+    --skel-shine: rgba(255, 255, 255, 0.55);
     --img-shadow: none;
     --card-shadow: none;
     --ripple: rgba(62, 33, 128, 0.16);
@@ -106,6 +108,7 @@
   --text: #3e2180;
   --muted: #dacafd;
   --ph-base: #dbcbfd;
+  --skel-shine: rgba(255, 255, 255, 0.55);
   --img-shadow: none;
   --card-shadow: none;
   --ripple: rgba(62, 33, 128, 0.16);
@@ -151,6 +154,7 @@
   --text: #fafafa;
   --muted: #34235b;
   --ph-base: #1d0c46;
+  --skel-shine: rgba(225, 213, 255, 0.1);
   --img-shadow: 0 7px 20px rgba(0, 0, 0, 0.25);
   --card-shadow: 0 0 17px rgba(43, 43, 139, 0.32);
   --ripple: rgba(168, 130, 255, 0.28);
@@ -286,6 +290,54 @@ a {
 }
 .ph:has(img)::after {
   display: none;
+}
+
+/* ---------- Loading skeleton ---------- */
+/* A soft light sweeps across (right to left, the reading direction) anything still
+   loading: picture frames until their picture arrives, and the bars that stand in for
+   comments and search results. */
+@keyframes skel {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 100% 0;
+  }
+}
+.skel,
+[data-imgwait] .ph:has(img:not([data-ok], [data-bad]))::after {
+  background: linear-gradient(100deg, transparent 35%, var(--skel-shine) 50%, transparent 65%) 0 0 / 300% 100%
+    no-repeat var(--ph-base);
+  animation: skel 1.4s ease-in-out infinite;
+}
+[data-imgwait] .ph:has(img:not([data-ok], [data-bad]))::after {
+  display: block;
+}
+/* The picture fades in once it has arrived; one that failed leaves the plain frame. */
+[data-imgwait] .ph img {
+  transition: opacity 0.35s ease;
+}
+[data-imgwait] .ph img:not([data-ok]) {
+  opacity: 0;
+}
+[data-imgwait] .ph:has(img[data-bad])::after {
+  display: block;
+}
+.skel {
+  display: block;
+  border-radius: 999px;
+}
+.ph.skel::after {
+  display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .skel,
+  [data-imgwait] .ph:has(img:not([data-ok], [data-bad]))::after {
+    animation: none;
+  }
+  [data-imgwait] .ph img {
+    transition: none;
+  }
 }
 
 /* ---------- Ticker ---------- */
@@ -2323,6 +2375,25 @@ ol.rt-list {
   background: var(--ground);
   color: var(--accent);
 }
+/* Loading: grey bars in place of the icon and the two lines of text. */
+.comments-toggle.is-loading {
+  cursor: default;
+}
+.comments-toggle .ct-skel-icon {
+  flex: none;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+.comments-toggle .ct-skel-line {
+  width: min(180px, 60%);
+  height: 16px;
+  margin-block: 5px;
+}
+.comments-toggle .ct-skel-line.short {
+  width: min(120px, 40%);
+  height: 11px;
+}
 .comments-toggle .ct-text {
   flex: 1;
   display: flex;
@@ -3150,6 +3221,26 @@ a.contact-card:hover {
 .page-search input::-webkit-search-cancel-button {
   -webkit-appearance: none;
   appearance: none;
+}
+.search-skel-box {
+  height: 56px;
+  border-radius: 50px;
+}
+.skel-card {
+  pointer-events: none;
+}
+.skel-card .skel-title {
+  height: clamp(18px, 1.9vw, 26px);
+  margin: 32px 24px 0;
+}
+.skel-card .skel-title.short {
+  width: 55%;
+  margin-top: 14px;
+}
+.skel-card .skel-meta {
+  width: 96px;
+  height: 14px;
+  margin: 30px 24px 28px;
 }
 .search-note {
   margin: 14px 6px 22px;

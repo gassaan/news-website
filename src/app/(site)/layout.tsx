@@ -6,6 +6,10 @@ import Footer from "@/components/Footer";
 import CardRipple from "@/components/CardRipple";
 import "./globals.css";
 
+// Loading skeleton for pictures: marks each picture once it has arrived (or failed), so
+// its frame can shimmer until then and the picture fades in (globals.css). Runs before
+// any picture is on the page, so none is missed.
+const IMG_WAIT_SCRIPT = `(function(){var d=document;d.documentElement.setAttribute("data-imgwait","");function m(e){var t=e.target;if(t&&t.tagName==="IMG")t.setAttribute(e.type==="load"?"data-ok":"data-bad","");}d.addEventListener("load",m,true);d.addEventListener("error",m,true);})();`;
 const THEME_INIT_SCRIPT = `(function(){try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark"){document.documentElement.setAttribute("data-theme",t);}}catch(e){}})();`;
 
 const democratsAkBlack = localFont({
@@ -72,6 +76,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="bg-ground text-text font-body flex min-h-full flex-col font-bold">
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: IMG_WAIT_SCRIPT }} />
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />

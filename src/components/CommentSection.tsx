@@ -151,6 +151,8 @@ export default function CommentSection({
   const pendingKey = `hulhangu-pending:${kind}:${target}`;
   // The form is always shown; the comments below it stay folded until opened.
   const [open, setOpen] = useState(false);
+  // Until the comments arrive a loading bar stands in for the comments bar.
+  const [loaded, setLoaded] = useState(!apiOn);
   const trap = useRef<HTMLInputElement>(null);
   const nextId = useRef(0);
   const count = comments.reduce((n, c) => n + 1 + (c.replies?.length ?? 0), 0);
@@ -159,6 +161,7 @@ export default function CommentSection({
     if (!apiOn) return;
     loadComments(target, kind).then(async (list) => {
       setName((n) => n || (remember("hulhangu-name") ?? ""));
+      setLoaded(true);
       if (!list) return;
       setComments(list);
       // Drop waiting replies that are now published, or too old to still be waiting.
@@ -340,7 +343,15 @@ export default function CommentSection({
         )}
       </form>
 
-      {count === 0 ? (
+      {!loaded ? (
+        <div className="comments-toggle is-loading" role="status" aria-label="ކޮމެންޓްތައް ލޯޑުވަނީ">
+          <span className="skel ct-skel-icon" />
+          <span className="ct-text">
+            <span className="skel ct-skel-line" />
+            <span className="skel ct-skel-line short" />
+          </span>
+        </div>
+      ) : count === 0 ? (
         // No comments yet: a quiet note in the same bar, nothing to open.
         <div className="comments-toggle is-empty">
           <span className="ct-icon" aria-hidden="true">
