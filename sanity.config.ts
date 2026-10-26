@@ -23,6 +23,9 @@ export default defineConfig({
   theme: studioTheme,
   projectId: project.projectId || "missing",
   dataset: project.dataset,
+  // The login is kept as a token in this browser (not a sanity.io cookie), so pages like
+  // Voice training can show it to the site's own service to prove who is asking.
+  auth: { loginMethod: "token" },
   // The Studio lives at /studio inside the site (plus the GitHub Pages sub-path).
   basePath: `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/studio`,
   plugins: [

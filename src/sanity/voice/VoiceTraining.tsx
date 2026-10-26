@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useClient } from "sanity";
+import { API_URL } from "@/lib/api";
 import { clock } from "../editor/inputs";
 import { recordWav, type WavRecording } from "./wavRecorder";
 import "../home/home.css";
@@ -13,26 +14,33 @@ import "./voice.css";
 // written and checked by Dhivehi speakers for training voice technology, and public
 // domain (CC0). Copied once from common-voice/server/data/dv, keeping 12–180 letters of Thaana only, in a fixed mixed order.
 //
-// The recordings are private: they go to their own dataset ("voice") that only
-// logged-in CMS users can read, never to the public dataset the website reads from.
-// The page makes that dataset the first time, and moves anything recorded before
-// out of the public dataset.
+// The recordings are private: they are kept by the site's online service (api/), which
+// only lets in the CMS administrator, confirmed with their Sanity login. Never in Sanity
+// itself, where the Free plan has no private datasets. Recordings made before, in the
+// old "voice" dataset, are moved over once, and that dataset is then deleted.
 
 const DOC = "voiceTraining";
 const VOICE = "voice";
 // About an hour of clear recordings is a good amount for training a voice.
 const GOAL_MINUTES = 60;
 
-type Clip = { _key: string; text: string; seconds: number; url?: string };
+type Clip = { key: string; text: string; seconds: number; bytes?: number };
 type Step = "ready" | "recording" | "check" | "saving";
-type Setup = "checking" | "ready" | "failed" | "public";
-type OldClip = { _key: string; text: string; seconds: number; assetId?: string; url?: string };
+type Setup = "checking" | "ready" | "login" | "denied" | "offline";
+type OldClip = { _key: string; text: string; seconds: number; url?: string; size?: number };
 
 const newKey = () => Array.from(crypto.getRandomValues(new Uint8Array(6)), (b) => b.toString(16).padStart(2, "0")).join("");
 
 export default function VoiceTraining() {
   const client = useClient({ apiVersion: "2025-02-19" });
   const voice = useMemo(() => client.withConfig({ dataset: VOICE }), [client]);
+  // The Studio keeps the login as a token (sanity.config.ts: loginMethod "token").
+  const token = client.config().token;
+  const api = useMemo(
+    () => (path: string, init: RequestInit = {}) =>
+      fetch(`${API_URL}${path}`, { ...init, cache: "no-store", headers: { ...init.headers, Authorization: `Bearer ${token}` } }),
+    [token],
+  );
   const [setup, setSetup] = useState<Setup>("checking");
   const [loaded, setLoaded] = useState<{ sentences: string[] } | null>(null);
   const [clips, setClips] = useState<Clip[]>([]);
@@ -42,84 +50,68 @@ export default function VoiceTraining() {
   const [take, setTake] = useState<{ blob: Blob; url: string; seconds: number } | null>(null);
   const [error, setError] = useState("");
   const [showAll, setShowAll] = useState(false);
+  const [moving, setMoving] = useState("");
   const recorder = useRef<WavRecording | null>(null);
   const started = useRef(0);
 
   useEffect(() => {
     let gone = false;
     (async () => {
-      // 1. The private dataset for the recordings (made once).
+      if (!API_URL) return setSetup("offline");
+      if (!token) return setSetup("login");
+      const list = async () => {
+        const res = await api("/voice/clips");
+        if (res.status === 403) return "denied" as const;
+        if (!res.ok) throw new Error("list");
+        return (await res.json()) as Clip[];
+      };
       try {
-        const found = (await client.datasets.list()).find((d) => d.name === VOICE);
-        if (!found) await client.datasets.create(VOICE, { aclMode: "private" });
-        else if (found.aclMode !== "private") await client.datasets.edit(VOICE, { aclMode: "private" });
-      } catch {
-        if (!gone) setSetup("failed");
-        return;
-      }
-      // The dataset can still be marked private while the plan no longer enforces it (the
-      // Free plan has no private datasets): try reading it without logging in, and pause
-      // recording if that works.
-      try {
-        const { projectId } = client.config();
-        const res = await fetch(
-          `https://${projectId}.api.sanity.io/v2025-02-19/data/query/${VOICE}?query=${encodeURIComponent("count(*)")}`,
-          { credentials: "omit", cache: "no-store" },
-        );
-        if (res.ok && typeof (await res.json()).result === "number") {
-          if (!gone) setSetup("public");
-          return;
-        }
-      } catch {
-        // Couldn't reach it without logging in: it is private.
-      }
-      // 2. Recordings made before this, in the public dataset: copy them over, then delete them there.
-      try {
-        const old = await client.fetch<OldClip[] | null>(
-          `*[_id == "${DOC}"][0].clips[]{ _key, text, seconds, "assetId": audio.asset._ref, "url": audio.asset->url }`,
-        );
-        if (old?.length) {
-          const have = new Set(await voice.fetch<string[]>(`coalesce(*[_id == "${DOC}"][0].clips[]._key, [])`));
-          const moved = [];
-          for (const c of old) {
-            if (!c.url || have.has(c._key)) continue;
-            const blob = await (await fetch(c.url)).blob();
-            const asset = await voice.assets.upload("file", blob, { filename: c.url.split("/").pop(), contentType: blob.type });
-            moved.push({ _key: c._key, text: c.text, seconds: c.seconds, audio: { _type: "file", asset: { _type: "reference", _ref: asset._id } } });
-          }
-          await voice.createIfNotExists({ _id: DOC, _type: DOC });
-          if (moved.length) await voice.patch(DOC).setIfMissing({ clips: [] }).append("clips", moved).commit();
-        }
+        let mine = await list();
+        if (mine === "denied") return gone ? undefined : setSetup("denied");
+        // Recordings from the old "voice" dataset: copy each one over, check they all
+        // arrived whole, then delete that dataset (it is no longer private on Free).
+        const old = await voice
+          .fetch<OldClip[] | null>(`*[_id == "${DOC}"][0].clips[]{ _key, text, seconds, "url": audio.asset->url, "size": audio.asset->size }`)
+          .catch(() => null);
         if (old) {
-          await client.delete(DOC);
-          for (const c of old) if (c.assetId) await client.delete(c.assetId).catch(() => undefined);
+          const have = new Set(mine.map((c) => c.key));
+          const todo = old.filter((c) => c.url && !have.has(c._key));
+          for (const [i, c] of todo.entries()) {
+            if (gone) return;
+            setMoving(`Moving your recordings to private storage… ${i + 1} of ${todo.length}`);
+            const blob = await (await fetch(c.url!)).blob();
+            const form = new FormData();
+            form.set("key", c._key);
+            form.set("text", c.text);
+            form.set("seconds", String(c.seconds || 0.1));
+            form.set("audio", blob, "voice.wav");
+            if (!(await api("/voice/clip", { method: "POST", body: form })).ok) throw new Error("move");
+          }
+          mine = await list();
+          if (mine === "denied") throw new Error("move");
+          const stored = new Map(mine.map((c) => [c.key, c.bytes]));
+          if (old.every((c) => !c.url || (stored.has(c._key) && (!c.size || stored.get(c._key) === c.size)))) {
+            await client.datasets.delete(VOICE).catch(() => {
+              if (!gone) setError("Your recordings are moved, but the old copy couldn't be deleted. On sanity.io/manage → Hulhangu → Datasets, delete \"voice\".");
+            });
+          }
+          setMoving("");
         }
-        // Leftover recordings in the public dataset that nothing uses (from earlier tries).
-        const loose = await client.fetch<string[]>(
-          `*[_type == "sanity.fileAsset" && originalFilename match "voice-*" && count(*[references(^._id)]) == 0]._id`,
-        );
-        for (const id of loose) await client.delete(id).catch(() => undefined);
-      } catch {
-        if (!gone) setError("Older recordings couldn't be moved to private storage yet. Open this page again to finish.");
-      }
-      // 3. Your recordings (private) and the sentences (loaded only on this page).
-      try {
-        const [mine, list] = await Promise.all([
-          voice.fetch<Clip[] | null>(`*[_id == "${DOC}"][0].clips[]{ _key, text, seconds, "url": audio.asset->url }`),
-          import("./sentences-dv.json"),
-        ]);
+        const sentences = await import("./sentences-dv.json");
         if (gone) return;
-        setLoaded({ sentences: list.default as string[] });
-        setClips((mine ?? []).slice().reverse());
+        setLoaded({ sentences: sentences.default as string[] });
+        setClips(mine.slice().reverse());
         setSetup("ready");
       } catch {
-        if (!gone) setError("The sentences couldn't be loaded. Check the connection and open this page again.");
+        if (gone) return;
+        setMoving("");
+        setSetup("offline");
       }
     })();
     return () => {
       gone = true;
     };
-  }, [client, voice]);
+  }, [api, client, token, voice]);
 
   // Leaving the page mid-recording switches the microphone off.
   useEffect(
@@ -179,15 +171,14 @@ export default function VoiceTraining() {
     setStep("saving");
     setError("");
     try {
-      const asset = await voice.assets.upload("file", take.blob, { filename: `voice-${clips.length + 1}.wav`, contentType: "audio/wav" });
-      const clip = { _key: newKey(), text: sentence, seconds: Math.round(take.seconds * 10) / 10 };
-      await voice.createIfNotExists({ _id: DOC, _type: DOC });
-      await voice
-        .patch(DOC)
-        .setIfMissing({ clips: [] })
-        .append("clips", [{ ...clip, audio: { _type: "file", asset: { _type: "reference", _ref: asset._id } } }])
-        .commit();
-      setClips((c) => [{ ...clip, url: asset.url }, ...c]);
+      const clip = { key: newKey(), text: sentence, seconds: Math.round(take.seconds * 10) / 10 };
+      const form = new FormData();
+      form.set("key", clip.key);
+      form.set("text", clip.text);
+      form.set("seconds", String(clip.seconds));
+      form.set("audio", take.blob, "voice.wav");
+      if (!(await api("/voice/clip", { method: "POST", body: form })).ok) throw new Error("save");
+      setClips((c) => [clip, ...c]);
       setTake(null);
       setStep("ready");
     } catch {
@@ -199,8 +190,8 @@ export default function VoiceTraining() {
   const remove = async (key: string) => {
     setError("");
     try {
-      await voice.patch(DOC).unset([`clips[_key=="${key}"]`]).commit();
-      setClips((c) => c.filter((x) => x._key !== key));
+      if (!(await api(`/voice/delete?key=${key}`, { method: "POST" })).ok) throw new Error("delete");
+      setClips((c) => c.filter((x) => x.key !== key));
     } catch {
       setError("That recording couldn't be deleted. Try again.");
     }
@@ -223,7 +214,7 @@ export default function VoiceTraining() {
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M6 11h12v9H6zM8.5 11V8a3.5 3.5 0 0 1 7 0v3" />
           </svg>
-          Private: kept apart from the website. Only people logged in to this CMS can open them.
+          Private: kept apart from the website. Only you, the CMS administrator, can open them.
         </p>
       </header>
 
@@ -254,26 +245,26 @@ export default function VoiceTraining() {
       <p className="vt-credit">Sentences: Mozilla Common Voice, written and checked by Dhivehi speakers (public domain).</p>
 
       <section className={`vt-card ${step}`} aria-live="polite">
-        {setup === "public" ? (
+        {setup === "login" ? (
           <div className="vt-note">
             <p>
-              <b>Recording is paused to keep your voice private.</b> The Sanity plan this project is on can&apos;t keep recordings private, so anyone could
-              reach them.
+              <b>Log in again to open your recordings.</b> Choose Log out from your picture at the top right, then log in. This only happens once.
             </p>
-            <p>Your recordings so far are kept. Recording starts again here once the recordings have a private home.</p>
           </div>
-        ) : setup === "failed" ? (
+        ) : setup === "denied" ? (
           <div className="vt-note">
             <p>
-              <b>Recording is paused to keep your voice private.</b> The private storage for recordings couldn&apos;t be set up from here.
+              <b>These recordings are private.</b> Only the CMS administrator can open them.
             </p>
+          </div>
+        ) : setup === "offline" ? (
+          <div className="vt-note">
             <p>
-              Fix: on sanity.io/manage open the Hulhangu project → Datasets → Add dataset, name it <b>voice</b> and choose <b>Private</b>. Then open this page
-              again.
+              <b>The private storage couldn&apos;t be reached.</b> Check the connection and open this page again. Your recordings are safe.
             </p>
           </div>
         ) : !loaded ? (
-          <p className="vt-note">{error ? "" : "Setting up private storage…"}</p>
+          <p className="vt-note">{error ? "" : moving || "Opening private storage…"}</p>
         ) : !sentence ? (
           <p className="vt-note">All sentences are done. New ones come with each new article.</p>
         ) : (
@@ -329,12 +320,12 @@ export default function VoiceTraining() {
         <section className="vt-list" aria-label="Saved recordings">
           <h2 className="sh-label">Saved recordings</h2>
           {shown.map((c) => (
-            <div key={c._key} className="vt-item">
+            <div key={c.key} className="vt-item">
               <p dir="rtl">{c.text}</p>
               <div className="vt-item-row">
-                {c.url && <audio controls preload="none" src={c.url} />}
+                <ClipAudio load={() => api(`/voice/audio?key=${c.key}`).then((r) => (r.ok ? r.blob() : Promise.reject(new Error("play"))))} />
                 <span className="vt-len">{clock(c.seconds || 0)}</span>
-                <button type="button" className="vt-del" aria-label="Delete this recording" onClick={() => remove(c._key)}>
+                <button type="button" className="vt-del" aria-label="Delete this recording" onClick={() => remove(c.key)}>
                   ×
                 </button>
               </div>
@@ -348,5 +339,36 @@ export default function VoiceTraining() {
         </section>
       )}
     </div>
+  );
+}
+
+// A saved recording: fetched from private storage (with the login) only when played.
+function ClipAudio({ load }: { load: () => Promise<Blob> }) {
+  const [url, setUrl] = useState<string | null>(null);
+  const [state, setState] = useState<"" | "busy" | "error">("");
+  useEffect(
+    () => () => {
+      if (url) URL.revokeObjectURL(url);
+    },
+    [url],
+  );
+  if (url) return <audio controls autoPlay src={url} />;
+  return (
+    <button
+      type="button"
+      className="vt-btn vt-play"
+      disabled={state === "busy"}
+      onClick={async () => {
+        setState("busy");
+        try {
+          setUrl(URL.createObjectURL(await load()));
+          setState("");
+        } catch {
+          setState("error");
+        }
+      }}
+    >
+      {state === "busy" ? "Loading…" : state === "error" ? "Couldn't load. Try again" : "▶ Play"}
+    </button>
   );
 }

@@ -24,7 +24,7 @@ function cors(request, env) {
   return {
     "Access-Control-Allow-Origin": allowed.includes(origin) ? origin : allowed[0] ?? "*",
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
     "Access-Control-Max-Age": "86400",
     Vary: "Origin",
   };
@@ -80,6 +80,92 @@ const clean = (s, max) =>
     .replace(/\n{3,}/g, "\n\n")
     .trim()
     .slice(0, max);
+
+// ---------- Voice training (private) ----------
+// The editor's voice recordings, kept to train a voice that reads articles aloud. Only
+// the CMS administrator can reach them: every request carries their Sanity login, which
+// Sanity itself confirms. The sound is stored in pieces, as database rows have a size limit.
+
+const VOICE_KEY = /^[a-f0-9]{8,32}$/;
+const VOICE_PART = 900000;
+const VOICE_MAX = 20000000;
+// Logins already confirmed (by a hash of the login, never the login itself), so playing
+// through the list doesn't ask Sanity every time.
+const voiceAdmins = new Map();
+
+async function voiceAdmin(request, env) {
+  const auth = request.headers.get("Authorization") ?? "";
+  const token = auth.startsWith("Bearer ") ? auth.slice(7).trim() : "";
+  if (!token || token.length > 500) return false;
+  const id = await sha256(token);
+  if ((voiceAdmins.get(id) ?? 0) > Date.now()) return true;
+  try {
+    const res = await fetch(`https://${env.SANITY_PROJECT}.api.sanity.io/v2021-06-07/users/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) return false;
+    const me = await res.json();
+    const ok = Boolean(me?.id) && (me.roles ?? []).some((r) => r?.name === "administrator");
+    if (ok) voiceAdmins.set(id, Date.now() + 10 * 60000);
+    return ok;
+  } catch {
+    return false;
+  }
+}
+
+async function voice(request, env, path, h) {
+  if (!(await voiceAdmin(request, env))) return json({ error: "not allowed" }, 403, h);
+  const key = new URL(request.url).searchParams.get("key") ?? "";
+
+  if (request.method === "GET" && path === "/voice/clips") {
+    const { results } = await env.DB.prepare("SELECT key, text, seconds, bytes FROM voice_clips ORDER BY at").all();
+    return json(results, 200, h);
+  }
+  if (request.method === "GET" && path === "/voice/audio") {
+    if (!VOICE_KEY.test(key)) return json({ error: "invalid" }, 400, h);
+    const { results } = await env.DB.prepare("SELECT data FROM voice_parts WHERE key = ?1 ORDER BY part").bind(key).all();
+    if (!results.length) return json({ error: "not found" }, 404, h);
+    const sound = new Blob(results.map((r) => new Uint8Array(r.data)));
+    return new Response(sound, { headers: { ...h, "Content-Type": "audio/wav", "Cache-Control": "private, no-store" } });
+  }
+  if (request.method === "POST" && path === "/voice/clip") {
+    const form = await request.formData().catch(() => null);
+    const audio = form?.get("audio");
+    const id = String(form?.get("key") ?? "");
+    const text = clean(form?.get("text"), 400);
+    const seconds = Number(form?.get("seconds"));
+    if (!VOICE_KEY.test(id) || !text || !(seconds > 0 && seconds <= 300) || typeof audio === "string" || !audio)
+      return json({ error: "invalid" }, 400, h);
+    const bytes = new Uint8Array(await audio.arrayBuffer());
+    if (!bytes.length || bytes.length > VOICE_MAX) return json({ error: "invalid" }, 400, h);
+    const steps = [
+      env.DB.prepare("DELETE FROM voice_parts WHERE key = ?1").bind(id),
+      env.DB.prepare("INSERT OR REPLACE INTO voice_clips (key, text, seconds, bytes, at) VALUES (?1, ?2, ?3, ?4, ?5)").bind(
+        id,
+        text,
+        seconds,
+        bytes.length,
+        Date.now(),
+      ),
+    ];
+    for (let at = 0, part = 0; at < bytes.length; at += VOICE_PART, part++) {
+      steps.push(
+        env.DB.prepare("INSERT INTO voice_parts (key, part, data) VALUES (?1, ?2, ?3)").bind(id, part, bytes.slice(at, at + VOICE_PART)),
+      );
+    }
+    await env.DB.batch(steps);
+    return json({ ok: true, bytes: bytes.length }, 200, h);
+  }
+  if (request.method === "POST" && path === "/voice/delete") {
+    if (!VOICE_KEY.test(key)) return json({ error: "invalid" }, 400, h);
+    await env.DB.batch([
+      env.DB.prepare("DELETE FROM voice_parts WHERE key = ?1").bind(key),
+      env.DB.prepare("DELETE FROM voice_clips WHERE key = ?1").bind(key),
+    ]);
+    return json({ ok: true }, 200, h);
+  }
+  return json({ error: "not found" }, 404, h);
+}
 
 // ---------- Views ----------
 
@@ -312,6 +398,7 @@ async function handle(request, env) {
   const url = new URL(request.url);
   const path = url.pathname.replace(/\/+$/, "") || "/";
   const q = url.searchParams;
+  if (path.startsWith("/voice/")) return voice(request, env, path, h);
 
   if (request.method === "GET") {
     if (path === "/" || path === "/health") return json({ ok: true }, 200, h);
