@@ -25,7 +25,7 @@ const GOAL_MINUTES = 60;
 
 type Clip = { _key: string; text: string; seconds: number; url?: string };
 type Step = "ready" | "recording" | "check" | "saving";
-type Setup = "checking" | "ready" | "failed";
+type Setup = "checking" | "ready" | "failed" | "public";
 type OldClip = { _key: string; text: string; seconds: number; assetId?: string; url?: string };
 
 const newKey = () => Array.from(crypto.getRandomValues(new Uint8Array(6)), (b) => b.toString(16).padStart(2, "0")).join("");
@@ -56,6 +56,22 @@ export default function VoiceTraining() {
       } catch {
         if (!gone) setSetup("failed");
         return;
+      }
+      // The dataset can still be marked private while the plan no longer enforces it (the
+      // Free plan has no private datasets): try reading it without logging in, and pause
+      // recording if that works.
+      try {
+        const { projectId } = client.config();
+        const res = await fetch(
+          `https://${projectId}.api.sanity.io/v2025-02-19/data/query/${VOICE}?query=${encodeURIComponent("count(*)")}`,
+          { credentials: "omit", cache: "no-store" },
+        );
+        if (res.ok && typeof (await res.json()).result === "number") {
+          if (!gone) setSetup("public");
+          return;
+        }
+      } catch {
+        // Couldn't reach it without logging in: it is private.
       }
       // 2. Recordings made before this, in the public dataset: copy them over, then delete them there.
       try {
@@ -238,7 +254,15 @@ export default function VoiceTraining() {
       <p className="vt-credit">Sentences: Mozilla Common Voice, written and checked by Dhivehi speakers (public domain).</p>
 
       <section className={`vt-card ${step}`} aria-live="polite">
-        {setup === "failed" ? (
+        {setup === "public" ? (
+          <div className="vt-note">
+            <p>
+              <b>Recording is paused to keep your voice private.</b> The Sanity plan this project is on can&apos;t keep recordings private, so anyone could
+              reach them.
+            </p>
+            <p>Your recordings so far are kept. Recording starts again here once the recordings have a private home.</p>
+          </div>
+        ) : setup === "failed" ? (
           <div className="vt-note">
             <p>
               <b>Recording is paused to keep your voice private.</b> The private storage for recordings couldn&apos;t be set up from here.
