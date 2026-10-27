@@ -16,18 +16,20 @@ export default function ThemeToggle({ className = "" }: { className?: string }) 
       root.getAttribute("data-theme") ||
       (window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
     const next = current === "light" ? "dark" : "light";
+    // The phone's top bar follows the site's choice, not only the phone's setting: a
+    // first theme-color of its own, ahead of the layout's two (see layout.tsx). Set
+    // straight away, before the page fades, so Safari can change its bar during the fade
+    // rather than after it.
+    let bar = document.getElementById("site-bar") as HTMLMetaElement | null;
+    if (!bar) {
+      bar = document.createElement("meta");
+      bar.name = "theme-color";
+      bar.id = "site-bar";
+      document.head.prepend(bar);
+    }
+    bar.content = BAR[next];
     const apply = () => {
       root.setAttribute("data-theme", next);
-      // The top bar follows the site's choice, not only the phone's setting: a first
-      // theme-color of its own, ahead of the layout's two (see layout.tsx).
-      let bar = document.getElementById("site-bar") as HTMLMetaElement | null;
-      if (!bar) {
-        bar = document.createElement("meta");
-        bar.name = "theme-color";
-        bar.id = "site-bar";
-        document.head.prepend(bar);
-      }
-      bar.content = BAR[next];
       try {
         localStorage.setItem("theme", next);
       } catch {
@@ -36,11 +38,8 @@ export default function ThemeToggle({ className = "" }: { className?: string }) 
     };
     // The colours fade from one look to the other: the whole page at once where the
     // browser can (a view transition), otherwise by fading each colour (globals.css).
-    // Not the view transition on Safari: it tints its top bar from the header and only
-    // catches up after the transition ends, so the bar changed late.
-    const safari = /^((?!chrome|chromium|crios|fxios|edg|android).)*safari/i.test(navigator.userAgent);
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) apply();
-    else if (document.startViewTransition && !safari) document.startViewTransition(apply);
+    else if (document.startViewTransition) document.startViewTransition(apply);
     else {
       root.setAttribute("data-theme-fade", "");
       apply();
