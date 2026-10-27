@@ -57,12 +57,28 @@ export default function SocialPost({ post }: { post: Social }) {
   useEffect(() => {
     const el = box.current;
     if (!el) return;
-    const show = async () => {
-      if (post.site === "x") {
-        const root = document.documentElement.getAttribute("data-theme");
-        const light = root ? root === "light" : window.matchMedia("(prefers-color-scheme: light)").matches;
-        el.querySelector("blockquote")?.setAttribute("data-theme", light ? "light" : "dark");
+    // X posts come in light or dark: the same as the site at the moment.
+    const theme = () => {
+      const root = document.documentElement.getAttribute("data-theme");
+      const light = root ? root === "light" : window.matchMedia("(prefers-color-scheme: light)").matches;
+      return light ? "light" : "dark";
+    };
+    let drawn = "";
+    const drawX = () => {
+      const now = theme();
+      if (now === drawn) return;
+      if (drawn) {
+        // Switched light/dark after the post was shown: draw it again in the new look,
+        // keeping its height meanwhile so the text below doesn't jump.
+        el.style.minHeight = `${el.offsetHeight}px`;
+        el.innerHTML = markup(post);
+        setTimeout(() => (el.style.minHeight = ""), 3000);
       }
+      drawn = now;
+      el.querySelector("blockquote")?.setAttribute("data-theme", now);
+      window.twttr?.ready?.((t) => t.widgets.load(el));
+    };
+    const show = async () => {
       if (post.site === "facebook" && !document.getElementById("fb-root")) {
         const root = document.createElement("div");
         root.id = "fb-root";
@@ -70,7 +86,7 @@ export default function SocialPost({ post }: { post: Social }) {
       }
       try {
         await loadScript(post.site);
-        if (post.site === "x") window.twttr?.ready?.((t) => t.widgets.load(el));
+        if (post.site === "x") drawX();
         else if (post.site === "instagram") window.instgrm?.Embeds.process();
         else window.FB?.XFBML.parse(el);
       } catch {
@@ -86,7 +102,19 @@ export default function SocialPost({ post }: { post: Social }) {
       { rootMargin: "600px 0px" },
     );
     watch.observe(el);
-    return () => watch.disconnect();
+    // The site's light/dark button, or the phone's own setting, changing.
+    const toggled = new MutationObserver(() => drawn && drawX());
+    const system = window.matchMedia("(prefers-color-scheme: light)");
+    const onSystem = () => drawn && drawX();
+    if (post.site === "x") {
+      toggled.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+      system.addEventListener("change", onSystem);
+    }
+    return () => {
+      watch.disconnect();
+      toggled.disconnect();
+      system.removeEventListener("change", onSystem);
+    };
   }, [post]);
 
   return <div ref={box} className={`rt-post rt-post-${post.site}`} dangerouslySetInnerHTML={{ __html: markup(post) }} />;
