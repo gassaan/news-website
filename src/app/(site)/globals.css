@@ -2106,6 +2106,22 @@ ol.rt-list {
 .rt-post-x iframe {
   border-radius: 12px;
 }
+/* Instagram and Facebook only come in white: rounded like the site's cards (over the
+   corners their own scripts set), and toned down a little in dark mode so they don't glare. */
+.rt-post-instagram iframe,
+.rt-post-facebook iframe {
+  border-radius: 18px !important;
+}
+:root:not([data-theme="light"]) .rt-post-instagram iframe,
+:root:not([data-theme="light"]) .rt-post-facebook iframe {
+  filter: brightness(0.88);
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) .rt-post-instagram iframe,
+  :root:not([data-theme="dark"]) .rt-post-facebook iframe {
+    filter: none;
+  }
+}
 .rt-hr {
   margin: 0 auto 1.4em;
   width: 40%;
