@@ -2075,7 +2075,7 @@ ol.rt-list {
   margin: 0 auto 1.4em;
   break-inside: avoid;
 }
-.rt-post > blockquote,
+.rt-post-embed > blockquote,
 .rt-post .fb-post > blockquote {
   box-sizing: border-box;
   width: 100%;
@@ -2086,6 +2086,99 @@ ol.rt-list {
   background: var(--surface);
   text-align: center;
   font-size: 0.85em;
+}
+/* While the post loads: a post-shaped skeleton, with the post laid out (but unseen)
+   behind it so its site can size it; it fades in once drawn. Only for readers with
+   scripts on (the page's loading script sets data-imgwait); without, the link shows. */
+.rt-post {
+  position: relative;
+}
+.rt-post-embed {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+[data-imgwait] .rt-post[data-state="loading"] .rt-post-embed {
+  position: absolute;
+  inset: 0 0 auto;
+  opacity: 0;
+  pointer-events: none;
+}
+.rt-post[data-state="shown"] .rt-post-embed {
+  animation: post-in 0.4s ease;
+}
+@keyframes post-in {
+  from {
+    opacity: 0;
+  }
+}
+.rt-post-skel {
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  direction: ltr;
+}
+[data-imgwait] .rt-post[data-state="loading"] .rt-post-skel {
+  display: flex;
+}
+.rt-post-skel .sk-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+.rt-post-skel .sk-avatar {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+}
+.rt-post-skel .sk-who {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.rt-post-skel .sk-name {
+  width: 42%;
+  height: 13px;
+}
+.rt-post-skel .sk-handle {
+  width: 26%;
+  height: 10px;
+}
+.rt-post-skel .sk-mark {
+  flex: none;
+  align-self: flex-start;
+  color: var(--accent-dim);
+}
+.rt-post-skel .sk-line {
+  height: 12px;
+}
+.rt-post-skel .sk-line.short {
+  width: 60%;
+}
+.rt-post-skel .sk-media {
+  aspect-ratio: 16 / 10;
+  margin-top: 6px;
+  border-radius: 10px;
+}
+.rt-post-skel .sk-foot {
+  width: 34%;
+  height: 10px;
+  margin-top: 4px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rt-post[data-state="shown"] .rt-post-embed {
+    animation: none;
+  }
 }
 .rt-post blockquote a {
   color: var(--accent);
