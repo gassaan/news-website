@@ -2098,6 +2098,13 @@ ol.rt-list {
 }
 .rt-post iframe {
   max-width: 100%;
+  /* The posts' own pages are light. Saying so keeps their frame see-through in dark
+     mode, where a mismatch makes the browser fill the frame's corners with white. */
+  color-scheme: light;
+}
+/* X's card has 12px corners: the frame is rounded the same, in case it isn't see-through. */
+.rt-post-x iframe {
+  border-radius: 12px;
 }
 .rt-hr {
   margin: 0 auto 1.4em;
