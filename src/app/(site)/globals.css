@@ -2106,11 +2106,13 @@ ol.rt-list {
 .rt-post-x iframe {
   border-radius: 12px;
 }
-/* Instagram and Facebook only come in white: rounded like the site's cards (over the
-   corners their own scripts set), and toned down a little in dark mode so they don't glare. */
+/* Instagram and Facebook draw a thin grey edge with square corners round their posts.
+   A 2px trim with rounded corners takes that edge off, leaving a clean white card with
+   the same 12px corners as X's. They only come in white, so dark mode tones them down. */
 .rt-post-instagram iframe,
 .rt-post-facebook iframe {
-  border-radius: 18px !important;
+  border-radius: 0 !important;
+  clip-path: inset(2px round 12px);
 }
 :root:not([data-theme="light"]) .rt-post-instagram iframe,
 :root:not([data-theme="light"]) .rt-post-facebook iframe {
