@@ -94,8 +94,9 @@ export default function Header() {
               aria-expanded={menuOpen}
               onClick={toggleMenu}
             >
+              {/* Three lines that turn into a cross while the menu is open (globals.css). */}
               <svg
-                className="i-open"
+                className="i-burger"
                 width="24"
                 height="18"
                 viewBox="0 0 24 18"
@@ -103,20 +104,11 @@ export default function Header() {
                 stroke="currentColor"
                 strokeWidth="1.6"
                 strokeLinecap="round"
+                aria-hidden="true"
               >
-                <path d="M1 1h22M1 9h22M1 17h22" />
-              </svg>
-              <svg
-                className="i-close"
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-              >
-                <path d="M2 2l16 16M18 2L2 18" />
+                <path className="b1" d="M1 1h22" />
+                <path className="b2" d="M1 9h22" />
+                <path className="b3" d="M1 17h22" />
               </svg>
             </button>
           </div>

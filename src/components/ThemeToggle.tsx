@@ -1,7 +1,13 @@
 "use client";
 
+import { useState } from "react";
+
 export default function ThemeToggle({ className = "" }: { className?: string }) {
+  // The sun or moon spins in when tapped (not when the page first opens).
+  const [tapped, setTapped] = useState(false);
+
   function toggle() {
+    setTapped(true);
     const root = document.documentElement;
     const current =
       root.getAttribute("data-theme") ||
@@ -20,7 +26,7 @@ export default function ThemeToggle({ className = "" }: { className?: string }) 
       type="button"
       onClick={toggle}
       aria-label="Switch light or dark mode"
-      className={`theme-toggle flex items-center justify-center rounded-full ${className}`}
+      className={`theme-toggle flex items-center justify-center rounded-full ${tapped ? "spin" : ""} ${className}`}
     >
       <svg
         className="i-sun"

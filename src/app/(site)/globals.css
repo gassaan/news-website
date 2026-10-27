@@ -413,6 +413,26 @@ a {
 :root[data-theme="dark"] .theme-toggle .i-sun {
   display: none;
 }
+/* After a tap, the icon that appears spins in: the sun turning, the moon swinging,
+   each with a small bounce. (An icon restarts its animation each time it is shown.) */
+.theme-toggle.spin .i-sun {
+  animation: sun-in 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.theme-toggle.spin .i-moon {
+  animation: moon-in 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes sun-in {
+  from {
+    opacity: 0;
+    transform: rotate(-120deg) scale(0.4);
+  }
+}
+@keyframes moon-in {
+  from {
+    opacity: 0;
+    transform: rotate(70deg) scale(0.4);
+  }
+}
 
 /* ==========================================================================
    Hulhangu component styles (ported from design/hulhangu-design.html)
@@ -545,20 +565,42 @@ nav.main a[aria-current] {
   border-radius: 50%;
   color: var(--nav-ink);
 }
-.icon-btn:hover {
-  background: rgba(255, 255, 255, 0.08);
+/* The round highlight only with a mouse: on phones a tap counts as a hover and left
+   it stuck. A tap gets a quick press instead. */
+@media (hover: hover) {
+  .icon-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
+}
+.icon-btn {
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+    background 0.15s;
+}
+.icon-btn:active {
+  transform: scale(0.86);
 }
 .menu-btn {
   display: none;
 }
-.menu-btn .i-close {
-  display: none;
+/* Menu: the three lines turn into a cross while the menu is open, and back. */
+.i-burger path {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition:
+    transform 0.35s cubic-bezier(0.65, 0, 0.35, 1),
+    opacity 0.2s;
 }
-.menu-btn[aria-expanded="true"] .i-open {
-  display: none;
+.menu-btn[aria-expanded="true"] .b1 {
+  transform: translateY(8px) rotate(45deg);
 }
-.menu-btn[aria-expanded="true"] .i-close {
-  display: block;
+.menu-btn[aria-expanded="true"] .b2 {
+  opacity: 0;
+  transform: scaleX(0.2);
+}
+.menu-btn[aria-expanded="true"] .b3 {
+  transform: translateY(-8px) rotate(-45deg);
 }
 .searchbox {
   display: none;
@@ -3728,8 +3770,10 @@ footer .logo {
   .bar .icon-btn {
     color: var(--mh-ink);
   }
-  .bar .icon-btn:hover {
-    background: var(--mh-field);
+  @media (hover: hover) {
+    .bar .icon-btn:hover {
+      background: var(--mh-field);
+    }
   }
   .mobile-nav {
     display: block;
