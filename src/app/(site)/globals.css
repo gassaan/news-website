@@ -2070,6 +2070,7 @@ ol.rt-list {
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 100%;
   max-width: 550px;
   margin: 0 auto 1.4em;
   break-inside: avoid;
