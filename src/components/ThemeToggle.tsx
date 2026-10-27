@@ -13,11 +13,22 @@ export default function ThemeToggle({ className = "" }: { className?: string }) 
       root.getAttribute("data-theme") ||
       (window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
     const next = current === "light" ? "dark" : "light";
-    root.setAttribute("data-theme", next);
-    try {
-      localStorage.setItem("theme", next);
-    } catch {
-      // ignore (private browsing, storage disabled, etc.)
+    const apply = () => {
+      root.setAttribute("data-theme", next);
+      try {
+        localStorage.setItem("theme", next);
+      } catch {
+        // ignore (private browsing, storage disabled, etc.)
+      }
+    };
+    // The colours fade from one look to the other: the whole page at once where the
+    // browser can (a view transition), otherwise by fading each colour (globals.css).
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) apply();
+    else if (document.startViewTransition) document.startViewTransition(apply);
+    else {
+      root.setAttribute("data-theme-fade", "");
+      apply();
+      setTimeout(() => root.removeAttribute("data-theme-fade"), 500);
     }
   }
 

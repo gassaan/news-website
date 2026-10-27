@@ -413,6 +413,22 @@ a {
 :root[data-theme="dark"] .theme-toggle .i-sun {
   display: none;
 }
+/* Switching light/dark: the page fades from one look to the other (ThemeToggle). */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.45s;
+  animation-timing-function: ease;
+}
+:root[data-theme-fade] *,
+:root[data-theme-fade] *::before,
+:root[data-theme-fade] *::after {
+  transition:
+    background-color 0.45s ease,
+    color 0.45s ease,
+    border-color 0.45s ease,
+    fill 0.45s ease,
+    stroke 0.45s ease !important;
+}
 /* After a tap, the icon that appears spins in: the sun turning, the moon swinging,
    each with a small bounce. (An icon restarts its animation each time it is shown.) */
 .theme-toggle.spin .i-sun {
