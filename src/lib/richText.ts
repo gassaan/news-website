@@ -101,14 +101,17 @@ export function videoEmbed(url: string): string | null {
 
 // Posts from X, Facebook and Instagram, shown with each site's own embed; anything
 // else stays a link.
-export type Social = { site: "x" | "facebook" | "instagram"; name: string; url: string; id?: string };
+// A Facebook share link ("facebook.com/share/…", what the app's Copy link gives) is only
+// a forward to the post: Facebook won't show it inside another site, so it stays a link.
+export type Social = { site: "x" | "facebook" | "instagram"; name: string; url: string; id?: string; short?: boolean };
 
 export function socialPost(url: string): Social | null {
   const x = url.match(/^https:\/\/(?:www\.|mobile\.)?(?:x|twitter)\.com\/\w{1,30}\/status(?:es)?\/(\d{5,25})/);
   if (x) return { site: "x", name: "X", url, id: x[1] };
   const ig = url.match(/^https:\/\/(?:www\.)?instagram\.com\/(?:[\w.]+\/)?(p|reel|tv)\/([\w-]+)/);
   if (ig) return { site: "instagram", name: "Instagram", url: `https://www.instagram.com/${ig[1]}/${ig[2]}/` };
-  if (/^https:\/\/(?:www\.|m\.|web\.)?facebook\.com\/\S+/.test(url)) return { site: "facebook", name: "Facebook", url };
+  if (/^https:\/\/(?:www\.|m\.|web\.)?facebook\.com\/\S+/.test(url))
+    return { site: "facebook", name: "Facebook", url, short: /facebook\.com\/share\//.test(url) };
   return null;
 }
 

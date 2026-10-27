@@ -48,6 +48,7 @@ function markup(post: Social): string {
     return `<blockquote class="twitter-tweet" data-dnt="true" data-align="center"><a href="https://twitter.com/x/status/${esc(post.id ?? "")}" target="_blank" rel="noopener noreferrer">${esc(post.name)} ގައި މި ޕޯސްޓް ބައްލަވާ</a></blockquote>`;
   if (post.site === "instagram")
     return `<blockquote class="instagram-media" data-instgrm-permalink="${esc(post.url)}" data-instgrm-version="14" data-instgrm-captioned>${link}</blockquote>`;
+  if (post.short) return `<blockquote>${link}</blockquote>`;
   return `<div class="fb-post" data-href="${esc(post.url)}" data-width="auto" data-show-text="true"><blockquote class="fb-xfbml-parse-ignore" cite="${esc(post.url)}">${link}</blockquote></div>`;
 }
 
@@ -56,7 +57,7 @@ export default function SocialPost({ post }: { post: Social }) {
 
   useEffect(() => {
     const el = box.current;
-    if (!el) return;
+    if (!el || post.short) return;
     // X posts come in light or dark: the same as the site at the moment.
     const theme = () => {
       const root = document.documentElement.getAttribute("data-theme");

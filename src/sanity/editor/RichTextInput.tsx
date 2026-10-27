@@ -199,6 +199,7 @@ function PostView({ node, deleteNode, editor }: NodeViewProps) {
       <span className="re-post-text">
         <b>{post ? `${post.name} post` : "Post"}</b>
         <span className="re-post-url">{url}</span>
+        {post?.short && <span className="re-post-warn">Share link: readers will only see a link. Use the post&apos;s full address to show the post.</span>}
       </span>
       {editor.isEditable && (
         <button type="button" className="re-x" aria-label="Remove the post" onClick={deleteNode}>
@@ -656,7 +657,14 @@ export function RichTextInput(props: TextInputProps) {
         <Popup scheme={scheme} label="Add a social post" onClose={() => setSheet(null)}>
           <input className="re-url" type="url" inputMode="url" autoFocus placeholder="X, Facebook or Instagram post link" value={url} onChange={(e) => setUrl(e.target.value)} />
           {url.trim() && !postOk && <p className="ef-photo-error">Paste the link of a post on X, Facebook or Instagram.</p>}
-          <p className="ef-note">On the post, tap Share → Copy link, then paste it here.</p>
+          {socialPost(url.trim())?.short ? (
+            <p className="ef-photo-error">
+              This is a Facebook share link, which Facebook won&apos;t show inside an article (readers would only see a link). For the post itself: open this link
+              in Safari or Chrome, copy the address from the top of the screen once the post opens, and paste that here.
+            </p>
+          ) : (
+            <p className="ef-note">On the post, tap Share → Copy link, then paste it here. For Facebook, copy the post&apos;s address from the browser instead.</p>
+          )}
           <div className="re-sheet-actions">
             <button type="button" className="re-pill re-solid" disabled={!postOk} onClick={() => run((ed) => ed.chain().focus().insertContent([{ type: "post", attrs: { url: url.trim() } }, { type: "paragraph" }]).run())}>
               Add post

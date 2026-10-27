@@ -1135,6 +1135,10 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.re-post-warn {
+  font: 500 12px/1.4 Inter, sans-serif;
+  color: #f0a742;
+}
 /* Under the text: Add, Preview and the word count */
 .re-foot {
   display: flex;
