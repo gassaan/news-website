@@ -340,18 +340,18 @@ a {
   }
 }
 
-/* Reading pages (articles and story episodes) in dark mode: a slightly lifted plum
-   instead of near-black, with softer lavender text, so long reading is easier on the
-   eyes (letters don't glow against black). Contrast about 11.7:1. */
+/* Reading pages (articles and story episodes) in dark mode: a dark, only lightly purple
+   background instead of near-black purple, with softer lavender text, so long reading
+   is easier on the eyes and the purple buttons stand out. Contrast about 12.4:1. */
 :root[data-theme="dark"]:has(#artBody) {
-  --ground: #151030;
-  --panel: #151030;
+  --ground: #0d0a1c;
+  --panel: #0d0a1c;
   --art-ink: #d3cae8;
 }
 @media not all and (prefers-color-scheme: light) {
   :root:not([data-theme]):has(#artBody) {
-    --ground: #151030;
-    --panel: #151030;
+    --ground: #0d0a1c;
+    --panel: #0d0a1c;
     --art-ink: #d3cae8;
   }
 }
