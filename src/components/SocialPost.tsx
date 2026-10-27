@@ -66,27 +66,15 @@ export default function SocialPost({ post }: { post: Social }) {
     const el = box.current;
     if (!el || post.short) return;
     let gone = false;
-    let poll: ReturnType<typeof setInterval> | undefined;
-    let giveUp: ReturnType<typeof setTimeout> | undefined;
-    const stop = () => {
-      clearInterval(poll);
-      clearTimeout(giveUp);
-    };
-    // Can't be shown: back to the plain link (the site's script may have taken it).
-    const fail = () => {
-      stop();
-      if (gone) return;
-      el.innerHTML = markup(post);
-      setState("link");
-    };
-    // Shown once the site's frame has loaded and taken its size (or has held a size for
-    // a while, in case its load came before this was watching).
-    const watch = () => {
+    // Calls back once the site's frame inside `layer` has loaded and taken its size (or
+    // has held a size for a while, in case its load came before this was watching), or
+    // gives up after GIVE_UP_MS. Returns a function that stops watching.
+    const whenDrawn = (layer: HTMLElement, ready: () => void, giveUp: () => void) => {
       let frame: HTMLIFrameElement | null = null;
       let loaded = false;
       let sizedAt = 0;
-      poll = setInterval(() => {
-        const f = el.querySelector("iframe");
+      const poll = setInterval(() => {
+        const f = layer.querySelector("iframe");
         if (f && f !== frame) {
           frame = f;
           loaded = false;
@@ -97,10 +85,26 @@ export default function SocialPost({ post }: { post: Social }) {
         sizedAt ||= Date.now();
         if (loaded || Date.now() - sizedAt > 1500) {
           stop();
-          if (!gone) setState("shown");
+          ready();
         }
       }, 200);
-      giveUp = setTimeout(fail, GIVE_UP_MS);
+      const timer = setTimeout(() => {
+        stop();
+        giveUp();
+      }, GIVE_UP_MS);
+      const stop = () => {
+        clearInterval(poll);
+        clearTimeout(timer);
+      };
+      return stop;
+    };
+    let watching = () => {};
+    // Can't be shown: back to the plain link (the site's script may have taken it).
+    const fail = () => {
+      watching();
+      if (gone) return;
+      el.innerHTML = markup(post);
+      setState("link");
     };
     // X posts come in light or dark: the same as the site at the moment.
     const theme = () => {
@@ -109,19 +113,41 @@ export default function SocialPost({ post }: { post: Social }) {
       return light ? "light" : "dark";
     };
     let drawn = "";
+    let redraw: HTMLElement | null = null;
     const drawX = () => {
       const now = theme();
       if (now === drawn) return;
-      if (drawn) {
-        // Switched light/dark after the post was shown: draw it again in the new look,
-        // keeping its height meanwhile so the text below doesn't jump.
-        el.style.minHeight = `${el.offsetHeight}px`;
-        el.innerHTML = markup(post);
-        setTimeout(() => (el.style.minHeight = ""), 3000);
-      }
+      const first = !drawn;
       drawn = now;
-      el.querySelector("blockquote")?.setAttribute("data-theme", now);
-      window.twttr?.ready?.((t) => t.widgets.load(el));
+      if (first) {
+        el.querySelector("blockquote")?.setAttribute("data-theme", now);
+        window.twttr?.ready?.((t) => t.widgets.load(el));
+        return;
+      }
+      // Switched light/dark after the post was shown: the new look is drawn unseen on top
+      // of the old one, which stays until the new one is ready (never the link or a gap).
+      watching();
+      redraw?.remove();
+      const layer = document.createElement("div");
+      layer.className = "rt-post-layer rt-post-next";
+      layer.innerHTML = markup(post);
+      layer.querySelector("blockquote")?.setAttribute("data-theme", now);
+      el.append(layer);
+      redraw = layer;
+      window.twttr?.ready?.((t) => t.widgets.load(layer));
+      watching = whenDrawn(
+        layer,
+        () => {
+          for (const old of [...el.children]) if (old !== layer) old.remove();
+          layer.classList.remove("rt-post-next");
+          redraw = null;
+        },
+        () => {
+          // The new look never came: keep the post as it was.
+          layer.remove();
+          redraw = null;
+        },
+      );
     };
     const show = async () => {
       if (post.site === "facebook" && !document.getElementById("fb-root")) {
@@ -136,7 +162,7 @@ export default function SocialPost({ post }: { post: Social }) {
         return;
       }
       if (gone) return;
-      watch();
+      watching = whenDrawn(el, () => !gone && setState("shown"), fail);
       if (post.site === "x") drawX();
       else if (post.site === "instagram") window.instgrm?.Embeds.process();
       else window.FB?.XFBML.parse(el);
@@ -160,7 +186,7 @@ export default function SocialPost({ post }: { post: Social }) {
     }
     return () => {
       gone = true;
-      stop();
+      watching();
       near.disconnect();
       toggled.disconnect();
       system.removeEventListener("change", onSystem);

@@ -2108,6 +2108,20 @@ ol.rt-list {
 .rt-post[data-state="shown"] .rt-post-embed {
   animation: post-in 0.4s ease;
 }
+/* An X post being redrawn in the other look (light/dark): drawn unseen over the old
+   one, then put in its place. */
+.rt-post-layer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+.rt-post-next {
+  position: absolute;
+  inset: 0 0 auto;
+  opacity: 0;
+  pointer-events: none;
+}
 @keyframes post-in {
   from {
     opacity: 0;
