@@ -34,8 +34,20 @@ export default function CardRipple() {
       });
     };
 
+    // The tap opens the card's page: the wave goes at once. Safari keeps a picture of the
+    // page as it is when leaving it, to show while swiping back; a wave still spreading
+    // then stayed in that picture as a still circle.
+    const onClick = (e: MouseEvent) => {
+      const card = (e.target as Element | null)?.closest?.(".card");
+      card?.querySelectorAll(".card-ripple").forEach((r) => r.remove());
+    };
+
     document.addEventListener("pointerdown", onDown, { passive: true });
-    return () => document.removeEventListener("pointerdown", onDown);
+    document.addEventListener("click", onClick, true);
+    return () => {
+      document.removeEventListener("pointerdown", onDown);
+      document.removeEventListener("click", onClick, true);
+    };
   }, []);
 
   return null;
