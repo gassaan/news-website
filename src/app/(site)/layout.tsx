@@ -8,8 +8,11 @@ import "./globals.css";
 
 // Loading skeleton for pictures: marks each picture once it has arrived (or failed), so
 // its frame can shimmer until then and the picture fades in (globals.css). Runs before
-// any picture is on the page, so none is missed.
-const IMG_WAIT_SCRIPT = `(function(){var d=document;d.documentElement.setAttribute("data-imgwait","");function m(e){var t=e.target;if(t&&t.tagName==="IMG")t.setAttribute(e.type==="load"?"data-ok":"data-bad","");}d.addEventListener("load",m,true);d.addEventListener("error",m,true);})();`;
+// any picture is on the page, so none is missed. A picture that already arrived during
+// this visit (going back to a page, say) is marked as soon as it is put on the page
+// again ("data-again": no fade), so it shows at once instead of blinking through the
+// shimmer and fade again.
+const IMG_WAIT_SCRIPT = `(function(){var d=document,seen=new Set();d.documentElement.setAttribute("data-imgwait","");function m(e){var t=e.target;if(t&&t.tagName==="IMG"){if(e.type==="load"){seen.add(t.getAttribute("src"));t.setAttribute("data-ok","");}else t.setAttribute("data-bad","");}}d.addEventListener("load",m,true);d.addEventListener("error",m,true);function known(im){if(!im.hasAttribute("data-ok")&&(seen.has(im.getAttribute("src"))||(im.complete&&im.naturalWidth))){im.setAttribute("data-again","");im.setAttribute("data-ok","");}}new MutationObserver(function(rs){for(var i=0;i<rs.length;i++){var a=rs[i].addedNodes;for(var j=0;j<a.length;j++){var n=a[j];if(n.nodeType!==1)continue;if(n.tagName==="IMG")known(n);else if(n.firstElementChild){var l=n.getElementsByTagName("img");for(var k=0;k<l.length;k++)known(l[k]);}}}}).observe(d.documentElement,{childList:true,subtree:true});})();`;
 // The saved light/dark choice, before the page shows. Safari's top bar colour normally
 // follows the phone's setting (theme-color below), so a first theme-color for the saved
 // choice ("site-bar", ahead of those) wins over them. React's own two are left as they are.

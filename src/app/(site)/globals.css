@@ -317,6 +317,10 @@ a {
 [data-imgwait] .ph img {
   transition: opacity 0.35s ease;
 }
+/* A picture already seen during this visit shows at once, without the fade. */
+[data-imgwait] .ph img[data-again] {
+  transition: none;
+}
 [data-imgwait] .ph img:not([data-ok]) {
   opacity: 0;
 }
