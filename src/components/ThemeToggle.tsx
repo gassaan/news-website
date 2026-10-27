@@ -36,8 +36,11 @@ export default function ThemeToggle({ className = "" }: { className?: string }) 
     };
     // The colours fade from one look to the other: the whole page at once where the
     // browser can (a view transition), otherwise by fading each colour (globals.css).
+    // Not the view transition on Safari: it tints its top bar from the header and only
+    // catches up after the transition ends, so the bar changed late.
+    const safari = /^((?!chrome|chromium|crios|fxios|edg|android).)*safari/i.test(navigator.userAgent);
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) apply();
-    else if (document.startViewTransition) document.startViewTransition(apply);
+    else if (document.startViewTransition && !safari) document.startViewTransition(apply);
     else {
       root.setAttribute("data-theme-fade", "");
       apply();

@@ -419,14 +419,20 @@ a {
   animation-duration: 0.45s;
   animation-timing-function: ease;
 }
-/* The button itself stays out of the fade (the old sun would show through the new
-   moon): its new icon shows at once and does only its own spin. */
+/* The top bar and the button stay out of the fade: the bar changes at once, together
+   with the phone's own bar above it (tinted from it), and the button's new icon does
+   only its own spin (the old sun would show through the new moon). */
+header.site {
+  view-transition-name: site-header;
+}
 .theme-toggle {
   view-transition-name: theme-toggle;
 }
+::view-transition-old(site-header),
 ::view-transition-old(theme-toggle) {
   display: none;
 }
+::view-transition-new(site-header),
 ::view-transition-new(theme-toggle) {
   animation: none;
 }
@@ -439,6 +445,10 @@ a {
     border-color 0.45s ease,
     fill 0.45s ease,
     stroke 0.45s ease !important;
+}
+:root[data-theme-fade] header.site,
+:root[data-theme-fade] header.site * {
+  transition: none !important;
 }
 /* After a tap, the icon that appears spins in: the sun turning, the moon swinging,
    each with a small bounce. (An icon restarts its animation each time it is shown.) */
