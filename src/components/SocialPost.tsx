@@ -98,57 +98,86 @@ export default function SocialPost({ post }: { post: Social }) {
       };
       return stop;
     };
-    let watching = () => {};
+    const watchers: (() => void)[] = [];
+    const watch = (layer: HTMLElement, ready: () => void, giveUp: () => void) => watchers.push(whenDrawn(layer, ready, giveUp));
     // Can't be shown: back to the plain link (the site's script may have taken it).
     const fail = () => {
-      watching();
+      watchers.forEach((stop) => stop());
       if (gone) return;
       el.innerHTML = markup(post);
       setState("link");
     };
-    // X posts come in light or dark: the same as the site at the moment.
-    const theme = () => {
+
+    // X posts come in light or dark. Each is kept drawn in both looks, so switching the
+    // site's look shows the other one at once: the site's current look is drawn first,
+    // the other one quietly after the post is showing.
+    type Look = "light" | "dark";
+    const theme = (): Look => {
       const root = document.documentElement.getAttribute("data-theme");
       const light = root ? root === "light" : window.matchMedia("(prefers-color-scheme: light)").matches;
       return light ? "light" : "dark";
     };
-    let drawn = "";
-    let redraw: HTMLElement | null = null;
-    const drawX = () => {
-      const now = theme();
-      if (now === drawn) return;
-      const first = !drawn;
-      drawn = now;
-      if (first) {
-        el.querySelector("blockquote")?.setAttribute("data-theme", now);
-        window.twttr?.ready?.((t) => t.widgets.load(el));
-        return;
+    const looks: Partial<Record<Look, { layer: HTMLElement; ready: boolean }>> = {};
+    let showing: Look | null = null;
+    const showLook = (look: Look) => {
+      for (const [name, l] of Object.entries(looks)) {
+        if (!l) continue;
+        l.layer.classList.toggle("rt-post-next", name !== look);
+        // The unseen look is skipped by screen readers and the keyboard.
+        l.layer.inert = name !== look;
       }
-      // Switched light/dark after the post was shown: the new look is drawn unseen on top
-      // of the old one, which stays until the new one is ready (never the link or a gap).
-      watching();
-      redraw?.remove();
+      showing = look;
+    };
+    // Draws the post in one look, unseen until it is ready. If it never comes, by default
+    // it is forgotten (the other look stays) and tried again at the next switch.
+    const drawLook = (look: Look, ready: () => void, never?: () => void) => {
       const layer = document.createElement("div");
       layer.className = "rt-post-layer rt-post-next";
+      layer.inert = true;
       layer.innerHTML = markup(post);
-      layer.querySelector("blockquote")?.setAttribute("data-theme", now);
+      layer.querySelector("blockquote")?.setAttribute("data-theme", look);
       el.append(layer);
-      redraw = layer;
+      const entry = { layer, ready: false };
+      looks[look] = entry;
       window.twttr?.ready?.((t) => t.widgets.load(layer));
-      watching = whenDrawn(
+      watch(
         layer,
         () => {
-          for (const old of [...el.children]) if (old !== layer) old.remove();
-          layer.classList.remove("rt-post-next");
-          redraw = null;
+          entry.ready = true;
+          ready();
         },
-        () => {
-          // The new look never came: keep the post as it was.
-          layer.remove();
-          redraw = null;
-        },
+        never ??
+          (() => {
+            layer.remove();
+            delete looks[look];
+          }),
       );
     };
+    const other = (look: Look): Look => (look === "light" ? "dark" : "light");
+    const drawX = () => {
+      el.innerHTML = "";
+      const first = theme();
+      drawLook(
+        first,
+        () => {
+          if (gone) return;
+          showLook(first);
+          setState("shown");
+          drawLook(other(first), () => looks[theme()]?.ready && showLook(theme()));
+        },
+        // The first look not coming at all means the post can't be shown.
+        fail,
+      );
+    };
+    const switchLook = () => {
+      if (!showing) return;
+      const want = theme();
+      if (want === showing) return;
+      const l = looks[want];
+      if (l?.ready) showLook(want);
+      else if (!l) drawLook(want, () => theme() === want && showLook(want));
+    };
+
     const show = async () => {
       if (post.site === "facebook" && !document.getElementById("fb-root")) {
         const root = document.createElement("div");
@@ -162,9 +191,12 @@ export default function SocialPost({ post }: { post: Social }) {
         return;
       }
       if (gone) return;
-      watching = whenDrawn(el, () => !gone && setState("shown"), fail);
-      if (post.site === "x") drawX();
-      else if (post.site === "instagram") window.instgrm?.Embeds.process();
+      if (post.site === "x") {
+        drawX();
+        return;
+      }
+      watch(el, () => !gone && setState("shown"), fail);
+      if (post.site === "instagram") window.instgrm?.Embeds.process();
       else window.FB?.XFBML.parse(el);
     };
     const near = new IntersectionObserver(
@@ -177,16 +209,16 @@ export default function SocialPost({ post }: { post: Social }) {
     );
     near.observe(el.parentElement ?? el);
     // The site's light/dark button, or the phone's own setting, changing.
-    const toggled = new MutationObserver(() => drawn && drawX());
+    const toggled = new MutationObserver(switchLook);
     const system = window.matchMedia("(prefers-color-scheme: light)");
-    const onSystem = () => drawn && drawX();
+    const onSystem = switchLook;
     if (post.site === "x") {
       toggled.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
       system.addEventListener("change", onSystem);
     }
     return () => {
       gone = true;
-      watching();
+      watchers.forEach((stop) => stop());
       near.disconnect();
       toggled.disconnect();
       system.removeEventListener("change", onSystem);
