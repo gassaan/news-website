@@ -5,6 +5,7 @@
 //   :: Fact box line   (lines in a row make one box)
 //   ![Caption](photo link)
 //   @[video](YouTube or Facebook link)
+//   @[post](X, Facebook or Instagram post link)
 //   ---                (a dividing line)
 // Inside a line: **bold** and [words](link). Any other line is a plain paragraph, so
 // text written before the editor had formatting still shows as it always did.
@@ -20,10 +21,12 @@ export type Block =
   | { type: "list"; ordered: boolean; items: string[] }
   | { type: "img"; src: string; caption: string }
   | { type: "video"; url: string }
+  | { type: "post"; url: string }
   | { type: "hr" };
 
 const IMG = /^!\[(.*)\]\((\S+)\)$/;
 const VIDEO = /^@\[video\]\((\S+)\)$/;
+const POST = /^@\[post\]\((\S+)\)$/;
 
 export function parseBlocks(lines: string[]): Block[] {
   const blocks: Block[] = [];
@@ -49,6 +52,7 @@ export function parseBlocks(lines: string[]): Block[] {
     } else if (line === "---") blocks.push({ type: "hr" });
     else if ((m = line.match(IMG))) blocks.push({ type: "img", caption: m[1], src: m[2] });
     else if ((m = line.match(VIDEO))) blocks.push({ type: "video", url: m[1] });
+    else if ((m = line.match(POST))) blocks.push({ type: "post", url: m[1] });
     else blocks.push({ type: "p", text: line });
   }
   return blocks;
@@ -92,6 +96,19 @@ export function videoEmbed(url: string): string | null {
   if (yt) return `https://www.youtube-nocookie.com/embed/${yt[1]}`;
   if (/^https:\/\/(www\.|m\.|web\.)?(facebook\.com|fb\.watch)\//.test(url))
     return `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}&show_text=false`;
+  return null;
+}
+
+// Posts from X, Facebook and Instagram, shown with each site's own embed; anything
+// else stays a link.
+export type Social = { site: "x" | "facebook" | "instagram"; name: string; url: string; id?: string };
+
+export function socialPost(url: string): Social | null {
+  const x = url.match(/^https:\/\/(?:www\.|mobile\.)?(?:x|twitter)\.com\/\w{1,30}\/status(?:es)?\/(\d{5,25})/);
+  if (x) return { site: "x", name: "X", url, id: x[1] };
+  const ig = url.match(/^https:\/\/(?:www\.)?instagram\.com\/(?:[\w.]+\/)?(p|reel|tv)\/([\w-]+)/);
+  if (ig) return { site: "instagram", name: "Instagram", url: `https://www.instagram.com/${ig[1]}/${ig[2]}/` };
+  if (/^https:\/\/(?:www\.|m\.|web\.)?facebook\.com\/\S+/.test(url)) return { site: "facebook", name: "Facebook", url };
   return null;
 }
 

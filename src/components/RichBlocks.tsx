@@ -1,5 +1,6 @@
 import { Fragment, type ReactNode } from "react";
-import { Block, parseInline, photoSrc, videoEmbed } from "@/lib/richText";
+import { Block, parseInline, photoSrc, socialPost, videoEmbed } from "@/lib/richText";
+import SocialPost from "./SocialPost";
 
 // One line of text with its bold words and links.
 export function RichLine({ text }: { text: string }) {
@@ -20,7 +21,8 @@ export function RichLine({ text }: { text: string }) {
   );
 }
 
-// A block of article text: paragraph, sub-heading, quote, list, fact box, photo, video or line.
+// A block of article text: paragraph, sub-heading, quote, list, fact box, photo, video,
+// social post or line.
 export function RichBlock({ block }: { block: Block }) {
   switch (block.type) {
     case "p":
@@ -93,6 +95,18 @@ export function RichBlock({ block }: { block: Block }) {
             allowFullScreen
           />
         </div>
+      ) : (
+        <p>
+          <a href={block.url} target="_blank" rel="noopener noreferrer">
+            {block.url}
+          </a>
+        </p>
+      );
+    }
+    case "post": {
+      const post = socialPost(block.url);
+      return post ? (
+        <SocialPost post={post} />
       ) : (
         <p>
           <a href={block.url} target="_blank" rel="noopener noreferrer">

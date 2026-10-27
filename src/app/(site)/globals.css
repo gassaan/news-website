@@ -2064,6 +2064,40 @@ ol.rt-list {
   height: 100%;
   border: 0;
 }
+/* A post from X, Facebook or Instagram, centred at its site's usual width. Before its
+   site's embed arrives (or if it is blocked) a card links to the post. */
+.rt-post {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 550px;
+  margin: 0 auto 1.4em;
+  break-inside: avoid;
+}
+.rt-post > blockquote,
+.rt-post .fb-post > blockquote {
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  padding: 26px 22px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: var(--surface);
+  text-align: center;
+  font-size: 0.85em;
+}
+.rt-post blockquote a {
+  color: var(--accent);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.rt-post .fb-post {
+  width: 100%;
+}
+.rt-post iframe {
+  max-width: 100%;
+}
 .rt-hr {
   margin: 0 auto 1.4em;
   width: 40%;

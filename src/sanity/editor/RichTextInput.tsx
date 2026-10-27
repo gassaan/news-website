@@ -13,9 +13,10 @@ import {
   type JSONContent,
   type NodeViewProps,
 } from "@tiptap/react";
+import { TextSelection } from "@tiptap/pm/state";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
-import { parseBlocks, parseInline, photoSrc, plainText, videoEmbed } from "@/lib/richText";
+import { parseBlocks, parseInline, photoSrc, plainText, socialPost, videoEmbed } from "@/lib/richText";
 import { RichBlock } from "@/components/RichBlocks";
 import { photoUrl } from "./inputs";
 
@@ -60,6 +61,8 @@ function toHtml(text: string): string {
           return `<figure data-photo data-src="${esc(b.src)}" data-caption="${esc(b.caption)}"></figure>`;
         case "video":
           return `<div data-video="${esc(b.url)}"></div>`;
+        case "post":
+          return `<div data-post="${esc(b.url)}"></div>`;
         case "hr":
           return "<hr>";
       }
@@ -125,6 +128,9 @@ function toText(doc: JSONContent): string {
       case "video":
         if (b.attrs?.url) out.push(`@[video](${b.attrs.url})`);
         break;
+      case "post":
+        if (b.attrs?.url) out.push(`@[post](${b.attrs.url})`);
+        break;
     }
   }
   return out.join("\n");
@@ -180,6 +186,41 @@ function VideoView({ node, deleteNode, editor }: NodeViewProps) {
   );
 }
 
+// A post from X, Facebook or Instagram: a card with the site's name and the link (the
+// post itself shows in Preview and on the site).
+function PostView({ node, deleteNode, editor }: NodeViewProps) {
+  const url = String(node.attrs.url);
+  const post = socialPost(url);
+  return (
+    <NodeViewWrapper className={`re-post re-post-${post?.site ?? "other"}`} contentEditable={false}>
+      <span className="re-post-icon" aria-hidden="true">
+        {post?.site === "x" ? "𝕏" : post?.site === "facebook" ? "f" : post?.site === "instagram" ? ICONS.instagram : ICONS.social}
+      </span>
+      <span className="re-post-text">
+        <b>{post ? `${post.name} post` : "Post"}</b>
+        <span className="re-post-url">{url}</span>
+      </span>
+      {editor.isEditable && (
+        <button type="button" className="re-x" aria-label="Remove the post" onClick={deleteNode}>
+          ×
+        </button>
+      )}
+    </NodeViewWrapper>
+  );
+}
+
+const Post = Node.create({
+  name: "post",
+  group: "block",
+  atom: true,
+  addAttributes() {
+    return { url: { default: "", parseHTML: (el) => el.getAttribute("data-post") ?? "", renderHTML: (a) => ({ "data-post": a.url }) } };
+  },
+  parseHTML: () => [{ tag: "div[data-post]" }],
+  renderHTML: ({ HTMLAttributes }) => ["div", HTMLAttributes],
+  addNodeView: () => ReactNodeViewRenderer(PostView),
+});
+
 const Photo = Node.create({
   name: "photo",
   group: "block",
@@ -234,6 +275,8 @@ const ICONS = {
   paragraph: <b className="re-glyph">¶</b>,
   photo: <I d="M4 7h3l2-2h6l2 2h3v12H4zM12 16.5a3.5 3.5 0 1 0 0-7a3.5 3.5 0 0 0 0 7z" />,
   video: <I d="M4 6h11v12H4zM15 10l5-3v10l-5-3" />,
+  social: <I d="M18 2.5a2.5 2.5 0 1 1 0 5a2.5 2.5 0 0 1 0-5zM6 9.5a2.5 2.5 0 1 1 0 5a2.5 2.5 0 0 1 0-5zM18 16.5a2.5 2.5 0 1 1 0 5a2.5 2.5 0 0 1 0-5zM8.2 13.2l7.6 4.1M15.8 6.7l-7.6 4.1" />,
+  instagram: <I d="M7 3h10a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4zM12 16a4 4 0 1 0 0-8a4 4 0 0 0 0 8zM17.5 6.5h.01" />,
   divider: <I d="M4 12h16" />,
   box: <I d="M4 5h16v14H4zM12 9v.01M12 12v4" />,
   eye: <I d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12zM12 15a3 3 0 1 0 0-6a3 3 0 0 0 0 6z" />,
@@ -242,7 +285,7 @@ const ICONS = {
 // Keeps the editor's cursor (and the phone's keyboard) while a toolbar button is pressed.
 const keepFocus = (e: MouseEvent | React.PointerEvent) => e.preventDefault();
 
-type Sheet = null | "add" | "link" | "video" | "preview";
+type Sheet = null | "add" | "link" | "video" | "post" | "preview";
 
 function Popup({ scheme, label, onClose, wide, children }: { scheme: string; label: string; onClose: () => void; wide?: boolean; children: ReactNode }) {
   return createPortal(
@@ -323,6 +366,7 @@ export function RichTextInput(props: TextInputProps) {
       Placeholder.configure({ placeholder: "މިތާ ލިޔުއްވާ…" }),
       Photo,
       Video,
+      Post,
       FactBox,
     ],
     content: toHtml(value ?? ""),
@@ -331,6 +375,27 @@ export function RichTextInput(props: TextInputProps) {
       // Keep the line being typed clear of the toolbar at the top.
       scrollMargin: { top: 90, bottom: 40, left: 0, right: 0 },
       scrollThreshold: { top: 90, bottom: 40, left: 0, right: 0 },
+      // A YouTube, Facebook video, X or Instagram link pasted on an empty line becomes the
+      // player or the post straight away.
+      handlePaste: (view, event) => {
+        const pasted = event.clipboardData?.getData("text/plain").trim() ?? "";
+        if (!/^https:\/\/\S+$/.test(pasted)) return false;
+        const { $from, empty } = view.state.selection;
+        if (!empty || $from.parent.type.name !== "paragraph" || $from.parent.content.size > 0 || $from.depth !== 1) return false;
+        const type = videoEmbed(pasted) ? "video" : socialPost(pasted) ? "post" : null;
+        if (!type) return false;
+        const { schema } = view.state;
+        const node = schema.nodes[type].create({ url: pasted });
+        const at = $from.before();
+        const tr = view.state.tr.replaceRangeWith(at, $from.after(), node);
+        // Carry on typing on an empty line under it (never with the new block selected,
+        // where the next key would replace it).
+        const after = at + node.nodeSize;
+        const next = tr.doc.resolve(after).nodeAfter;
+        if (next?.type.name !== "paragraph" || next.content.size > 0) tr.insert(after, schema.nodes.paragraph.create());
+        view.dispatch(tr.setSelection(TextSelection.create(tr.doc, after + 1)).scrollIntoView());
+        return true;
+      },
     },
     onUpdate: ({ editor: ed }) => {
       const next = toText(ed.getJSON());
@@ -407,9 +472,11 @@ export function RichTextInput(props: TextInputProps) {
     const from = e?.currentTarget ?? editor?.view.dom;
     setScheme(from?.closest("[data-scheme]")?.getAttribute("data-scheme") ?? "dark");
     if (which === "link") setUrl(editor?.getAttributes("link").href ?? "");
-    if (which === "video") setUrl("");
+    if (which === "video" || which === "post") setUrl("");
     setSheet(which);
   };
+  // Photos, videos and posts are added with an empty line under them, where typing carries
+  // on (otherwise the new block stays selected and the next key would replace it).
   const run = (fn: (ed: Editor) => void) => {
     if (!editor) return;
     fn(editor);
@@ -422,7 +489,7 @@ export function RichTextInput(props: TextInputProps) {
     setError("");
     try {
       const asset = await client.assets.upload("image", f, { filename: f.name });
-      editor.chain().focus().insertContent({ type: "photo", attrs: { src: asset.url, caption: "" } }).run();
+      editor.chain().focus().insertContent([{ type: "photo", attrs: { src: asset.url, caption: "" } }, { type: "paragraph" }]).run();
     } catch {
       setError("The photo couldn't be uploaded. Check the connection and try again.");
     } finally {
@@ -443,6 +510,7 @@ export function RichTextInput(props: TextInputProps) {
       else ed.chain().focus().extendMarkRange("link").setLink({ href }).run();
     });
   const videoOk = Boolean(videoEmbed(url.trim()));
+  const postOk = Boolean(socialPost(url.trim()));
 
   const blocks: { key: string; dv: string; en: string; icon: ReactNode; on?: boolean; act: (e: MouseEvent<HTMLButtonElement>) => void }[] = [
     { key: "p", dv: "ޕެރެގްރާފް", en: "Paragraph", icon: ICONS.paragraph, act: () => run((ed) => ed.chain().focus().clearNodes().run()) },
@@ -460,6 +528,7 @@ export function RichTextInput(props: TextInputProps) {
       },
     },
     { key: "v", dv: "ވީޑިއޯ", en: "Video", icon: ICONS.video, act: (e) => open("video", e) },
+    { key: "s", dv: "ސޯޝަލް ޕޯސްޓް", en: "Social post", icon: ICONS.social, act: (e) => open("post", e) },
     { key: "hr", dv: "ލައިނެއް", en: "Divider", icon: ICONS.divider, act: () => run((ed) => ed.chain().focus().setHorizontalRule().run()) },
     { key: "b", dv: "ފެކްޓް ބޮކްސް", en: "Fact box", icon: ICONS.box, on: state?.box, act: () => run((ed) => ed.chain().focus().setParagraph().toggleWrap("factBox").run()) },
   ];
@@ -576,8 +645,21 @@ export function RichTextInput(props: TextInputProps) {
           <input className="re-url" type="url" inputMode="url" autoFocus placeholder="YouTube or Facebook video link" value={url} onChange={(e) => setUrl(e.target.value)} />
           {url.trim() && !videoOk && <p className="ef-photo-error">Paste a YouTube or Facebook video link.</p>}
           <div className="re-sheet-actions">
-            <button type="button" className="re-pill re-solid" disabled={!videoOk} onClick={() => run((ed) => ed.chain().focus().insertContent({ type: "video", attrs: { url: url.trim() } }).run())}>
+            <button type="button" className="re-pill re-solid" disabled={!videoOk} onClick={() => run((ed) => ed.chain().focus().insertContent([{ type: "video", attrs: { url: url.trim() } }, { type: "paragraph" }]).run())}>
               Add video
+            </button>
+          </div>
+        </Popup>
+      )}
+
+      {sheet === "post" && (
+        <Popup scheme={scheme} label="Add a social post" onClose={() => setSheet(null)}>
+          <input className="re-url" type="url" inputMode="url" autoFocus placeholder="X, Facebook or Instagram post link" value={url} onChange={(e) => setUrl(e.target.value)} />
+          {url.trim() && !postOk && <p className="ef-photo-error">Paste the link of a post on X, Facebook or Instagram.</p>}
+          <p className="ef-note">On the post, tap Share → Copy link, then paste it here.</p>
+          <div className="re-sheet-actions">
+            <button type="button" className="re-pill re-solid" disabled={!postOk} onClick={() => run((ed) => ed.chain().focus().insertContent([{ type: "post", attrs: { url: url.trim() } }, { type: "paragraph" }]).run())}>
+              Add post
             </button>
           </div>
         </Popup>

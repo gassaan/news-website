@@ -1090,6 +1090,51 @@
   text-overflow: ellipsis;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
 }
+/* A social post inside the text: the site's mark, its name and the link */
+.re-post {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 14px 14px 52px;
+  border-radius: 14px;
+  border: 1px solid var(--ef-edge);
+  background: color-mix(in srgb, #8f66f0 8%, transparent);
+}
+.re-post-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #1c0c45;
+  color: #fff;
+  font: 700 22px/1 Inter, sans-serif;
+}
+.re-post-facebook .re-post-icon {
+  background: #1877f2;
+}
+.re-post-instagram .re-post-icon {
+  background: linear-gradient(45deg, #f9a43a, #e1306c 55%, #8a3ab9);
+}
+.re-post-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  font: 700 14px Inter, sans-serif;
+  color: var(--ef-text);
+}
+.re-post-url {
+  direction: ltr;
+  text-align: right;
+  font: 500 11px Inter, sans-serif;
+  color: var(--ef-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 /* Under the text: Add, Preview and the word count */
 .re-foot {
   display: flex;
