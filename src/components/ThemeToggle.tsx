@@ -4,32 +4,6 @@ import { useState } from "react";
 
 // Safari's top bar colour for each look: the header's colour (layout.tsx theme-color).
 const BAR = { dark: "#150735", light: "#3e2180" };
-// How long the page fades (globals.css, view-transition), and CSS's "ease" curve, so the
-// phone's bars can fade in step with it.
-const FADE_MS = 450;
-function ease(x: number): number {
-  // cubic-bezier(0.25, 0.1, 0.25, 1): find the curve's t for this x, then its y.
-  const bez = (t: number, a: number, b: number) => 3 * a * t * (1 - t) ** 2 + 3 * b * t * t * (1 - t) + t ** 3;
-  let lo = 0;
-  let hi = 1;
-  for (let i = 0; i < 20; i++) {
-    const mid = (lo + hi) / 2;
-    if (bez(mid, 0.25, 0.25) < x) lo = mid;
-    else hi = mid;
-  }
-  return bez((lo + hi) / 2, 0.1, 1);
-}
-const mix = (from: string, to: string, k: number) =>
-  "#" +
-  [1, 3, 5]
-    .map((i) => {
-      const a = parseInt(from.slice(i, i + 2), 16);
-      const b = parseInt(to.slice(i, i + 2), 16);
-      return Math.round(a + (b - a) * k)
-        .toString(16)
-        .padStart(2, "0");
-    })
-    .join("");
 
 export default function ThemeToggle({ className = "" }: { className?: string }) {
   // The sun or moon spins in when tapped (not when the page first opens).
@@ -42,11 +16,9 @@ export default function ThemeToggle({ className = "" }: { className?: string }) 
       root.getAttribute("data-theme") ||
       (window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
     const next = current === "light" ? "dark" : "light";
-    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    // The phone's bars (Safari's top and bottom) follow the site's choice, not only the
-    // phone's setting: a first theme-color of its own, ahead of the layout's two (see
-    // layout.tsx). Its colour fades frame by frame in step with the page, so the bars
-    // change together with it (not at once, nor after the fade).
+    root.setAttribute("data-theme", next);
+    // The phone's bar (Safari's) follows the site's choice, not only the phone's setting:
+    // a first theme-color of its own, ahead of the layout's two (see layout.tsx).
     let bar = document.getElementById("site-bar") as HTMLMetaElement | null;
     if (!bar) {
       bar = document.createElement("meta");
@@ -54,32 +26,11 @@ export default function ThemeToggle({ className = "" }: { className?: string }) 
       bar.id = "site-bar";
       document.head.prepend(bar);
     }
-    const meta = bar;
-    const from = BAR[current as keyof typeof BAR];
-    const to = BAR[next];
-    const start = performance.now();
-    const step = (now: number) => {
-      const k = still ? 1 : Math.min(1, (now - start) / FADE_MS);
-      meta.content = mix(from, to, ease(k));
-      if (k < 1) requestAnimationFrame(step);
-    };
-    step(start);
-    const apply = () => {
-      root.setAttribute("data-theme", next);
-      try {
-        localStorage.setItem("theme", next);
-      } catch {
-        // ignore (private browsing, storage disabled, etc.)
-      }
-    };
-    // The colours fade from one look to the other: the whole page at once where the
-    // browser can (a view transition), otherwise by fading each colour (globals.css).
-    if (still) apply();
-    else if (document.startViewTransition) document.startViewTransition(apply);
-    else {
-      root.setAttribute("data-theme-fade", "");
-      apply();
-      setTimeout(() => root.removeAttribute("data-theme-fade"), 500);
+    bar.content = BAR[next];
+    try {
+      localStorage.setItem("theme", next);
+    } catch {
+      // ignore (private browsing, storage disabled, etc.)
     }
   }
 
