@@ -1,4 +1,4 @@
-import type { Metadata, Viewport } from "next";
+import type { Metadata } from "next";
 import { preconnect } from "react-dom";
 import localFont from "next/font/local";
 import Header from "@/components/Header";
@@ -10,7 +10,10 @@ import "./globals.css";
 // its frame can shimmer until then and the picture fades in (globals.css). Runs before
 // any picture is on the page, so none is missed.
 const IMG_WAIT_SCRIPT = `(function(){var d=document;d.documentElement.setAttribute("data-imgwait","");function m(e){var t=e.target;if(t&&t.tagName==="IMG")t.setAttribute(e.type==="load"?"data-ok":"data-bad","");}d.addEventListener("load",m,true);d.addEventListener("error",m,true);})();`;
-const THEME_INIT_SCRIPT = `(function(){try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark"){document.documentElement.setAttribute("data-theme",t);}}catch(e){}})();`;
+// The saved light/dark choice, before the page shows. Safari's top bar colour normally
+// follows the phone's setting (theme-color below), so a first theme-color for the saved
+// choice ("site-bar", ahead of those) wins over them. React's own two are left as they are.
+const THEME_INIT_SCRIPT = `(function(){try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark"){document.documentElement.setAttribute("data-theme",t);var m=document.createElement("meta");m.name="theme-color";m.id="site-bar";m.content=t==="dark"?"#150735":"#3e2180";document.head.prepend(m);}}catch(e){}})();`;
 
 const democratsAkBlack = localFont({
   src: "../../fonts/Democrats-AK-Black.woff2",
@@ -51,14 +54,6 @@ const inter = localFont({
   display: "swap",
 });
 
-// Browser bar colour matches the header.
-export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#150735" },
-    { media: "(prefers-color-scheme: light)", color: "#3e2180" },
-  ],
-};
-
 export const metadata: Metadata = {
   title: "Hulhangu",
   description: "ދިވެހި ބަހުން ޚަބަރު ފެތުރުމަށް ހަދާފައިވާ ސައިޓެއް",
@@ -74,6 +69,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
       className={`${democratsAkBlack.variable} ${democratsAkuruBold.variable} ${democratsAkuruRegular.variable} ${magRound.variable} ${inter.variable} h-full antialiased`}
     >
+      <head>
+        {/* Browser bar colour, the same as the header (ThemeToggle's BAR), following the
+            phone's setting. Written here rather than with Next's themeColor, which puts it
+            back on every page change, ahead of the site's own choice ("site-bar"). */}
+        <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#150735" />
+        <meta name="theme-color" media="(prefers-color-scheme: light)" content="#3e2180" />
+      </head>
       <body className="bg-ground text-text font-body flex min-h-full flex-col font-bold">
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: IMG_WAIT_SCRIPT }} />

@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 
+// Safari's top bar colour for each look: the header's colour (layout.tsx theme-color).
+const BAR = { dark: "#150735", light: "#3e2180" };
+
 export default function ThemeToggle({ className = "" }: { className?: string }) {
   // The sun or moon spins in when tapped (not when the page first opens).
   const [tapped, setTapped] = useState(false);
@@ -15,6 +18,16 @@ export default function ThemeToggle({ className = "" }: { className?: string }) 
     const next = current === "light" ? "dark" : "light";
     const apply = () => {
       root.setAttribute("data-theme", next);
+      // The top bar follows the site's choice, not only the phone's setting: a first
+      // theme-color of its own, ahead of the layout's two (see layout.tsx).
+      let bar = document.getElementById("site-bar") as HTMLMetaElement | null;
+      if (!bar) {
+        bar = document.createElement("meta");
+        bar.name = "theme-color";
+        bar.id = "site-bar";
+        document.head.prepend(bar);
+      }
+      bar.content = BAR[next];
       try {
         localStorage.setItem("theme", next);
       } catch {

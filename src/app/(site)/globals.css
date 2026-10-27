@@ -419,6 +419,17 @@ a {
   animation-duration: 0.45s;
   animation-timing-function: ease;
 }
+/* The button itself stays out of the fade (the old sun would show through the new
+   moon): its new icon shows at once and does only its own spin. */
+.theme-toggle {
+  view-transition-name: theme-toggle;
+}
+::view-transition-old(theme-toggle) {
+  display: none;
+}
+::view-transition-new(theme-toggle) {
+  animation: none;
+}
 :root[data-theme-fade] *,
 :root[data-theme-fade] *::before,
 :root[data-theme-fade] *::after {
