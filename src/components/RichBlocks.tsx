@@ -96,11 +96,7 @@ export function RichBlock({ block }: { block: Block }) {
           />
         </div>
       ) : (
-        <p>
-          <a href={block.url} target="_blank" rel="noopener noreferrer">
-            {block.url}
-          </a>
-        </p>
+        <FallbackLink url={block.url} />
       );
     }
     case "post": {
@@ -108,14 +104,26 @@ export function RichBlock({ block }: { block: Block }) {
       return post ? (
         <SocialPost post={post} />
       ) : (
-        <p>
-          <a href={block.url} target="_blank" rel="noopener noreferrer">
-            {block.url}
-          </a>
-        </p>
+        <FallbackLink url={block.url} />
       );
     }
     case "hr":
       return <hr className="rt-hr" />;
   }
+}
+
+// A video or post link that can't be shown as one: a plain link, but only to a web
+// address (http/https); anything else (javascript:, data:…) stays as text.
+function FallbackLink({ url }: { url: string }) {
+  return (
+    <p>
+      {/^https?:\/\//i.test(url) ? (
+        <a href={url} target="_blank" rel="noopener noreferrer">
+          {url}
+        </a>
+      ) : (
+        url
+      )}
+    </p>
+  );
 }

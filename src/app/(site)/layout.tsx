@@ -76,6 +76,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         {/* Browser bar colour, the same as the header (ThemeToggle's BAR), following the
             phone's setting. Written here rather than with Next's themeColor, which puts it
             back on every page change, ahead of the site's own choice ("site-bar"). */}
+        {/* Browser protections that a page can declare itself (GitHub Pages can't send
+            security headers): no plugins, the page's own base address only, forms only
+            to this site, and every request over a secure connection. */}
+        <meta
+          httpEquiv="Content-Security-Policy"
+          content="object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests"
+        />
         <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#150735" />
         <meta name="theme-color" media="(prefers-color-scheme: light)" content="#3e2180" />
       </head>

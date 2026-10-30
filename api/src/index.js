@@ -10,7 +10,7 @@ const DOC_ID = /^[A-Za-z0-9][A-Za-z0-9._-]{0,99}$/;
 const VOTER = /^[A-Za-z0-9-]{16,64}$/;
 
 // Requests allowed per reader per hour, by action.
-const LIMITS = { view: 600, vote: 60, rate: 120, like: 300, comment: 6 };
+const LIMITS = { view: 600, vote: 60, rate: 120, like: 300, comment: 6, voiceDenied: 60 };
 
 // Days are counted in Maldives time (UTC+5), so "today" starts at local midnight.
 const MV_MS = 5 * 3600000;
@@ -27,6 +27,10 @@ function cors(request, env) {
     "Access-Control-Allow-Headers": "Content-Type, Authorization",
     "Access-Control-Max-Age": "86400",
     Vary: "Origin",
+    // Answers are data only: never to be guessed into another type, and the reader's
+    // page address isn't passed on from here.
+    "X-Content-Type-Options": "nosniff",
+    "Referrer-Policy": "no-referrer",
   };
 }
 
@@ -93,10 +97,21 @@ const VOICE_MAX = 20000000;
 // through the list doesn't ask Sanity every time.
 const voiceAdmins = new Map();
 
-async function voiceAdmin(request, env) {
+function bearer(request) {
   const auth = request.headers.get("Authorization") ?? "";
   const token = auth.startsWith("Bearer ") ? auth.slice(7).trim() : "";
-  if (!token || token.length > 500) return false;
+  return token && token.length <= 500 ? token : "";
+}
+
+// An administrator login this service already confirmed recently.
+async function knownAdmin(request) {
+  const token = bearer(request);
+  return Boolean(token) && (voiceAdmins.get(await sha256(token)) ?? 0) > Date.now();
+}
+
+async function voiceAdmin(request, env) {
+  const token = bearer(request);
+  if (!token) return false;
   const id = await sha256(token);
   if ((voiceAdmins.get(id) ?? 0) > Date.now()) return true;
   try {
@@ -114,7 +129,21 @@ async function voiceAdmin(request, env) {
 }
 
 async function voice(request, env, path, h) {
-  if (!(await voiceAdmin(request, env))) return json({ error: "not allowed" }, 403, h);
+  // Refused logins are counted per reader: past the hourly limit, the next tries are
+  // turned away before asking Sanity, so nobody can keep guessing (or keep this service
+  // busy asking Sanity). Each refusal is noted in the service's logs. The administrator,
+  // once confirmed, always gets in (many readers share one address).
+  const who = await reader(request, env);
+  const denied = await env.DB.prepare("SELECT n FROM hits WHERE key = ?1").bind(`voiceDenied|${who}|${hour()}`).first();
+  if ((denied?.n ?? 0) >= LIMITS.voiceDenied && !(await knownAdmin(request))) {
+    console.warn(JSON.stringify({ event: "voice-denied", reader: who, path, limited: true }));
+    return json({ error: "slow down" }, 429, h);
+  }
+  if (!(await voiceAdmin(request, env))) {
+    await allow(env, who, "voiceDenied");
+    console.warn(JSON.stringify({ event: "voice-denied", reader: who, path }));
+    return json({ error: "not allowed" }, 403, h);
+  }
   const key = new URL(request.url).searchParams.get("key") ?? "";
 
   if (request.method === "GET" && path === "/voice/clips") {
@@ -436,7 +465,10 @@ async function handle(request, env) {
   const who = await reader(request, env);
   const action = { "/view": "view", "/vote": "vote", "/rate": "rate", "/like": "like", "/comment": "comment" }[path];
   if (!action) return json({ error: "not found" }, 404, h);
-  if (!(await allow(env, who, action))) return json({ error: "slow down" }, 429, h);
+  if (!(await allow(env, who, action))) {
+    console.warn(JSON.stringify({ event: "rate-limited", reader: who, action }));
+    return json({ error: "slow down" }, 429, h);
+  }
 
   if (action === "view") {
     const slug = String(data.slug ?? "");

@@ -12,9 +12,15 @@ database_id = "00000000-0000-0000-0000-000000000000"
 [vars]
 SANITY_PROJECT = "b2549qo6"
 SANITY_DATASET = "production"
-ALLOWED_ORIGINS = "https://gassaan.github.io,http://localhost:3000,http://localhost:4567"
+# Only the live site may use the service from a browser (and hulhangu.com once it moves).
+ALLOWED_ORIGINS = "https://gassaan.github.io,https://hulhangu.com,https://www.hulhangu.com"
 
 # Once a day: forget yesterday's "already counted" marks (must match DAILY_CRON).
 # Every hour: refresh the readers numbers for the editors' dashboard.
 [triggers]
 crons = ["17 3 * * *", "7 * * * *"]
+
+# Keep the service's logs (errors, refused voice logins, rate limits) for looking into
+# anything unusual. Included in Cloudflare's free plan.
+[observability]
+enabled = true
