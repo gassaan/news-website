@@ -14,75 +14,48 @@ type ApiCounts = { up?: number; down?: number; love?: number; sad?: number; haha
 const fromApi = (c?: ApiCounts): Counts => ({ like: c?.up ?? 0, dislike: c?.down ?? 0, love: c?.love ?? 0, sad: c?.sad ?? 0, haha: c?.haha ?? 0 });
 
 const THUMB = "M2 10.5A1.5 1.5 0 0 1 3.5 9h2A1.5 1.5 0 0 1 7 10.5v9A1.5 1.5 0 0 1 5.5 21h-2A1.5 1.5 0 0 1 2 19.5zM9 10l3.6-7a2.4 2.4 0 0 1 4.3 1.9L15.9 9h4.2a2 2 0 0 1 2 2.4l-1.5 7.9A2.6 2.6 0 0 1 18 21H9z";
-const face = (mouth: string) => (
-  <>
-    <circle cx="12" cy="12" r="7.6" fill="none" stroke="#fff" strokeWidth="1.6" />
-    <circle cx="9.3" cy="10.3" r="1.05" fill="#fff" />
-    <circle cx="14.7" cy="10.3" r="1.05" fill="#fff" />
-    <path d={mouth} fill="none" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" />
-  </>
-);
-// The picker's order, left to right.
-const REACTIONS: { key: Reaction; value: number; label: string; glyph: ReactNode }[] = [
-  {
-    key: "dislike",
-    value: -1,
-    label: "ނުރުހުން",
-    glyph: <path fill="#fff" d="M22 13.5A1.5 1.5 0 0 1 20.5 15h-2a1.5 1.5 0 0 1-1.5-1.5v-9A1.5 1.5 0 0 1 18.5 3h2A1.5 1.5 0 0 1 22 4.5zM15 14l-3.6 7a2.4 2.4 0 0 1-4.3-1.9L8.1 15H3.9a2 2 0 0 1-2-2.4l1.5-7.9A2.6 2.6 0 0 1 6 3h9z" />,
-  },
-  {
-    key: "like",
-    value: 1,
-    label: "ލައިކް",
-    glyph: <path fill="#fff" d={THUMB} />,
-  },
-  {
-    key: "love",
-    value: 2,
-    label: "ލޯބި",
-    glyph: <path fill="#fff" d="M12 20.3s-7.4-4.5-9-9.1C1.9 7.9 4 4.6 7.3 4.6c1.9 0 3.5 1 4.7 2.7 1.2-1.7 2.8-2.7 4.7-2.7 3.3 0 5.4 3.3 4.3 6.6-1.6 4.6-9 9.1-9 9.1z" />,
-  },
-  { key: "sad", value: 3, label: "ހިތާމަ", glyph: face("M9 16c.8-1 1.8-1.5 3-1.5s2.2.5 3 1.5") },
-  { key: "haha", value: 4, label: "ހިނިގަނޑު", glyph: face("M8.8 13.6c.8 1.3 1.9 1.9 3.2 1.9s2.4-.6 3.2-1.9") },
+const HEART = "M12 20.3s-7.4-4.5-9-9.1C1.9 7.9 4 4.6 7.3 4.6c1.9 0 3.5 1 4.7 2.7 1.2-1.7 2.8-2.7 4.7-2.7 3.3 0 5.4 3.3 4.3 6.6-1.6 4.6-9 9.1-9 9.1z";
+const MOUTH = { sad: "M9 16c.8-1 1.8-1.5 3-1.5s2.2.5 3 1.5", haha: "M8.8 13.6c.8 1.3 1.9 1.9 3.2 1.9s2.4-.6 3.2-1.9" };
+
+// Top to bottom in the reactions card.
+const REACTIONS: { key: Reaction; value: number; label: string }[] = [
+  { key: "like", value: 1, label: "ލައިކް" },
+  { key: "love", value: 2, label: "ލޯބި" },
+  { key: "haha", value: 4, label: "ހިނިގަނޑު" },
+  { key: "sad", value: 3, label: "ހިތާމަ" },
+  { key: "dislike", value: -1, label: "ނުރުހުން" },
 ];
 const byKey = Object.fromEntries(REACTIONS.map((r) => [r.key, r])) as Record<Reaction, (typeof REACTIONS)[number]>;
 
-// One reaction as its round coloured badge.
-function ReactionBadge({ r, size = 34 }: { r: Reaction; size?: number }) {
+// A reaction's sign, drawn in the text colour: as a line, or filled for your own.
+function Glyph({ r, size, solid = false }: { r: Reaction; size: number; solid?: boolean }) {
+  const line = { fill: "none", stroke: "currentColor", strokeWidth: 1.7, strokeLinecap: "round", strokeLinejoin: "round" } as const;
+  const paint = solid ? { fill: "currentColor" } : line;
+  let body: ReactNode;
+  if (r === "like") body = <path d={THUMB} {...paint} />;
+  else if (r === "dislike") body = <path d={THUMB} transform="rotate(180 12 12)" {...paint} />;
+  else if (r === "love") body = <path d={HEART} {...paint} />;
+  else
+    body = (
+      <>
+        <circle cx="12" cy="12" r="7.6" {...line} />
+        <circle cx="9.3" cy="10.3" r="1.1" fill="currentColor" />
+        <circle cx="14.7" cy="10.3" r="1.1" fill="currentColor" />
+        <path d={MOUTH[r]} {...line} />
+      </>
+    );
   return (
-    <span className={`rx rx-${r}`} style={{ width: size, height: size }} aria-hidden="true">
-      <svg width={size * 0.55} height={size * 0.55} viewBox="0 0 24 24">
-        {byKey[r].glyph}
-      </svg>
-    </span>
+    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
+      {body}
+    </svg>
   );
 }
 
-// The reactions a comment has, most used first, each with its count above it.
-function ReactionSummary({ counts }: { counts: Counts }) {
-  const used = REACTIONS.filter((r) => (counts[r.key] ?? 0) > 0).sort((a, b) => (counts[b.key] ?? 0) - (counts[a.key] ?? 0));
-  if (!used.length) return null;
-  return (
-    <ul className="rx-sum" dir="ltr" aria-label="ރިއެކްޝަންތައް">
-      {used.map((r) => (
-        <li key={r.key} title={r.label}>
-          <span className="rx-n">{counts[r.key]}</span>
-          <ReactionBadge r={r.key} />
-          <span className="sr-only">{r.label}</span>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-// The reaction button: a tap likes (or takes your reaction back); holding it, or
-// hovering with a mouse, opens the picker with all five.
-function ReactButton({ mine, onReact }: { mine: VoteState; onReact: (v: VoteState) => void }) {
+// The reactions pill: your reaction (or a thumb) and the total. Tapping it opens a
+// small card like the site's polls: a row per reaction, with a bar and its count.
+function ReactPill({ counts, mine, onReact }: { counts: Counts; mine: VoteState; onReact: (v: VoteState) => void }) {
   const [open, setOpen] = useState(false);
   const wrap = useRef<HTMLDivElement>(null);
-  const hold = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const hover = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const held = useRef(false);
 
   useEffect(() => {
     if (!open) return;
@@ -97,94 +70,52 @@ function ReactButton({ mine, onReact }: { mine: VoteState; onReact: (v: VoteStat
       document.removeEventListener("keydown", esc);
     };
   }, [open]);
-  useEffect(
-    () => () => {
-      if (hold.current) clearTimeout(hold.current);
-      if (hover.current) clearTimeout(hover.current);
-    },
-    [],
-  );
 
-  const mouse = () => typeof window !== "undefined" && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-  const pick = (r: Reaction) => {
-    onReact(mine === r ? null : r);
-    setOpen(false);
-  };
+  const total = REACTIONS.reduce((n, r) => n + (counts[r.key] ?? 0), 0);
+  const most = Math.max(1, ...REACTIONS.map((r) => counts[r.key] ?? 0));
 
   return (
-    <div
-      className="react"
-      ref={wrap}
-      onMouseEnter={() => {
-        if (!mouse()) return;
-        if (hover.current) clearTimeout(hover.current);
-        hover.current = setTimeout(() => setOpen(true), 450);
-      }}
-      onMouseLeave={() => {
-        if (!mouse()) return;
-        if (hover.current) clearTimeout(hover.current);
-        hover.current = setTimeout(() => setOpen(false), 350);
-      }}
-    >
+    <div className="react" ref={wrap}>
       {open && (
-        <div className="rx-pick" role="menu" dir="ltr">
-          {REACTIONS.map((r) => (
-            <button
-              key={r.key}
-              type="button"
-              role="menuitemradio"
-              aria-checked={mine === r.key}
-              aria-label={r.label}
-              className={mine === r.key ? "on" : ""}
-              onClick={() => pick(r.key)}
-            >
-              <ReactionBadge r={r.key} size={44} />
-            </button>
-          ))}
+        <div className="react-poll" role="menu" aria-label="ރިއެކްޝަން">
+          {REACTIONS.map((r) => {
+            const n = counts[r.key] ?? 0;
+            const on = mine === r.key;
+            return (
+              <button
+                key={r.key}
+                type="button"
+                role="menuitemradio"
+                aria-checked={on}
+                aria-label={`${r.label} ${n}`}
+                className={`react-row ${on ? "on" : ""}`}
+                onClick={() => {
+                  onReact(on ? null : r.key);
+                  setOpen(false);
+                }}
+              >
+                <i style={{ width: `${(n / most) * 82}%` }} />
+                <span className="react-c">
+                  <Glyph r={r.key} size={14} solid={on} />
+                </span>
+                <b>{n}</b>
+              </button>
+            );
+          })}
         </div>
       )}
       <button
         type="button"
-        className={`react-btn ${mine ? "is-on" : ""}`}
-        aria-label={mine ? byKey[mine].label : byKey.like.label}
-        aria-pressed={Boolean(mine)}
+        className="react-pill"
         aria-haspopup="menu"
         aria-expanded={open}
-        onPointerDown={(e) => {
-          held.current = false;
-          if (e.pointerType === "mouse") return;
-          if (hold.current) clearTimeout(hold.current);
-          hold.current = setTimeout(() => {
-            held.current = true;
-            setOpen(true);
-          }, 420);
-        }}
-        onPointerUp={() => hold.current && clearTimeout(hold.current)}
-        onPointerLeave={() => hold.current && clearTimeout(hold.current)}
-        onPointerCancel={() => hold.current && clearTimeout(hold.current)}
-        onContextMenu={(e) => e.preventDefault()}
-        onKeyDown={(e) => {
-          if (e.key === "ArrowUp" || e.key === "ArrowDown") {
-            e.preventDefault();
-            setOpen(true);
-          }
-        }}
-        onClick={() => {
-          if (held.current) {
-            held.current = false;
-            return;
-          }
-          setOpen(false);
-          onReact(mine ? null : "like");
-        }}
+        aria-label={`${mine ? byKey[mine].label : "ރިއެކްޝަން"} ${total}`}
+        onClick={() => setOpen((o) => !o)}
       >
-        {mine ? (
-          <ReactionBadge r={mine} size={44} />
-        ) : (
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d={THUMB} />
-          </svg>
-        )}
+        <span className={`react-disc ${mine ? "on" : ""}`} key={mine ?? "none"}>
+          <Glyph r={mine ?? "like"} size={20} solid={Boolean(mine)} />
+        </span>
+        <b>{total}</b>
       </button>
     </div>
   );
@@ -569,7 +500,7 @@ export default function CommentSection({
             <article className="comment" key={c.id}>
               <header>
                 <strong>{c.author}</strong>
-                <ReactionSummary counts={countsOf(c)} />
+                
               </header>
               <p>{c.text}</p>
               <div className="c-foot">
@@ -583,7 +514,7 @@ export default function CommentSection({
                 >
                   <ReplyIcon />
                 </button>
-                <ReactButton mine={votes[c.id] ?? null} onReact={(v) => setVote(c.id, v)} />
+                <ReactPill counts={countsOf(c)} mine={votes[c.id] ?? null} onReact={(v) => setVote(c.id, v)} />
                 <time>{c.timeAgo}</time>
               </div>
 
@@ -604,7 +535,7 @@ export default function CommentSection({
                       </span>
                       {r.author}
                     </strong>
-                    <ReactionSummary counts={countsOf(r)} />
+                    
                   </header>
                   <p>{r.text}</p>
                   <div className="c-foot">
@@ -616,7 +547,7 @@ export default function CommentSection({
                     >
                       <ReplyIcon />
                     </button>
-                    <ReactButton mine={votes[r.id] ?? null} onReact={(v) => setVote(r.id, v)} />
+                    <ReactPill counts={countsOf(r)} mine={votes[r.id] ?? null} onReact={(v) => setVote(r.id, v)} />
                     <time>{r.timeAgo}</time>
                   </div>
                 </article>
