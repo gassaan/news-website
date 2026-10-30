@@ -1,11 +1,194 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Comment } from "@/lib/articles";
 import { apiGet, apiOn, apiPost, remember, timeAgo, voterId } from "@/lib/api";
 import project from "@/sanity/project.json";
 
-type VoteState = "like" | "dislike" | null;
+// Reactions on comments, one per device. The service stores them as numbers (and
+// still calls likes and dislikes "up" and "down").
+type Reaction = "dislike" | "like" | "love" | "sad" | "haha";
+type VoteState = Reaction | null;
+type Counts = Partial<Record<Reaction, number>>;
+type ApiCounts = { up?: number; down?: number; love?: number; sad?: number; haha?: number };
+const fromApi = (c?: ApiCounts): Counts => ({ like: c?.up ?? 0, dislike: c?.down ?? 0, love: c?.love ?? 0, sad: c?.sad ?? 0, haha: c?.haha ?? 0 });
+
+const THUMB = "M2 10.5A1.5 1.5 0 0 1 3.5 9h2A1.5 1.5 0 0 1 7 10.5v9A1.5 1.5 0 0 1 5.5 21h-2A1.5 1.5 0 0 1 2 19.5zM9 10l3.6-7a2.4 2.4 0 0 1 4.3 1.9L15.9 9h4.2a2 2 0 0 1 2 2.4l-1.5 7.9A2.6 2.6 0 0 1 18 21H9z";
+const face = (mouth: string) => (
+  <>
+    <circle cx="12" cy="12" r="7.6" fill="none" stroke="#fff" strokeWidth="1.6" />
+    <circle cx="9.3" cy="10.3" r="1.05" fill="#fff" />
+    <circle cx="14.7" cy="10.3" r="1.05" fill="#fff" />
+    <path d={mouth} fill="none" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" />
+  </>
+);
+// The picker's order, left to right.
+const REACTIONS: { key: Reaction; value: number; label: string; glyph: ReactNode }[] = [
+  {
+    key: "dislike",
+    value: -1,
+    label: "ނުރުހުން",
+    glyph: <path fill="#fff" d="M22 13.5A1.5 1.5 0 0 1 20.5 15h-2a1.5 1.5 0 0 1-1.5-1.5v-9A1.5 1.5 0 0 1 18.5 3h2A1.5 1.5 0 0 1 22 4.5zM15 14l-3.6 7a2.4 2.4 0 0 1-4.3-1.9L8.1 15H3.9a2 2 0 0 1-2-2.4l1.5-7.9A2.6 2.6 0 0 1 6 3h9z" />,
+  },
+  {
+    key: "like",
+    value: 1,
+    label: "ލައިކް",
+    glyph: <path fill="#fff" d={THUMB} />,
+  },
+  {
+    key: "love",
+    value: 2,
+    label: "ލޯބި",
+    glyph: <path fill="#fff" d="M12 20.3s-7.4-4.5-9-9.1C1.9 7.9 4 4.6 7.3 4.6c1.9 0 3.5 1 4.7 2.7 1.2-1.7 2.8-2.7 4.7-2.7 3.3 0 5.4 3.3 4.3 6.6-1.6 4.6-9 9.1-9 9.1z" />,
+  },
+  { key: "sad", value: 3, label: "ހިތާމަ", glyph: face("M9 16c.8-1 1.8-1.5 3-1.5s2.2.5 3 1.5") },
+  { key: "haha", value: 4, label: "ހިނިގަނޑު", glyph: face("M8.8 13.6c.8 1.3 1.9 1.9 3.2 1.9s2.4-.6 3.2-1.9") },
+];
+const byKey = Object.fromEntries(REACTIONS.map((r) => [r.key, r])) as Record<Reaction, (typeof REACTIONS)[number]>;
+
+// One reaction as its round coloured badge.
+function ReactionBadge({ r, size = 34 }: { r: Reaction; size?: number }) {
+  return (
+    <span className={`rx rx-${r}`} style={{ width: size, height: size }} aria-hidden="true">
+      <svg width={size * 0.55} height={size * 0.55} viewBox="0 0 24 24">
+        {byKey[r].glyph}
+      </svg>
+    </span>
+  );
+}
+
+// The reactions a comment has, most used first, each with its count above it.
+function ReactionSummary({ counts }: { counts: Counts }) {
+  const used = REACTIONS.filter((r) => (counts[r.key] ?? 0) > 0).sort((a, b) => (counts[b.key] ?? 0) - (counts[a.key] ?? 0));
+  if (!used.length) return null;
+  return (
+    <ul className="rx-sum" dir="ltr" aria-label="ރިއެކްޝަންތައް">
+      {used.map((r) => (
+        <li key={r.key} title={r.label}>
+          <span className="rx-n">{counts[r.key]}</span>
+          <ReactionBadge r={r.key} />
+          <span className="sr-only">{r.label}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+// The reaction button: a tap likes (or takes your reaction back); holding it, or
+// hovering with a mouse, opens the picker with all five.
+function ReactButton({ mine, onReact }: { mine: VoteState; onReact: (v: VoteState) => void }) {
+  const [open, setOpen] = useState(false);
+  const wrap = useRef<HTMLDivElement>(null);
+  const hold = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hover = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const held = useRef(false);
+
+  useEffect(() => {
+    if (!open) return;
+    const away = (e: PointerEvent) => {
+      if (!wrap.current?.contains(e.target as Node)) setOpen(false);
+    };
+    const esc = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    document.addEventListener("pointerdown", away);
+    document.addEventListener("keydown", esc);
+    return () => {
+      document.removeEventListener("pointerdown", away);
+      document.removeEventListener("keydown", esc);
+    };
+  }, [open]);
+  useEffect(
+    () => () => {
+      if (hold.current) clearTimeout(hold.current);
+      if (hover.current) clearTimeout(hover.current);
+    },
+    [],
+  );
+
+  const mouse = () => typeof window !== "undefined" && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+  const pick = (r: Reaction) => {
+    onReact(mine === r ? null : r);
+    setOpen(false);
+  };
+
+  return (
+    <div
+      className="react"
+      ref={wrap}
+      onMouseEnter={() => {
+        if (!mouse()) return;
+        if (hover.current) clearTimeout(hover.current);
+        hover.current = setTimeout(() => setOpen(true), 450);
+      }}
+      onMouseLeave={() => {
+        if (!mouse()) return;
+        if (hover.current) clearTimeout(hover.current);
+        hover.current = setTimeout(() => setOpen(false), 350);
+      }}
+    >
+      {open && (
+        <div className="rx-pick" role="menu" dir="ltr">
+          {REACTIONS.map((r) => (
+            <button
+              key={r.key}
+              type="button"
+              role="menuitemradio"
+              aria-checked={mine === r.key}
+              aria-label={r.label}
+              className={mine === r.key ? "on" : ""}
+              onClick={() => pick(r.key)}
+            >
+              <ReactionBadge r={r.key} size={44} />
+            </button>
+          ))}
+        </div>
+      )}
+      <button
+        type="button"
+        className={`react-btn ${mine ? "is-on" : ""}`}
+        aria-label={mine ? byKey[mine].label : byKey.like.label}
+        aria-pressed={Boolean(mine)}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        onPointerDown={(e) => {
+          held.current = false;
+          if (e.pointerType === "mouse") return;
+          if (hold.current) clearTimeout(hold.current);
+          hold.current = setTimeout(() => {
+            held.current = true;
+            setOpen(true);
+          }, 420);
+        }}
+        onPointerUp={() => hold.current && clearTimeout(hold.current)}
+        onPointerLeave={() => hold.current && clearTimeout(hold.current)}
+        onPointerCancel={() => hold.current && clearTimeout(hold.current)}
+        onContextMenu={(e) => e.preventDefault()}
+        onKeyDown={(e) => {
+          if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+            e.preventDefault();
+            setOpen(true);
+          }
+        }}
+        onClick={() => {
+          if (held.current) {
+            held.current = false;
+            return;
+          }
+          setOpen(false);
+          onReact(mine ? null : "like");
+        }}
+      >
+        {mine ? (
+          <ReactionBadge r={mine} size={44} />
+        ) : (
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d={THUMB} />
+          </svg>
+        )}
+      </button>
+    </div>
+  );
+}
 
 function ReplyIcon() {
   return (
@@ -22,59 +205,6 @@ function ReplyIcon() {
       <path d="M9 14 4 9l5-5" />
       <path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11" />
     </svg>
-  );
-}
-
-function VoteButtons({
-  likes,
-  dislikes,
-  vote,
-  onVote,
-}: {
-  likes: number;
-  dislikes: number;
-  vote: VoteState;
-  onVote: (v: VoteState) => void;
-}) {
-  return (
-    <div className="votes">
-      <button
-        type="button"
-        className="vote"
-        aria-label="Like"
-        aria-pressed={vote === "like"}
-        onClick={() => onVote(vote === "like" ? null : "like")}
-      >
-        <span className="vi">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M2 10.5A1.5 1.5 0 0 1 3.5 9h2A1.5 1.5 0 0 1 7 10.5v9A1.5 1.5 0 0 1 5.5 21h-2A1.5 1.5 0 0 1 2 19.5zM9 10l3.6-7a2.4 2.4 0 0 1 4.3 1.9L15.9 9h4.2a2 2 0 0 1 2 2.4l-1.5 7.9A2.6 2.6 0 0 1 18 21H9z" />
-          </svg>
-        </span>
-        <span className="vn">{likes}</span>
-      </button>
-      <button
-        type="button"
-        className="vote"
-        aria-label="Dislike"
-        aria-pressed={vote === "dislike"}
-        onClick={() => onVote(vote === "dislike" ? null : "dislike")}
-      >
-        <span className="vi">
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.6"
-            strokeLinejoin="round"
-          >
-            <path d="M22 13.5A1.5 1.5 0 0 1 20.5 15h-2a1.5 1.5 0 0 1-1.5-1.5v-9A1.5 1.5 0 0 1 18.5 3h2A1.5 1.5 0 0 1 22 4.5zM15 14l-3.6 7a2.4 2.4 0 0 1-4.3-1.9L8.1 15H3.9a2 2 0 0 1-2-2.4l1.5-7.9A2.6 2.6 0 0 1 6 3h9z" />
-          </svg>
-        </span>
-        <span className="vn">{dislikes}</span>
-      </button>
-    </div>
   );
 }
 
@@ -139,7 +269,7 @@ export default function CommentSection({
   // Without the online service the page shows the sample thread, as before.
   const [comments, setComments] = useState(apiOn ? [] : initialComments);
   const [votes, setVotes] = useState<Record<string, VoteState>>({});
-  const [counts, setCounts] = useState<Record<string, { up: number; down: number }>>({});
+  const [counts, setCounts] = useState<Record<string, Counts>>({});
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [text, setText] = useState("");
@@ -178,14 +308,12 @@ export default function CommentSection({
       const mine: Record<string, VoteState> = {};
       for (const id of ids) {
         const v = remember(`hulhangu-like:${id}`);
-        if (v === "like" || v === "dislike") mine[id] = v;
+        if (v && v in byKey) mine[id] = v as Reaction;
       }
       setVotes(mine);
       for (let i = 0; i < ids.length; i += 100) {
-        const got = await apiGet<Record<string, { up: number; down: number }>>(
-          `/likes?ids=${ids.slice(i, i + 100).join(",")}`,
-        );
-        if (got) setCounts((prev) => ({ ...prev, ...got }));
+        const got = await apiGet<Record<string, ApiCounts>>(`/likes?ids=${ids.slice(i, i + 100).join(",")}`);
+        if (got) setCounts((prev) => ({ ...prev, ...Object.fromEntries(Object.entries(got).map(([k, c]) => [k, fromApi(c)])) }));
       }
     });
   }, [target, kind, pendingKey]);
@@ -195,21 +323,29 @@ export default function CommentSection({
     return `${prefix}-${nextId.current}`;
   }
 
-  function likesOf(c: Comment) {
+  function countsOf(c: Comment): Counts {
     const v = votes[c.id] ?? null;
-    if (apiOn) return { up: counts[c.id]?.up ?? 0, down: counts[c.id]?.down ?? 0 };
-    return { up: c.likes + (v === "like" ? 1 : 0), down: c.dislikes + (v === "dislike" ? 1 : 0) };
+    if (apiOn) return counts[c.id] ?? {};
+    return { like: c.likes + (v === "like" ? 1 : 0), dislike: c.dislikes + (v === "dislike" ? 1 : 0), ...(v && v !== "like" && v !== "dislike" ? { [v]: 1 } : {}) };
   }
 
   function setVote(id: string, v: VoteState) {
+    const before = votes[id] ?? null;
     setVotes((prev) => ({ ...prev, [id]: v }));
     if (!apiOn || id.startsWith("local")) return;
+    // Shown at once; the service's count replaces it when it answers.
+    setCounts((prev) => {
+      const c = { ...(prev[id] ?? {}) };
+      if (before) c[before] = Math.max(0, (c[before] ?? 0) - 1);
+      if (v) c[v] = (c[v] ?? 0) + 1;
+      return { ...prev, [id]: c };
+    });
     remember(`hulhangu-like:${id}`, v ?? "");
-    apiPost<{ up: number; down: number }>("/like", {
+    apiPost<ApiCounts>("/like", {
       comment: id,
-      value: v === "like" ? 1 : v === "dislike" ? -1 : 0,
+      value: v ? byKey[v].value : 0,
       voter: voterId(),
-    }).then((res) => res && setCounts((prev) => ({ ...prev, [id]: res })));
+    }).then((res) => res && setCounts((prev) => ({ ...prev, [id]: fromApi(res) })));
   }
 
   // Sends a comment or reply to the editors. Returns true when it was received.
@@ -433,7 +569,7 @@ export default function CommentSection({
             <article className="comment" key={c.id}>
               <header>
                 <strong>{c.author}</strong>
-                <time>{c.timeAgo}</time>
+                <ReactionSummary counts={countsOf(c)} />
               </header>
               <p>{c.text}</p>
               <div className="c-foot">
@@ -447,12 +583,8 @@ export default function CommentSection({
                 >
                   <ReplyIcon />
                 </button>
-                <VoteButtons
-                  likes={likesOf(c).up}
-                  dislikes={likesOf(c).down}
-                  vote={votes[c.id] ?? null}
-                  onVote={(v) => setVote(c.id, v)}
-                />
+                <ReactButton mine={votes[c.id] ?? null} onReact={(v) => setVote(c.id, v)} />
+                <time>{c.timeAgo}</time>
               </div>
 
               {replyingTo === c.id && (
@@ -472,7 +604,7 @@ export default function CommentSection({
                       </span>
                       {r.author}
                     </strong>
-                    <time>{r.timeAgo}</time>
+                    <ReactionSummary counts={countsOf(r)} />
                   </header>
                   <p>{r.text}</p>
                   <div className="c-foot">
@@ -484,12 +616,8 @@ export default function CommentSection({
                     >
                       <ReplyIcon />
                     </button>
-                    <VoteButtons
-                      likes={likesOf(r).up}
-                      dislikes={likesOf(r).down}
-                      vote={votes[r.id] ?? null}
-                      onVote={(v) => setVote(r.id, v)}
-                    />
+                    <ReactButton mine={votes[r.id] ?? null} onReact={(v) => setVote(r.id, v)} />
+                    <time>{r.timeAgo}</time>
                   </div>
                 </article>
               ))}

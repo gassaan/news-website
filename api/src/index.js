@@ -408,15 +408,22 @@ async function addComment(env, data) {
   return { ok: true, id };
 }
 
+// Reactions on comments, one per device: -1 dislike, 1 like, 2 love, 3 sad, 4 haha.
+// (Likes and dislikes keep their old names, up and down.)
+const REACTIONS = [-1, 1, 2, 3, 4];
+
 async function likeCounts(env, ids) {
   if (!ids.length) return {};
   const marks = ids.map((_, i) => `?${i + 1}`).join(",");
   const { results } = await env.DB.prepare(
-    `SELECT comment, SUM(value = 1) AS up, SUM(value = -1) AS down FROM comment_votes WHERE comment IN (${marks}) GROUP BY comment`,
+    `SELECT comment, SUM(value = 1) AS up, SUM(value = -1) AS down, SUM(value = 2) AS love, SUM(value = 3) AS sad, SUM(value = 4) AS haha
+     FROM comment_votes WHERE comment IN (${marks}) GROUP BY comment`,
   )
     .bind(...ids)
     .all();
-  return Object.fromEntries(results.map((r) => [r.comment, { up: r.up, down: r.down }]));
+  return Object.fromEntries(
+    results.map((r) => [r.comment, { up: r.up, down: r.down, love: r.love, sad: r.sad, haha: r.haha }]),
+  );
 }
 
 // ---------- Router ----------
@@ -511,7 +518,7 @@ async function handle(request, env) {
     const comment = String(data.comment ?? "");
     const value = Number(data.value);
     const voter = String(data.voter ?? "");
-    if (!DOC_ID.test(comment) || ![-1, 0, 1].includes(value) || !VOTER.test(voter))
+    if (!DOC_ID.test(comment) || !(value === 0 || REACTIONS.includes(value)) || !VOTER.test(voter))
       return json({ error: "invalid" }, 400, h);
     if (value === 0) {
       await env.DB.prepare("DELETE FROM comment_votes WHERE comment = ?1 AND voter = ?2").bind(comment, voter).run();
@@ -522,7 +529,7 @@ async function handle(request, env) {
         .bind(comment, voter, value)
         .run();
     }
-    return json((await likeCounts(env, [comment]))[comment] ?? { up: 0, down: 0 }, 200, h);
+    return json((await likeCounts(env, [comment]))[comment] ?? { up: 0, down: 0, love: 0, sad: 0, haha: 0 }, 200, h);
   }
 
   // Comment. "website" is a hidden form field only robots fill in.

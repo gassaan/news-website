@@ -13,7 +13,7 @@ for (const f of fs.readdirSync(`${HERE}../migrations`).sort()) db.exec(fs.readFi
 // The parts of Cloudflare's D1 the service uses.
 class Stmt {
   constructor(sql, args = []) {
-    this.sql = sql.replace(/\?(\d+)/g, "?");
+    this.sql = sql; // numbered ?1, ?2 … as D1 takes them (SQLite does too)
     this.args = args;
   }
   bind(...a) {
@@ -103,6 +103,19 @@ check((await post("/comment", "{not json")).status === 400, "broken data is refu
 const sneaky = await post("/comment", { target: "article-1", name: "Ali", text: "hello", _id: "featuredArticles", role: "admin" });
 check(sneaky.status === 200 && writes.length === 1 && !writes[0].includes("featuredArticles") && !writes[0].includes('"role"'), "extra fields in a comment are ignored, and it goes in as an unpublished draft");
 check(writes[0].includes('"_id":"drafts.'), "new comments wait for an editor (drafts)");
+
+// --- Comment reactions: one per device, five kinds, nothing else
+const voter = "device-0123456789abcdef";
+const react = (value, v = voter) => post("/like", { comment: "c-1", value, voter: v });
+check((await react(7)).status === 400, "reactions: an unknown reaction is refused");
+await react(1);
+await react(2, "device-2222222222222222");
+let counts = await (await react(4, "device-3333333333333333")).json();
+check(counts.up === 1 && counts.love === 1 && counts.haha === 1 && counts.down === 0, "reactions: like, love and haha are counted");
+counts = await (await react(3)).json();
+check(counts.up === 0 && counts.sad === 1, "reactions: changing yours moves it, one per device");
+counts = await (await react(0)).json();
+check(counts.sad === 0 && counts.love === 1, "reactions: taking yours back removes it");
 
 // --- Abuse limits
 let last;
