@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "dev": "wrangler dev --local",
-    "deploy": "wrangler deploy"
+    "deploy": "wrangler deploy",
+    "test": "node --no-warnings test/service.test.mjs"
   },
   "devDependencies": {
     "wrangler": "4.153.0"

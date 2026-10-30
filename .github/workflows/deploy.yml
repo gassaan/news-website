@@ -58,6 +58,9 @@ jobs:
         working-directory: api
         run: |
           npm ci
+          # Security tests first (api/test): if any protection is broken, the service
+          # isn't updated (the site still is).
+          npm test
           # The database: created the first time, then its tables brought up to date.
           ID=$(npx wrangler d1 list --json | node -e 'let d="";process.stdin.on("data",c=>d+=c).on("end",()=>console.log((JSON.parse(d).find(x=>x.name==="hulhangu")||{}).uuid||""))')
           if [ -z "$ID" ]; then
