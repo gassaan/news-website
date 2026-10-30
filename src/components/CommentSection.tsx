@@ -1,58 +1,52 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Comment } from "@/lib/articles";
 import { apiGet, apiOn, apiPost, remember, timeAgo, voterId } from "@/lib/api";
 import project from "@/sanity/project.json";
 
-// Reactions on comments, one per device. The service stores them as numbers (and
-// still calls likes and dislikes "up" and "down").
-type Reaction = "dislike" | "like" | "love" | "sad" | "haha";
+// Reactions on comments, one per device: like, love or dislike. The service stores
+// them as numbers (and still calls likes and dislikes "up" and "down").
+type Reaction = "like" | "love" | "dislike";
 type VoteState = Reaction | null;
 type Counts = Partial<Record<Reaction, number>>;
-type ApiCounts = { up?: number; down?: number; love?: number; sad?: number; haha?: number };
-const fromApi = (c?: ApiCounts): Counts => ({ like: c?.up ?? 0, dislike: c?.down ?? 0, love: c?.love ?? 0, sad: c?.sad ?? 0, haha: c?.haha ?? 0 });
+type ApiCounts = { up?: number; down?: number; love?: number };
+const fromApi = (c?: ApiCounts): Counts => ({ like: c?.up ?? 0, love: c?.love ?? 0, dislike: c?.down ?? 0 });
 
-const THUMB = "M2 10.5A1.5 1.5 0 0 1 3.5 9h2A1.5 1.5 0 0 1 7 10.5v9A1.5 1.5 0 0 1 5.5 21h-2A1.5 1.5 0 0 1 2 19.5zM9 10l3.6-7a2.4 2.4 0 0 1 4.3 1.9L15.9 9h4.2a2 2 0 0 1 2 2.4l-1.5 7.9A2.6 2.6 0 0 1 18 21H9z";
-const HEART = "M12 20.3s-7.4-4.5-9-9.1C1.9 7.9 4 4.6 7.3 4.6c1.9 0 3.5 1 4.7 2.7 1.2-1.7 2.8-2.7 4.7-2.7 3.3 0 5.4 3.3 4.3 6.6-1.6 4.6-9 9.1-9 9.1z";
-const MOUTH = { sad: "M9 16c.8-1 1.8-1.5 3-1.5s2.2.5 3 1.5", haha: "M8.8 13.6c.8 1.3 1.9 1.9 3.2 1.9s2.4-.6 3.2-1.9" };
-
-// Top to bottom in the reactions card.
-const REACTIONS: { key: Reaction; value: number; label: string }[] = [
-  { key: "like", value: 1, label: "ލައިކް" },
-  { key: "love", value: 2, label: "ލޯބި" },
-  { key: "haha", value: 4, label: "ހިނިގަނޑު" },
-  { key: "sad", value: 3, label: "ހިތާމަ" },
-  { key: "dislike", value: -1, label: "ނުރުހުން" },
+// Left to right in the reactions strip.
+const REACTIONS: { key: Reaction; value: number; label: string; path: string }[] = [
+  {
+    key: "like",
+    value: 1,
+    label: "ލައިކް",
+    path: "M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z",
+  },
+  {
+    key: "love",
+    value: 2,
+    label: "ލޯބި",
+    path: "M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z",
+  },
+  {
+    key: "dislike",
+    value: -1,
+    label: "ނުރުހުން",
+    path: "M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z",
+  },
 ];
 const byKey = Object.fromEntries(REACTIONS.map((r) => [r.key, r])) as Record<Reaction, (typeof REACTIONS)[number]>;
 
-// A reaction's sign, drawn in the text colour: as a line, or filled for your own.
-function Glyph({ r, size, solid = false }: { r: Reaction; size: number; solid?: boolean }) {
-  const line = { fill: "none", stroke: "currentColor", strokeWidth: 1.7, strokeLinecap: "round", strokeLinejoin: "round" } as const;
-  const paint = solid ? { fill: "currentColor" } : line;
-  let body: ReactNode;
-  if (r === "like") body = <path d={THUMB} {...paint} />;
-  else if (r === "dislike") body = <path d={THUMB} transform="rotate(180 12 12)" {...paint} />;
-  else if (r === "love") body = <path d={HEART} {...paint} />;
-  else
-    body = (
-      <>
-        <circle cx="12" cy="12" r="7.6" {...line} />
-        <circle cx="9.3" cy="10.3" r="1.1" fill="currentColor" />
-        <circle cx="14.7" cy="10.3" r="1.1" fill="currentColor" />
-        <path d={MOUTH[r]} {...line} />
-      </>
-    );
+// A reaction's sign, solid, in the text colour.
+function Glyph({ r, size }: { r: Reaction; size: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
-      {body}
+      <path d={byKey[r].path} fill="currentColor" />
     </svg>
   );
 }
 
 // The reactions pill: your reaction (or a thumb) and the total. Tapping it opens a
-// small card like the site's polls: a row per reaction, with a bar and its count.
+// small strip of the three, each sign with its count; yours in a solid lavender chip.
 function ReactPill({ counts, mine, onReact }: { counts: Counts; mine: VoteState; onReact: (v: VoteState) => void }) {
   const [open, setOpen] = useState(false);
   const wrap = useRef<HTMLDivElement>(null);
@@ -72,12 +66,11 @@ function ReactPill({ counts, mine, onReact }: { counts: Counts; mine: VoteState;
   }, [open]);
 
   const total = REACTIONS.reduce((n, r) => n + (counts[r.key] ?? 0), 0);
-  const most = Math.max(1, ...REACTIONS.map((r) => counts[r.key] ?? 0));
 
   return (
     <div className="react" ref={wrap}>
       {open && (
-        <div className="react-poll" role="menu" aria-label="ރިއެކްޝަން">
+        <div className="react-poll" role="menu" aria-label="ރިއެކްޝަން" dir="ltr">
           {REACTIONS.map((r) => {
             const n = counts[r.key] ?? 0;
             const on = mine === r.key;
@@ -88,16 +81,13 @@ function ReactPill({ counts, mine, onReact }: { counts: Counts; mine: VoteState;
                 role="menuitemradio"
                 aria-checked={on}
                 aria-label={`${r.label} ${n}`}
-                className={`react-row ${on ? "on" : ""}`}
+                className={`react-opt ${on ? "on" : ""}`}
                 onClick={() => {
                   onReact(on ? null : r.key);
                   setOpen(false);
                 }}
               >
-                <i style={{ width: `${(n / most) * 82}%` }} />
-                <span className="react-c">
-                  <Glyph r={r.key} size={14} solid={on} />
-                </span>
+                <Glyph r={r.key} size={22} />
                 <b>{n}</b>
               </button>
             );
@@ -113,7 +103,7 @@ function ReactPill({ counts, mine, onReact }: { counts: Counts; mine: VoteState;
         onClick={() => setOpen((o) => !o)}
       >
         <span className={`react-disc ${mine ? "on" : ""}`} key={mine ?? "none"}>
-          <Glyph r={mine ?? "like"} size={20} solid={Boolean(mine)} />
+          <Glyph r={mine ?? "like"} size={20} />
         </span>
         <b>{total}</b>
       </button>

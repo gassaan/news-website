@@ -3251,15 +3251,12 @@ a.contact-card:hover {
   color: var(--accent);
   transition: transform 0.15s, border-color 0.15s;
 }
-.react-pill b,
-.react-row b {
+.react-pill b {
   font-family: var(--font-latin);
   font-weight: 500;
+  font-size: 15px;
   font-variant-numeric: tabular-nums;
   color: var(--text);
-}
-.react-pill b {
-  font-size: 15px;
 }
 .react-pill:active {
   transform: scale(0.94);
@@ -3280,76 +3277,58 @@ a.contact-card:hover {
   color: #150735;
   animation: react-in 0.25s ease-out;
 }
-/* ...which opens a small card like the polls: a row per reaction, a bar and its count. */
+/* ...which opens a small strip of the three: each sign with its count beside it,
+   yours in a solid lavender chip. */
 .comment > .c-foot {
   position: relative;
 }
 .react-poll {
   position: absolute;
   bottom: calc(100% + 6px);
-  inset-inline-start: -6px;
+  /* Above the pill, on the right (the strip itself reads left to right). */
+  right: -6px;
   z-index: 5;
-  width: 210px;
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 9px;
-  border-radius: 26px;
+  gap: 2px;
+  padding: 6px;
+  border-radius: 999px;
   background: var(--panel);
   border: 1px solid var(--line);
   box-shadow: 0 12px 32px rgba(30, 10, 80, 0.22);
   transform-origin: 100% 100%;
   animation: react-pop 0.18s ease-out;
 }
-.react-row {
-  position: relative;
+.react-opt {
   display: flex;
   align-items: center;
-  gap: 12px;
-  width: 100%;
-  height: 40px;
-  padding: 0 6px;
+  gap: 7px;
+  height: 42px;
+  padding: 0 13px;
   border-radius: 999px;
-  background: var(--panel-in);
-  border: 1px solid var(--line);
   color: var(--accent);
-  overflow: hidden;
-  transition: border-color 0.15s, transform 0.15s;
+  transition: background 0.15s, transform 0.15s;
 }
-.react-row i {
-  position: absolute;
-  inset-block: 0;
-  inset-inline-start: 0;
-  background: rgba(168, 130, 255, 0.16);
-}
-.react-row b {
-  position: relative;
-  margin-inline-start: auto;
-  padding-inline-end: 8px;
+.react-opt b {
+  font-family: var(--font-latin);
+  font-weight: 600;
   font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
 }
-.react-c {
-  position: relative;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: 1.5px solid currentColor;
-  display: grid;
-  place-items: center;
-}
-.react-row.on {
-  border-color: var(--accent-dim);
-}
-.react-row.on .react-c {
+.react-opt.on {
   background: #a882ff;
-  border-color: #a882ff;
   color: #150735;
 }
-.react-row:active {
-  transform: scale(0.97);
+.react-opt.on b {
+  color: #150735;
+}
+.react-opt:active {
+  transform: scale(0.94);
 }
 @media (hover: hover) {
-  .react-row:hover,
+  .react-opt:not(.on):hover {
+    background: rgba(168, 130, 255, 0.14);
+  }
   .react-pill:hover {
     border-color: var(--accent-dim);
   }
