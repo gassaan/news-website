@@ -706,9 +706,7 @@ section {
   top: 0;
   bottom: -20px;
   left: 50%;
-  /* Wider than the screen (computers show the site at 80%, which shrinks 100vw);
-     the page clips what goes past its sides. */
-  width: 200vw;
+  width: 100vw;
   translate: -50% 0;
   z-index: -1;
   pointer-events: none;
@@ -716,10 +714,9 @@ section {
     linear-gradient(color-mix(in srgb, var(--accent) 13%, transparent) 1px, transparent 1px),
     linear-gradient(90deg, color-mix(in srgb, var(--accent) 13%, transparent) 1px, transparent 1px);
   background-size: 28px 28px;
-  /* Lighter lines than behind the graphics, right across the screen; they only fade
-     softly at the top and bottom (not at the sides). */
-  -webkit-mask: linear-gradient(transparent, #000 18%, #000 78%, transparent);
-  mask: linear-gradient(transparent, #000 18%, #000 78%, transparent);
+  /* Lighter lines than behind the graphics, fading softly away from the card. */
+  -webkit-mask: radial-gradient(ellipse 80% 75% at 50% 50%, #000 15%, transparent 78%);
+  mask: radial-gradient(ellipse 80% 75% at 50% 50%, #000 15%, transparent 78%);
 }
 /* The top stories sit in a pile; the top card flies away to show the next. */
 .hero-track {
@@ -1154,8 +1151,8 @@ section {
 .cats::-webkit-scrollbar {
   display: none;
 }
-/* The same faint purple grid as behind the top stories and graphics, right across
-   the screen behind the category tiles, fading softly at the top and bottom. */
+/* The same faint purple grid as behind the top stories and graphics, behind the
+   category tiles, fading softly away towards the edges. */
 #cats {
   position: relative;
   isolation: isolate;
@@ -1164,21 +1161,15 @@ section {
 #cats::before {
   content: "";
   position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 50%;
-  /* Wider than the screen (computers show the site at 80%, which shrinks 100vw);
-     the page clips what goes past its sides. */
-  width: 200vw;
-  translate: -50% 0;
+  inset: 0;
   z-index: -1;
   pointer-events: none;
   background-image:
     linear-gradient(color-mix(in srgb, var(--accent) 18%, transparent) 1px, transparent 1px),
     linear-gradient(90deg, color-mix(in srgb, var(--accent) 18%, transparent) 1px, transparent 1px);
   background-size: 28px 28px;
-  -webkit-mask: linear-gradient(transparent, #000 18%, #000 82%, transparent);
-  mask: linear-gradient(transparent, #000 18%, #000 82%, transparent);
+  -webkit-mask: radial-gradient(ellipse 75% 70% at 50% 50%, #000 30%, transparent 75%);
+  mask: radial-gradient(ellipse 75% 70% at 50% 50%, #000 30%, transparent 75%);
 }
 .cat {
   position: relative;
@@ -1316,22 +1307,15 @@ section {
 .gfx-sec::before {
   content: "";
   position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 50%;
-  /* Wider than the screen (computers show the site at 80%, which shrinks 100vw);
-     the page clips what goes past its sides. */
-  width: 200vw;
-  translate: -50% 0;
+  inset: 0;
   z-index: -1;
   pointer-events: none;
   background-image:
     linear-gradient(color-mix(in srgb, var(--accent) 18%, transparent) 1px, transparent 1px),
     linear-gradient(90deg, color-mix(in srgb, var(--accent) 18%, transparent) 1px, transparent 1px);
   background-size: 28px 28px;
-  /* Right across the section, fading softly only at the top and bottom. */
-  -webkit-mask: linear-gradient(transparent, #000 18%, #000 82%, transparent);
-  mask: linear-gradient(transparent, #000 18%, #000 82%, transparent);
+  -webkit-mask: radial-gradient(ellipse 75% 70% at 50% 55%, #000 30%, transparent 75%);
+  mask: radial-gradient(ellipse 75% 70% at 50% 55%, #000 30%, transparent 75%);
 }
 @media (prefers-reduced-motion: reduce) {
   .gfx-stack .gfx-card {
