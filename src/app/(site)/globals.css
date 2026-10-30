@@ -1154,6 +1154,32 @@ section {
 .cats::-webkit-scrollbar {
   display: none;
 }
+/* The same faint purple grid as behind the top stories and graphics, right across
+   the screen behind the category tiles, fading softly at the top and bottom. */
+#cats {
+  position: relative;
+  isolation: isolate;
+  padding-block: 28px;
+}
+#cats::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  /* Wider than the screen (computers show the site at 80%, which shrinks 100vw);
+     the page clips what goes past its sides. */
+  width: 200vw;
+  translate: -50% 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--accent) 18%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--accent) 18%, transparent) 1px, transparent 1px);
+  background-size: 28px 28px;
+  -webkit-mask: linear-gradient(transparent, #000 18%, #000 82%, transparent);
+  mask: linear-gradient(transparent, #000 18%, #000 82%, transparent);
+}
 .cat {
   position: relative;
   flex: none;
