@@ -3751,10 +3751,10 @@ footer .logo {
   display: inline-block;
   margin-bottom: 24px;
 }
-/* The footer logo rests in a soft silvery white, and every few seconds a bright
-   white glint glides across it, entering at the right (where Dhivehi starts).
-   The logo's own fill is set inline, hence !important. */
-footer .logo > span {
+/* The header and footer logos rest in a soft silvery white, and every few seconds
+   a bright white glint glides across them, entering at the right (where Dhivehi
+   starts). The logo's own fill is set inline, hence !important. */
+.logo > span {
   background-color: #d9d3e6 !important;
   background-image: linear-gradient(
     110deg,
@@ -3780,7 +3780,7 @@ footer .logo > span {
 }
 /* No glint for readers who turn motion off: the logo stays plain white. */
 @media (prefers-reduced-motion: reduce) {
-  footer .logo > span {
+  .logo > span {
     background-color: var(--logo) !important;
     background-image: none;
   }
