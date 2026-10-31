@@ -1105,19 +1105,28 @@ section {
     transform: translateY(-4px);
   }
 }
+/* The photo's inset and corner, and the rating capsule's height. The capsule sits
+   so its round end shares a centre with the photo's corner (concentric curves). */
+.story {
+  --ph-in: 6px;
+  --ph-r: 44px;
+  --cap-h: 28px;
+}
 .story .ph {
   position: absolute;
-  inset: 6px;
-  border-radius: 44px;
+  inset: var(--ph-in);
+  border-radius: var(--ph-r);
   border: 1px solid var(--line);
 }
 .story .rating {
   position: absolute;
-  top: 16px;
-  right: 16px;
+  top: calc(var(--ph-in) + var(--ph-r) - var(--cap-h) / 2);
+  right: calc(var(--ph-in) + var(--ph-r) - var(--cap-h) / 2);
   z-index: 2;
   display: flex;
   align-items: center;
+  box-sizing: border-box;
+  height: var(--cap-h);
   gap: 4px;
   /* Dark pill with a glowing purple edge and a gold star; same in both themes. */
   background: rgba(8, 0, 24, 0.7);
@@ -1128,8 +1137,8 @@ section {
     0 0 14px rgba(168, 130, 255, 0.6),
     inset 0 0 8px rgba(168, 130, 255, 0.25);
   color: #ffffff;
-  border-radius: 50px;
-  padding: 5px 12px;
+  border-radius: calc(var(--cap-h) / 2);
+  padding: 0 12px;
   font-family: var(--font-latin);
   font-weight: 600;
   font-size: 13px;
@@ -3699,8 +3708,8 @@ a.contact-card:hover {
   .story-grid .story {
     border-radius: 38px;
   }
-  .story-grid .story .ph {
-    border-radius: 32px;
+  .story-grid .story {
+    --ph-r: 32px;
   }
   /* Home page: one full row of stories until there are eight for two rows. */
   .home-stories:not(:has(> :nth-child(8))) > :nth-child(n + 5) {
@@ -4236,15 +4245,14 @@ footer .logo > span {
     border-radius: 24px;
     padding: 3px;
   }
-  .story .ph {
-    inset: 3px;
-    border-radius: 21px;
+  .story {
+    --ph-in: 3px;
+    --ph-r: 21px;
+    --cap-h: 22px;
   }
   .story .rating {
-    top: 10px;
-    right: 10px;
     gap: 3px;
-    padding: 3px 8px;
+    padding: 0 8px;
     font-size: 11px;
   }
   .story .rating svg {
