@@ -3753,36 +3753,45 @@ footer .logo {
 }
 /* The header and footer logos rest in a soft silvery white, and every few seconds
    a bright white glint glides across them, entering at the right (where Dhivehi
-   starts). The logo's own fill is set inline, hence !important. */
+   starts). The glint is its own layer, slid by the graphics chip (transform only),
+   so the logo is never redrawn; the logo's shape clips it. The logo's fill is set
+   inline, hence !important. */
 .logo > span {
+  position: relative;
+  overflow: hidden;
   background-color: #d9d3e6 !important;
+}
+.logo-glint {
+  position: absolute;
+  inset: 0;
   background-image: linear-gradient(
     110deg,
-    transparent 42%,
-    rgba(255, 255, 255, 0.6) 47%,
+    transparent 28%,
+    rgba(255, 255, 255, 0.6) 42%,
     #ffffff 50%,
-    rgba(255, 255, 255, 0.6) 53%,
-    transparent 58%
+    rgba(255, 255, 255, 0.6) 58%,
+    transparent 72%
   );
-  background-size: 300% 100%;
-  background-repeat: no-repeat;
-  background-position: 8% 0;
+  transform: translateX(90%);
+  will-change: transform;
   animation: logo-glint 3s ease-in-out infinite;
 }
 @keyframes logo-glint {
   0% {
-    background-position: 8% 0;
+    transform: translateX(90%);
   }
   62%,
   100% {
-    background-position: 92% 0;
+    transform: translateX(-90%);
   }
 }
 /* No glint for readers who turn motion off: the logo stays plain white. */
 @media (prefers-reduced-motion: reduce) {
   .logo > span {
     background-color: var(--logo) !important;
-    background-image: none;
+  }
+  .logo-glint {
+    display: none;
   }
 }
 .brand-name,

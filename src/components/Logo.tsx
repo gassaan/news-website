@@ -16,6 +16,9 @@ export default function Logo({ className = "h-10" }: { className?: string }) {
         WebkitMaskPosition: "center",
         WebkitMaskSize: "contain",
       }}
-    />
+    >
+      {/* The light that glides across the logo (styled in globals.css). */}
+      <span className="logo-glint" aria-hidden="true" />
+    </span>
   );
 }
