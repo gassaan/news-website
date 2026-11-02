@@ -39,10 +39,10 @@ const democratsAkuruRegular = localFont({
   display: "swap",
 });
 
-// Article page headlines (Mv MAG Round). Not preloaded: only article pages use it,
-// so other pages never download it.
+// Article page headlines (Mv MAG Round Bold). Not preloaded: only article pages use
+// it, so other pages never download it.
 const magRound = localFont({
-  src: "../../fonts/Mv-MAG-Round-XBold.woff2",
+  src: "../../fonts/Mv-MAG-Round-Bold.woff2",
   weight: "700",
   variable: "--font-mag-round",
   display: "swap",
