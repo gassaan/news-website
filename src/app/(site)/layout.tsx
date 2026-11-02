@@ -39,11 +39,11 @@ const democratsAkuruRegular = localFont({
   display: "swap",
 });
 
-// Article page headlines (MV Midhili Bold by Hassan Hameed; its terms allow use
-// without modification). Not preloaded: only article pages use it, so other pages
-// never download it.
-const midhili = localFont({
-  src: "../../fonts/MV-Midhili-Bold.woff2",
+// Article page headlines (MV A Waheed Bold: Abdulla Waheed's calligraphy, made into a
+// font by Hassan Hameed; used unchanged). Not preloaded: only article pages use it,
+// so other pages never download it.
+const waheed = localFont({
+  src: "../../fonts/MV-A-Waheed.woff2",
   weight: "700",
   variable: "--font-headline",
   display: "swap",
@@ -71,7 +71,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="dv"
       dir="rtl"
       suppressHydrationWarning
-      className={`${democratsAkBlack.variable} ${democratsAkuruBold.variable} ${democratsAkuruRegular.variable} ${midhili.variable} ${inter.variable} h-full antialiased`}
+      className={`${democratsAkBlack.variable} ${democratsAkuruBold.variable} ${democratsAkuruRegular.variable} ${waheed.variable} ${inter.variable} h-full antialiased`}
     >
       <head>
         {/* Browser bar colour, the same as the header (ThemeToggle's BAR), following the
