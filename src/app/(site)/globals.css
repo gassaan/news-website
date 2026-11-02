@@ -3234,18 +3234,26 @@ a.contact-card:hover {
 .comment > .c-foot time {
   margin-inline-start: auto;
 }
+/* The reply button matches the reactions pill beside it: the same dark fill, thin
+   border and height, with a lavender arrow. */
 .reply-btn {
-  width: 44px;
-  height: 44px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: #a882ff;
-  color: #150735;
-  transition: opacity 0.15s;
+  background: var(--panel-in);
+  border: 1px solid var(--line);
+  color: var(--accent);
+  transition: transform 0.15s, border-color 0.15s;
 }
-.reply-btn:hover {
-  opacity: 0.88;
+.reply-btn:active {
+  transform: scale(0.94);
+}
+@media (hover: hover) {
+  .reply-btn:hover {
+    border-color: var(--accent-dim);
+  }
 }
 /* Reactions: a pill with your reaction (or a thumb) and the total... */
 .react-pill {
