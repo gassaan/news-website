@@ -1974,7 +1974,7 @@ section {
 }
 /* Article page headline in Mv MAG Round; letters it lacks fall back to the usual heading font. */
 .art-head .art-headline {
-  font-family: var(--font-mag-round), var(--font-head);
+  font-family: var(--font-headline), var(--font-head);
   font-weight: 700;
   /* A little bigger than other headlines (32px → 36px on phones). */
   font-size: clamp(36px, 5.6vw, 80px);

@@ -39,12 +39,13 @@ const democratsAkuruRegular = localFont({
   display: "swap",
 });
 
-// Article page headlines (Mv MAG Round Bold). Not preloaded: only article pages use
-// it, so other pages never download it.
-const magRound = localFont({
-  src: "../../fonts/Mv-MAG-Round-Bold.woff2",
+// Article page headlines (MV Midhili Bold by Hassan Hameed; its terms allow use
+// without modification). Not preloaded: only article pages use it, so other pages
+// never download it.
+const midhili = localFont({
+  src: "../../fonts/MV-Midhili-Bold.woff2",
   weight: "700",
-  variable: "--font-mag-round",
+  variable: "--font-headline",
   display: "swap",
   preload: false,
 });
@@ -70,7 +71,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="dv"
       dir="rtl"
       suppressHydrationWarning
-      className={`${democratsAkBlack.variable} ${democratsAkuruBold.variable} ${democratsAkuruRegular.variable} ${magRound.variable} ${inter.variable} h-full antialiased`}
+      className={`${democratsAkBlack.variable} ${democratsAkuruBold.variable} ${democratsAkuruRegular.variable} ${midhili.variable} ${inter.variable} h-full antialiased`}
     >
       <head>
         {/* Browser bar colour, the same as the header (ThemeToggle's BAR), following the
