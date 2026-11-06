@@ -20,7 +20,8 @@ const TEXT = { right: 573, left: 72 };
 // still well above the summary's size) to fit whole; only then is it cut with "…".
 const HEAD = { size: 64, min: 42, lineRatio: 1.625, max: 2, color: "#ece6ff" };
 const SUM = { size: 26, line: 60, max: 5, color: "#d9ccf7" };
-const GAP = 4;
+// Space between the headline and the summary.
+const GAP = 22;
 // The text block sits a little below the middle, leaving more room above the headline.
 const SHIFT = 20;
 // Space kept clear above and below the text block.
