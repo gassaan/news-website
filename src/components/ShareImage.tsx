@@ -16,11 +16,13 @@ const SCALE = 2;
 const CARD = { x: 30, y: 30, w: 1140, h: 640, r: 44, border: 2 };
 const PHOTO_W = 545;
 const TEXT = { right: 573, left: 72 };
-const HEAD = { size: 64, line: 104, max: 2, color: "#ece6ff" };
+const HEAD = { size: 64, line: 104, max: 3, color: "#ece6ff" };
 const SUM = { size: 26, line: 60, max: 5, color: "#d9ccf7" };
 const GAP = 4;
 // The text block sits a little below the middle, leaving more room above the headline.
 const SHIFT = 20;
+// Space kept clear above and below the text block.
+const PAD = 30;
 // Small faint line under the summary: the date on the right, the website on the left.
 const FOOT = { size: 15, line: 22, gap: 18, color: "#d9ccf7", alpha: 0.35 };
 const SITE = "hulhangu.com";
@@ -216,8 +218,11 @@ async function drawPicture(
   const width = TEXT.right - TEXT.left;
   ctx.font = headFont;
   const headLines = wrap(ctx, title, width, HEAD.max, true);
+  // A three-line headline leaves room for fewer summary lines.
+  const room = inner.h - PAD * 2 - SHIFT - headLines.length * HEAD.line - GAP - FOOT.gap - FOOT.line;
+  const sumMax = Math.max(0, Math.min(SUM.max, Math.floor(room / SUM.line)));
   ctx.font = sumFont;
-  const sumLines = summary ? wrap(ctx, summary, width, SUM.max) : [];
+  const sumLines = summary && sumMax ? wrap(ctx, summary, width, sumMax) : [];
   const total =
     headLines.length * HEAD.line +
     (sumLines.length ? GAP + sumLines.length * SUM.line : 0) +
