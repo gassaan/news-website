@@ -556,6 +556,11 @@ nav.main a[aria-current] {
   gap: 16px;
   color: var(--nav-ink);
 }
+/* The outermost icon's drawing lines up with the page margin: its round tap area
+   (wider than the icon) reaches past the margin instead. */
+#searchBtn {
+  margin-inline-end: -8px;
+}
 .tools .sep {
   width: 1px;
   height: 26px;
@@ -3964,6 +3969,7 @@ footer .logo {
     grid-column: 1;
     grid-row: 1;
     justify-self: start;
+    margin-inline-start: -8px;
   }
   .logo {
     grid-column: 2;
@@ -3974,6 +3980,7 @@ footer .logo {
     grid-column: 3;
     grid-row: 1;
     justify-self: end;
+    margin-inline-end: -7px;
   }
   .bar .icon-btn {
     color: var(--mh-ink);
