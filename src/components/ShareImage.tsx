@@ -16,7 +16,9 @@ const SCALE = 2;
 const CARD = { x: 30, y: 30, w: 1140, h: 640, r: 44, border: 2 };
 const PHOTO_W = 545;
 const TEXT = { right: 573, left: 72 };
-const HEAD = { size: 64, line: 104, max: 3, color: "#ece6ff" };
+// The headline takes at most two lines. A long one first shrinks (down to `min`,
+// still well above the summary's size) to fit whole; only then is it cut with "…".
+const HEAD = { size: 64, min: 42, lineRatio: 1.625, max: 2, color: "#ece6ff" };
 const SUM = { size: 26, line: 60, max: 5, color: "#d9ccf7" };
 const GAP = 4;
 // The text block sits a little below the middle, leaving more room above the headline.
@@ -128,13 +130,14 @@ async function drawPicture(
 ): Promise<Blob | null> {
   const headEl = document.querySelector("h1.headline");
   const bodyEl = document.querySelector(".art-body p") ?? document.body;
-  const headFont = `900 ${HEAD.size}px ${headEl ? getComputedStyle(headEl).fontFamily : "sans-serif"}`;
+  const headFamily = headEl ? getComputedStyle(headEl).fontFamily : "sans-serif";
+  const headFontAt = (size: number) => `900 ${size}px ${headFamily}`;
   const bodyStyle = getComputedStyle(bodyEl);
   const sumFont = `${bodyStyle.fontWeight} ${SUM.size}px ${bodyStyle.fontFamily}`;
   const dateFont = `700 ${FOOT.size}px ${getComputedStyle(document.body).fontFamily}`;
   const siteFont = `500 ${FOOT.size}px ${getComputedStyle(document.body).getPropertyValue("--font-latin") || "sans-serif"}`;
   await Promise.all([
-    document.fonts.load(headFont, title),
+    document.fonts.load(headFontAt(HEAD.size), title),
     document.fonts.load(sumFont, summary),
     document.fonts.load(dateFont, date),
     document.fonts.load(siteFont, SITE),
@@ -216,15 +219,22 @@ async function drawPicture(
   ctx.textAlign = "right";
   ctx.textBaseline = "middle";
   const width = TEXT.right - TEXT.left;
+  let headSize = HEAD.size;
+  for (; headSize > HEAD.min; headSize -= 2) {
+    ctx.font = headFontAt(headSize);
+    if (wrap(ctx, title, width, Infinity).length <= HEAD.max) break;
+  }
+  const headFont = headFontAt(headSize);
+  const headLine = Math.round(headSize * HEAD.lineRatio);
   ctx.font = headFont;
   const headLines = wrap(ctx, title, width, HEAD.max, true);
-  // A three-line headline leaves room for fewer summary lines.
-  const room = inner.h - PAD * 2 - SHIFT - headLines.length * HEAD.line - GAP - FOOT.gap - FOOT.line;
+  // The summary gets the lines that still fit (at most five).
+  const room = inner.h - PAD * 2 - SHIFT - headLines.length * headLine - GAP - FOOT.gap - FOOT.line;
   const sumMax = Math.max(0, Math.min(SUM.max, Math.floor(room / SUM.line)));
   ctx.font = sumFont;
   const sumLines = summary && sumMax ? wrap(ctx, summary, width, sumMax) : [];
   const total =
-    headLines.length * HEAD.line +
+    headLines.length * headLine +
     (sumLines.length ? GAP + sumLines.length * SUM.line : 0) +
     FOOT.gap +
     FOOT.line;
@@ -232,8 +242,8 @@ async function drawPicture(
   ctx.font = headFont;
   ctx.fillStyle = HEAD.color;
   for (const line of headLines) {
-    ctx.fillText(line, TEXT.right, y + HEAD.line / 2);
-    y += HEAD.line;
+    ctx.fillText(line, TEXT.right, y + headLine / 2);
+    y += headLine;
   }
   y += GAP;
   ctx.font = sumFont;
