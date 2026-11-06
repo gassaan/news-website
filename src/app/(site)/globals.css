@@ -1792,19 +1792,6 @@ section {
   color: var(--cap-ink);
   font-size: clamp(13px, 1.3vw, 18px);
 }
-.lead .cap {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-width: 0;
-  font-family: var(--font-reading);
-  font-weight: 400;
-}
-.lead .cap span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
 .lead .views svg {
   flex: none;
 }
@@ -1842,7 +1829,9 @@ section {
     inset-inline: 30px;
   }
 }
+/* Only the view count sits on the photo, at its left (the summary is in the article). */
 .lead-hero figcaption {
+  justify-content: flex-end;
   position: absolute;
   inset-inline: 12px;
   bottom: calc(var(--sheet-overlap) + 12px);
@@ -1853,7 +1842,6 @@ section {
   font-size: 13px;
   pointer-events: none;
 }
-.lead-hero .cap,
 .lead-hero .views {
   background: rgba(8, 0, 24, 0.6);
   -webkit-backdrop-filter: blur(8px);
@@ -1861,18 +1849,12 @@ section {
   border-radius: 99px;
   padding: 6px 14px;
 }
-.lead-hero .cap {
-  max-width: 68%;
-}
 .lead-hero .views {
   gap: 6px;
 }
 .lead-hero .views svg {
   width: 20px;
   height: 14px;
-}
-.lead-hero .cap:has(span:empty) {
-  display: none;
 }
 .art-sheet {
   position: relative;

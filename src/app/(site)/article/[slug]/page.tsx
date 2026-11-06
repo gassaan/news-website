@@ -75,9 +75,6 @@ export default async function ArticlePage({
         <figure className="lead lead-hero">
           <ArticleImage slug={article.slug} alt={article.title} className="lead-img" priority />
           <figcaption>
-            <span className="cap">
-              <span>{article.excerpt}</span>
-            </span>
             <span className="views">
               <ViewCount slug={article.slug} initial={viewCount(article.slug)} />
               <svg width="26" height="18" viewBox="0 0 26 18" fill="none" stroke="currentColor" strokeWidth="1.6">
