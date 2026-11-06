@@ -1972,10 +1972,8 @@ section {
   color: var(--body-ink);
   opacity: 0.85;
 }
-/* Article page headline in Mv MAG Round; letters it lacks fall back to the usual heading font. */
+/* Article page headline, in the usual heading font (Democrats). */
 .art-head .art-headline {
-  font-family: var(--font-headline), var(--font-head);
-  font-weight: 700;
   /* A little bigger than other headlines (32px → 36px on phones). */
   font-size: clamp(36px, 5.6vw, 80px);
 }
