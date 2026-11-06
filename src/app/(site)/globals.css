@@ -2421,6 +2421,49 @@ ol.rt-list {
   gap: 14px;
   margin-top: clamp(28px, 4vw, 48px);
 }
+/* Share: the button opens a small pill above it with Facebook, X and copy link. */
+.share-wrap {
+  position: relative;
+}
+.share-pop {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  translate: -50% 0;
+  z-index: 5;
+  display: flex;
+  gap: 6px;
+  padding: 6px;
+  border-radius: 999px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  box-shadow: 0 12px 32px rgba(30, 10, 80, 0.22);
+  animation: react-pop 0.18s ease-out;
+}
+.share-pop button {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--panel-in);
+  border: 1px solid var(--line);
+  color: var(--accent);
+  transition: transform 0.15s, background 0.15s;
+}
+.share-pop button:active {
+  transform: scale(0.92);
+}
+@media (hover: hover) {
+  .share-pop button:hover {
+    background: var(--line);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .share-pop {
+    animation: none;
+  }
+}
 .toast {
   text-align: center;
   color: var(--accent);
