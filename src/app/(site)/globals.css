@@ -1972,10 +1972,16 @@ section {
   color: var(--body-ink);
   opacity: 0.85;
 }
-/* Article page headline, in the usual heading font (Democrats). */
-.art-head .art-headline {
-  /* A little bigger than other headlines (32px → 36px on phones). */
-  font-size: clamp(36px, 5.6vw, 80px);
+/* Article page headline, in the usual heading font (Democrats): calm and solid so
+   every line reads equally clearly. A little smaller with tighter lines (30px on
+   phones), using the full width so long headlines take fewer lines, in solid text
+   rather than the fade the album and episode headlines use. */
+.art-head .headline.art-headline {
+  font-size: clamp(30px, 4.6vw, 66px);
+  line-height: 1.6;
+  max-width: 28ch;
+  background: none;
+  color: var(--text);
 }
 /* Headline letters fade from the text colour into purple (article and album pages). */
 .art-head .headline,
