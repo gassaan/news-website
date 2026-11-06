@@ -29,6 +29,8 @@ export type Article = {
   poll?: string;
   // The article read aloud, recorded or uploaded in the dashboard.
   audio?: string;
+  // Who took or supplied the main photo, shown on it only when filled in.
+  photoCredit?: string;
   episodes?: Episode[];
 };
 

@@ -29,6 +29,14 @@ export const article = defineType({
     dateTimeField(),
     photoField("image", "މައި ފޮޓޯ", true),
     defineField({
+      name: "photoCredit",
+      title: "ފޮޓޯ ކްރެޑިޓް",
+      // Optional: when filled in, the website shows it in a small pill on the main photo.
+      description: "ބޭނުންނަމަ ފޮޓޯ ނެގި ފަރާތް ލިޔުއްވާ. ލިޔުއްވައިފިނަމަ ސައިޓުގައި މައި ފޮޓޯގެ މަތީގައި ފެންނާނެ.",
+      type: "string",
+      validation: (r) => r.max(60),
+    }),
+    defineField({
       name: "audio",
       title: "ލިޔުން ކިޔާދީފައިވާ އަޑު",
       // Optional: with audio, the website shows a play button on the main photo.

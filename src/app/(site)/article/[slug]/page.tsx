@@ -75,6 +75,16 @@ export default async function ArticlePage({
         <figure className="lead lead-hero">
           <ArticleImage slug={article.slug} alt={article.title} className="lead-img" priority />
           <figcaption>
+            {article.photoCredit && (
+              <span className="credit">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z" />
+                  <circle cx="12" cy="13.5" r="3.5" />
+                </svg>
+                <span className="sr-only">ފޮޓޯ: </span>
+                <span>{article.photoCredit}</span>
+              </span>
+            )}
             <span className="views">
               <ViewCount slug={article.slug} initial={viewCount(article.slug)} />
               <svg width="26" height="18" viewBox="0 0 26 18" fill="none" stroke="currentColor" strokeWidth="1.6">

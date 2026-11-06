@@ -1829,9 +1829,9 @@ section {
     inset-inline: 30px;
   }
 }
-/* Only the view count sits on the photo, at its left (the summary is in the article). */
+/* On the photo: the photo credit at its right (only when the article has one) and
+   the view count at its left. */
 .lead-hero figcaption {
-  justify-content: flex-end;
   position: absolute;
   inset-inline: 12px;
   bottom: calc(var(--sheet-overlap) + 12px);
@@ -1842,7 +1842,8 @@ section {
   font-size: 13px;
   pointer-events: none;
 }
-.lead-hero .views {
+.lead-hero .views,
+.lead-hero .credit {
   background: rgba(8, 0, 24, 0.6);
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
@@ -1851,6 +1852,23 @@ section {
 }
 .lead-hero .views {
   gap: 6px;
+  margin-inline-start: auto;
+}
+.lead-hero .credit {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  max-width: 65%;
+  font-size: 12px;
+}
+.lead-hero .credit svg {
+  flex: none;
+}
+.lead-hero .credit span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .lead-hero .views svg {
   width: 20px;
