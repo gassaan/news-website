@@ -21,7 +21,7 @@ import CommentSection from "@/components/CommentSection";
 import ViewCount from "@/components/ViewCount";
 import SectionCarousel from "@/components/SectionCarousel";
 import Card from "@/components/Card";
-import AdSlot from "@/components/AdSlot";
+import AdSlot, { InArticleAd } from "@/components/AdSlot";
 import NewsTicker from "@/components/NewsTicker";
 import { getBreakingNews } from "@/lib/breaking";
 import { shareMetadata } from "@/lib/share";
@@ -70,7 +70,7 @@ export default async function ArticlePage({
           href={breaking.slug ? `/article/${breaking.slug}` : undefined}
         />
       )}
-      <AdSlot className="art-top-ad" />
+      <AdSlot place="article-top" className="art-top-ad" />
 
       <article className="story-page">
         <figure className="lead lead-hero">
@@ -112,7 +112,12 @@ export default async function ArticlePage({
           </header>
 
           <div className="wrap">
-            <ArticleBody slug={article.slug} paragraphs={article.body} author={article.author} />
+            <ArticleBody
+              slug={article.slug}
+              paragraphs={article.body}
+              author={article.author}
+              ad={<InArticleAd placeholder={<ArticleImage slug={`${article.slug}-ad`} alt="" sizes="(max-width: 720px) 92vw, 570px" />} />}
+            />
             <ArticleActions
               title={article.title}
               slug={article.slug}
@@ -124,7 +129,7 @@ export default async function ArticlePage({
         </div>
       </article>
 
-      <AdSlot className="art-end-ad" />
+      <AdSlot place="article-end" className="art-end-ad" />
 
       {poll && (
         <section className="wrap narrow">

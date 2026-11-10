@@ -47,7 +47,7 @@ export default function Home() {
         <CategoryMarquee categories={visibleCategories} />
       </section>
 
-      <AdSlot />
+      <AdSlot place="home" />
 
       <section id="popular" className="wrap">
         <div className="sec-head">
@@ -59,7 +59,7 @@ export default function Home() {
         <CardGrid articles={popular} counts={[6, 8]} />
       </section>
 
-      <AdSlot />
+      <AdSlot place="home" />
 
       <section id="reports" className="wrap">
         <div className="sec-head">
@@ -83,7 +83,7 @@ export default function Home() {
         <GraphicsSwipe graphics={getGraphics()} />
       </section>
 
-      <AdSlot />
+      <AdSlot place="home" />
 
       <section id="stories" className="wrap">
         <div className="sec-head">
@@ -115,7 +115,7 @@ export default function Home() {
         </div>
       </section>
 
-      <AdSlot />
+      <AdSlot place="home" />
     </>
   );
 }

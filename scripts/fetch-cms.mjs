@@ -44,6 +44,10 @@ const QUERY = `{
   "featured": *[_id == "featuredArticles"][0].articles[]->slug.current,
   "commentTargets": *[_type == "comment" && kind == "article"].target,
   "breaking": *[_id == "breakingNews"][0] { on, headline, "slug": article->slug.current, "title": article->title },
+  "ads": *[_type == "ad" && paused != true && (!defined(endsAt) || endsAt > now())] | order(startsAt desc) {
+    _id, name, link, places, "start": startsAt, "end": endsAt,
+    "wide": wide.asset->{ url, "w": metadata.dimensions.width, "h": metadata.dimensions.height },
+    "square": square.asset->{ url, "w": metadata.dimensions.width, "h": metadata.dimensions.height } },
   "stamp": { "latest": *[_type != "comment"] | order(_updatedAt desc)[0]._updatedAt, "count": count(*[_type != "comment"]), "due": ${DUE} }
 }`;
 
@@ -192,6 +196,24 @@ if (r.breaking?.on) {
   const headline = (r.breaking.headline ?? "").trim() || (live ? r.breaking.title : "");
   if (headline) cms.breaking = { headline, ...(live ? { slug } : {}) };
 }
+
+// Adverts that haven't ended (the page itself hides them once their time is up, and
+// shows ones that start later on their day). Links only to web addresses.
+const AD_PLACES = new Set(["home", "article-top", "article-in", "article-end", "category", "other"]);
+const adPicture = (p) => (p?.url && p.w && p.h ? { src: p.url, w: p.w, h: p.h } : undefined);
+const ads = (r.ads ?? [])
+  .map((a) => ({
+    id: a._id,
+    name: a.name ?? "",
+    ...(/^https?:\/\//i.test(a.link ?? "") ? { link: a.link } : {}),
+    places: (a.places ?? []).filter((p) => AD_PLACES.has(p)),
+    ...(a.start ? { start: a.start } : {}),
+    ...(a.end ? { end: a.end } : {}),
+    ...(adPicture(a.wide) ? { wide: adPicture(a.wide) } : {}),
+    ...(adPicture(a.square) ? { square: adPicture(a.square) } : {}),
+  }))
+  .filter((a) => a.places.length && (a.wide || a.square));
+if (ads.length) cms.ads = ads;
 
 // Real numbers from the site's online service (api/), when it is set up: views per
 // article, the week's most read, and story ratings. Missing numbers never stop a build.

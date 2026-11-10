@@ -1255,6 +1255,26 @@ section {
   letter-spacing: 0.02em;
 }
 /* A slim "Sponsored" strip under each ad. */
+/* A real advert from the newsroom: its whole picture, never cropped. */
+.ad-link {
+  display: block;
+  line-height: 0;
+}
+.ad-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 420px;
+  object-fit: contain;
+  background: var(--surface);
+}
+.in-ad .ad-img {
+  max-height: none;
+}
+.ad-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
 .ad small {
   display: block;
   background: var(--surface);

@@ -26,7 +26,7 @@ export default function GraphicsPage() {
           viewerRatio={GRAPHIC_RATIO}
         />
       </div>
-      <AdSlot />
+      <AdSlot place="other" />
     </>
   );
 }

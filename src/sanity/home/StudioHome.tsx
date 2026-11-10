@@ -4,6 +4,7 @@ import { IntentLink } from "sanity/router";
 import { usePaneRouter } from "sanity/structure";
 import { useNotifications } from "../notifications/useNotifications";
 import HomeScreenTip from "./HomeScreenTip";
+import { useIsEditor } from "../roles";
 import "./home.css";
 
 // The CMS start screen: a purple welcome card with one-tap "new …" buttons, the
@@ -29,6 +30,7 @@ const ICONS = {
   doc: "M7 3h7l5 5v13H7zM14 3v5h5M10 13h6M10 17h4",
   plus: "M12 5v14M5 12h14",
   mic: "M9 5a3 3 0 0 1 6 0v6a3 3 0 0 1-6 0zM5 11a7 7 0 0 0 14 0M12 18v3",
+  megaphone: "M3 10v4h4l6 4V6l-6 4zM16 9a4 4 0 0 1 0 6M19 6a8 8 0 0 1 0 12",
 };
 type IconName = keyof typeof ICONS;
 
@@ -97,6 +99,8 @@ export default function StudioHome() {
   const { counts, now } = useNotifications();
   const [data, setData] = useState<Data | null>(null);
   const [today] = useState(() => new Date());
+  // Ads are for editors only.
+  const editor = useIsEditor();
   const [saving, setSaving] = useState(false);
   const [needsHeadline, setNeedsHeadline] = useState(false);
 
@@ -240,6 +244,12 @@ export default function StudioHome() {
           <Icon name="mic" size={16} />
           އަޑު ތަމްރީނު · Voice training
         </Link>
+        {editor && (
+          <Link childId="ad" className={cls("sh-page", "ad")}>
+            <Icon name="megaphone" size={16} />
+            އިޢުލާނު · Ads
+          </Link>
+        )}
       </div>
     </div>
   );

@@ -837,3 +837,53 @@
 [data-scheme="light"] .sh-tip-add {
   color: #fff;
 }
+
+/* Ads list: a wide thumbnail, a status pill and the numbers on the side. */
+.sl-row img.sl-wide {
+  width: 74px;
+  height: 46px;
+  border-radius: 10px;
+}
+.sl-ad {
+  flex-wrap: wrap;
+  direction: ltr;
+  justify-content: flex-end;
+  font: 500 12px Inter, sans-serif;
+}
+.sl-adpill {
+  padding: 1px 8px;
+  border-radius: 999px;
+  font: 600 10.5px/1.6 Inter, sans-serif;
+  white-space: nowrap;
+  color: var(--sh-muted);
+  background: color-mix(in srgb, var(--sh-muted) 14%, transparent);
+}
+.sl-adpill.running {
+  color: var(--sh-teal);
+  background: color-mix(in srgb, var(--sh-teal) 16%, transparent);
+}
+.sl-adpill.soon {
+  color: var(--sh-sky);
+  background: color-mix(in srgb, var(--sh-sky) 16%, transparent);
+}
+.sl-adpill.paused,
+.sl-adpill.draft {
+  color: var(--sh-amber);
+  background: color-mix(in srgb, var(--sh-amber) 16%, transparent);
+}
+.sl-adnums {
+  align-self: center;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  direction: ltr;
+  flex-shrink: 0;
+  font: 500 11px/1.4 Inter, sans-serif;
+  color: var(--sh-muted);
+  white-space: nowrap;
+}
+.sl-adnums b {
+  font-size: 14px;
+  color: var(--sh-text);
+}
+:is(.sl-ic, .sl-noimg).ad { --tone: var(--sh-red); }

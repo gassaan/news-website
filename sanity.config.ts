@@ -58,6 +58,7 @@ export default defineConfig({
           graphic: () => list("graphic"),
           poll: () => list("poll"),
           comment: () => list("comment"),
+          ad: () => list("ad"),
         };
         return S.component(StudioHome)
           .id("root")

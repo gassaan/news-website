@@ -10,13 +10,17 @@ const DOC_ID = /^[A-Za-z0-9][A-Za-z0-9._-]{0,99}$/;
 const VOTER = /^[A-Za-z0-9-]{16,64}$/;
 
 // Requests allowed per reader per hour, by action.
-const LIMITS = { view: 600, vote: 60, rate: 120, like: 300, comment: 6, voiceDenied: 60 };
+const LIMITS = { view: 600, vote: 60, rate: 120, like: 300, comment: 6, ad: 300, voiceDenied: 60 };
 
 // Days are counted in Maldives time (UTC+5), so "today" starts at local midnight.
 const MV_MS = 5 * 3600000;
 const mvDay = (ms) => new Date(ms + MV_MS).toISOString().slice(0, 10);
 const today = () => mvDay(Date.now());
 const hour = () => new Date().toISOString().slice(0, 13);
+// The hour of the day in the Maldives (0-23).
+const mvHour = (ms) => new Date(ms + MV_MS).getUTCHours();
+// "Reading now" means an article or story opened in the last 5 minutes.
+const LIVE_MS = 5 * 60000;
 
 function cors(request, env) {
   const origin = request.headers.get("Origin") ?? "";
@@ -128,11 +132,12 @@ async function voiceAdmin(request, env) {
   }
 }
 
-async function voice(request, env, path, h) {
-  // Refused logins are counted per reader: past the hourly limit, the next tries are
-  // turned away before asking Sanity, so nobody can keep guessing (or keep this service
-  // busy asking Sanity). Each refusal is noted in the service's logs. The administrator,
-  // once confirmed, always gets in (many readers share one address).
+// Only the CMS administrator gets past this (null = allowed, otherwise the refusal).
+// Refused logins are counted per reader: past the hourly limit, the next tries are
+// turned away before asking Sanity, so nobody can keep guessing (or keep this service
+// busy asking Sanity). Each refusal is noted in the service's logs. The administrator,
+// once confirmed, always gets in (many readers share one address).
+async function adminOnly(request, env, path, h) {
   const who = await reader(request, env);
   const denied = await env.DB.prepare("SELECT n FROM hits WHERE key = ?1").bind(`voiceDenied|${who}|${hour()}`).first();
   if ((denied?.n ?? 0) >= LIMITS.voiceDenied && !(await knownAdmin(request))) {
@@ -144,6 +149,12 @@ async function voice(request, env, path, h) {
     console.warn(JSON.stringify({ event: "voice-denied", reader: who, path }));
     return json({ error: "not allowed" }, 403, h);
   }
+  return null;
+}
+
+async function voice(request, env, path, h) {
+  const refused = await adminOnly(request, env, path, h);
+  if (refused) return refused;
   const key = new URL(request.url).searchParams.get("key") ?? "";
 
   if (request.method === "GET" && path === "/voice/clips") {
@@ -199,12 +210,18 @@ async function voice(request, env, path, h) {
 // ---------- Views ----------
 
 async function addView(env, who, slug) {
-  const day = today();
-  const fresh = await env.DB.prepare("INSERT OR IGNORE INTO seen (key, day) VALUES (?1, ?2)")
-    .bind(`${slug}|${who}|${day}`, day)
-    .run();
+  const now = Date.now();
+  const day = mvDay(now);
+  const [fresh] = await env.DB.batch([
+    env.DB.prepare("INSERT OR IGNORE INTO seen (key, day) VALUES (?1, ?2)").bind(`${slug}|${who}|${day}`, day),
+    // Reading now: this device's latest page.
+    env.DB.prepare("INSERT INTO live (device, slug, at) VALUES (?1, ?2, ?3) ON CONFLICT(device) DO UPDATE SET slug = ?2, at = ?3").bind(who, slug, now),
+  ]);
   if (fresh.meta.changes) {
     await env.DB.batch([
+      env.DB.prepare(
+        "INSERT INTO views_hourly (day, hour, n) VALUES (?1, ?2, 1) ON CONFLICT(day, hour) DO UPDATE SET n = n + 1",
+      ).bind(day, mvHour(now)),
       env.DB.prepare(
         "INSERT INTO views (slug, n) VALUES (?1, 1) ON CONFLICT(slug) DO UPDATE SET n = n + 1",
       ).bind(slug),
@@ -227,18 +244,63 @@ async function topViewed(env, days, limit) {
   return results;
 }
 
+// People who opened an article or story in the last 5 minutes, and what they're reading.
+async function liveReaders(env) {
+  const since = Date.now() - LIVE_MS;
+  const [total, top] = await env.DB.batch([
+    env.DB.prepare("SELECT COUNT(*) AS n FROM live WHERE at > ?1").bind(since),
+    env.DB.prepare("SELECT slug, COUNT(*) AS n FROM live WHERE at > ?1 GROUP BY slug ORDER BY n DESC, slug LIMIT 6").bind(since),
+  ]);
+  return { now: total.results[0]?.n ?? 0, top: top.results.map((r) => ({ slug: r.slug, n: r.n })) };
+}
+
+// ---------- Adverts ----------
+
+// A reader saw or tapped adverts: each person counts once per advert per day.
+async function addAdEvent(env, who, ads, event) {
+  const day = today();
+  const column = event === "tap" ? "taps" : "seen";
+  for (const ad of ads) {
+    const fresh = await env.DB.prepare("INSERT OR IGNORE INTO seen (key, day) VALUES (?1, ?2)")
+      .bind(`ad-${event}|${ad}|${who}|${day}`, day)
+      .run();
+    if (!fresh.meta.changes) continue;
+    await env.DB.prepare(
+      `INSERT INTO ad_stats (ad, day, ${column}) VALUES (?1, ?2, 1) ON CONFLICT(ad, day) DO UPDATE SET ${column} = ${column} + 1`,
+    )
+      .bind(ad, day)
+      .run();
+  }
+}
+
+async function adStats(env, ids) {
+  if (!ids.length) return {};
+  const marks = ids.map((_, i) => `?${i + 1}`).join(",");
+  const { results } = await env.DB.prepare(
+    `SELECT ad, SUM(seen) AS seen, SUM(taps) AS taps, MIN(day) AS first, MAX(day) AS last FROM ad_stats WHERE ad IN (${marks}) GROUP BY ad`,
+  )
+    .bind(...ids)
+    .all();
+  return Object.fromEntries(results.map((r) => [r.ad, { seen: r.seen, taps: r.taps, first: r.first, last: r.last }]));
+}
+
 // ---------- Dashboard ----------
 
 // Numbers for the editors' dashboard: views per day for 30 days, views per article
 // this week and this month, and poll votes. All of it is counts the site shows anyway.
 async function dashboardStats(env) {
   const day = (back) => mvDay(Date.now() - back * 86400000);
-  const [daily, week, month, polls] = await env.DB.batch([
+  const [daily, week, month, polls, hours, hourDays] = await env.DB.batch([
     env.DB.prepare("SELECT day, SUM(n) AS n FROM views_daily WHERE day >= ?1 GROUP BY day ORDER BY day").bind(day(29)),
     env.DB.prepare("SELECT slug, SUM(n) AS n FROM views_daily WHERE day >= ?1 GROUP BY slug").bind(day(6)),
     env.DB.prepare("SELECT slug, SUM(n) AS n FROM views_daily WHERE day >= ?1 GROUP BY slug").bind(day(29)),
     env.DB.prepare("SELECT poll, option, COUNT(*) AS n FROM poll_votes GROUP BY poll, option"),
+    // Best time to publish: views by hour of the day over the last 4 weeks.
+    env.DB.prepare("SELECT hour, SUM(n) AS n FROM views_hourly WHERE day >= ?1 GROUP BY hour").bind(day(27)),
+    env.DB.prepare("SELECT COUNT(DISTINCT day) AS n FROM views_hourly WHERE day >= ?1").bind(day(27)),
   ]);
+  const byHour = Array(24).fill(0);
+  for (const r of hours.results) if (r.hour >= 0 && r.hour < 24) byHour[r.hour] = r.n;
   const bySlug = (rows) => Object.fromEntries(rows.results.map((r) => [r.slug, r.n]));
   const pollVotes = {};
   for (const r of polls.results) (pollVotes[r.poll] ??= {})[r.option] = r.n;
@@ -248,6 +310,8 @@ async function dashboardStats(env) {
     week: bySlug(week),
     month: bySlug(month),
     polls: pollVotes,
+    hours: byHour,
+    hourDays: hourDays.results[0]?.n ?? 0,
   };
 }
 
@@ -459,6 +523,14 @@ async function handle(request, env) {
     }
     if (path === "/ratings") return json(await allRatings(env), 200, h, 30);
     if (path === "/stats") return json(await dashboardStats(env), 200, h, 60);
+    if (path === "/live") return json(await liveReaders(env), 200, h, 15);
+    // Advert numbers are for the newsroom's administrator only.
+    if (path === "/ads/stats") {
+      const refused = await adminOnly(request, env, path, h);
+      if (refused) return refused;
+      const ids = (q.get("ids") ?? "").split(",").filter((s) => DOC_ID.test(s) && !s.startsWith("drafts.")).slice(0, 50);
+      return json(await adStats(env, ids), 200, h);
+    }
     if (path === "/likes") {
       const ids = (q.get("ids") ?? "").split(",").filter((s) => DOC_ID.test(s)).slice(0, 100);
       return json(await likeCounts(env, ids), 200, h, 10);
@@ -470,7 +542,7 @@ async function handle(request, env) {
   const data = await body(request);
   if (!data || typeof data !== "object") return json({ error: "invalid" }, 400, h);
   const who = await reader(request, env);
-  const action = { "/view": "view", "/vote": "vote", "/rate": "rate", "/like": "like", "/comment": "comment" }[path];
+  const action = { "/view": "view", "/vote": "vote", "/rate": "rate", "/like": "like", "/comment": "comment", "/ad": "ad" }[path];
   if (!action) return json({ error: "not found" }, 404, h);
   if (!(await allow(env, who, action))) {
     console.warn(JSON.stringify({ event: "rate-limited", reader: who, action }));
@@ -484,6 +556,16 @@ async function handle(request, env) {
     // address, so the device's own id is used, with the address only as a fallback.
     const device = VOTER.test(String(data.voter ?? "")) ? `d:${data.voter}` : `a:${who}`;
     return json({ views: await addView(env, device, slug) }, 200, h);
+  }
+
+  if (action === "ad") {
+    const event = data.event;
+    const ads = Array.isArray(data.ads) ? data.ads.map(String) : [];
+    if ((event !== "seen" && event !== "tap") || !ads.length || ads.length > 10 || !ads.every((a) => DOC_ID.test(a) && !a.startsWith("drafts.")))
+      return json({ error: "invalid" }, 400, h);
+    const device = VOTER.test(String(data.voter ?? "")) ? `d:${data.voter}` : `a:${who}`;
+    await addAdEvent(env, device, [...new Set(ads)], event);
+    return json({ ok: true }, 200, h);
   }
 
   if (action === "vote") {
@@ -551,15 +633,19 @@ const worker = {
     }
   },
   async scheduled(event, env) {
-    // Hourly: refresh the readers numbers for the dashboard, once Cloudflare is set up.
+    // Hourly: forget who was reading over an hour ago, and refresh the readers numbers
+    // for the dashboard, once Cloudflare is set up.
     if (event.cron !== DAILY_CRON) {
+      await env.DB.prepare("DELETE FROM live WHERE at < ?1").bind(Date.now() - 3600000).run();
       if (env.CF_ANALYTICS_TOKEN && env.CF_ACCOUNT_ID && env.SANITY_TOKEN) await readerStats(env);
       return;
     }
-    // Daily tidy-up: yesterday's "already counted" marks and old flood counters.
+    // Daily tidy-up: yesterday's "already counted" marks, old flood counters and hourly
+    // views older than 90 days.
     await env.DB.batch([
       env.DB.prepare("DELETE FROM seen WHERE day < ?1").bind(today()),
       env.DB.prepare("DELETE FROM hits"),
+      env.DB.prepare("DELETE FROM views_hourly WHERE day < ?1").bind(mvDay(Date.now() - 90 * 86400000)),
     ]);
   },
 };

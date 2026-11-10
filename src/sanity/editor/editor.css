@@ -1731,3 +1731,51 @@
   font: 700 15px/1.7 var(--font-thaana), Inter, sans-serif;
   text-align: right;
 }
+
+/* Dhivehi punctuation help (thaana.tsx): English marks to fix, and mixed-up words. */
+.th-notes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+.th-fix,
+.th-mixed {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 14px;
+  font: 500 12.5px/1.5 Inter, sans-serif;
+}
+.th-fix {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: color-mix(in srgb, var(--ef-ok) 12%, transparent);
+  color: var(--ef-text);
+}
+.th-fix .ef-soft {
+  height: 34px;
+}
+.th-mixed {
+  background: color-mix(in srgb, #e3b341 15%, transparent);
+  color: var(--ef-text);
+}
+.th-mixed b {
+  color: #e3b341;
+}
+[data-scheme="light"] .th-mixed b {
+  color: #8a6100;
+}
+.th-words {
+  font: 600 14px/1.8 var(--font-thaana), sans-serif;
+}
+.re-mixed {
+  text-decoration: underline wavy #e3b341;
+  text-decoration-skip-ink: none;
+  text-underline-offset: 6px;
+}
+/* An advert's numbers: three across. */
+.nr-tiles.ad-tiles {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}

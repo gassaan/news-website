@@ -457,3 +457,140 @@ button.hd-btn {
   align-items: center;
   flex-wrap: wrap;
 }
+
+/* Reading now: a green box with a soft pulse, and what people are reading. */
+.hd-kpi.hd-live {
+  border-color: color-mix(in srgb, var(--hd-good) 45%, var(--hd-line));
+}
+.hd-live .hd-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.hd-pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--hd-good);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--hd-good) 50%, transparent);
+  animation: hd-pulse 2s ease-out infinite;
+}
+@keyframes hd-pulse {
+  to {
+    box-shadow: 0 0 0 7px transparent;
+  }
+}
+.hd-live-list {
+  display: grid;
+}
+.hd-live-row {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-top: 1px solid var(--hd-line);
+  font-size: 14px;
+}
+.hd-live-row:first-child {
+  border-top: 0;
+}
+.hd-live-row .dv {
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.hd-ppl {
+  display: flex;
+  gap: 3px;
+}
+.hd-ppl i {
+  width: 6px;
+  height: 15px;
+  border-radius: 4px;
+  background: var(--hd-good);
+  opacity: 0.85;
+}
+.hd-live-n {
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--hd-good);
+}
+
+/* Best time to publish: views by hour, the best two hours, and the days of the week. */
+.hd-hours {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 110px;
+}
+.hd-hours span {
+  flex: 1;
+  min-height: 3px;
+  border-radius: 4px 4px 2px 2px;
+  background: color-mix(in srgb, var(--hd-accent) 40%, transparent);
+}
+.hd-hours span.top {
+  background: var(--hd-accent);
+}
+.hd-hours-axis {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10.5px;
+  color: var(--hd-muted);
+}
+.hd-best {
+  margin: 4px 0 0;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--hd-accent-soft);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.hd-best > span:first-child {
+  font-size: 20px;
+}
+.hd-best small {
+  color: var(--hd-muted);
+  font-size: 12px;
+}
+.hd-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  align-items: end;
+  margin-top: 6px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--hd-muted);
+}
+.hd-days span {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  height: 80px;
+}
+.hd-days i {
+  width: 100%;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--hd-accent) 40%, transparent);
+}
+.hd-days .top i {
+  background: var(--hd-accent);
+}
+.hd-days .top {
+  color: var(--hd-ink);
+  font-weight: 700;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hd-pulse {
+    animation: none;
+  }
+}

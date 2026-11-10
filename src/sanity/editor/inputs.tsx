@@ -16,6 +16,7 @@ import {
 } from "sanity";
 import { toSlug } from "../slug";
 import { formatWhen } from "../dates";
+import { ThaanaNote, fixText, useThaanaTyping } from "./thaana";
 import "./editor.css";
 
 // Tap-friendly inputs for the editing form: round buttons instead of lists and
@@ -117,6 +118,8 @@ export function DateTimeInput(props: StringInputProps) {
   };
   // Sanity draws a date field's name inside its own picker, so this input shows it.
   const { title, description } = props.schemaType;
+  // plain: no "Scheduled" tag (advert dates); clearable: a button that empties the date.
+  const opts = (props.schemaType.options ?? {}) as { plain?: boolean; clearable?: string };
   const open = (e: MouseEvent<HTMLInputElement>) => {
     try {
       e.currentTarget.showPicker?.();
@@ -148,8 +151,14 @@ export function DateTimeInput(props: StringInputProps) {
         <button type="button" className="ef-soft" disabled={readOnly} onClick={() => onChange(set(new Date().toISOString()))}>
           Now
         </button>
+        {/* An end date can be taken away again (an advert with no end). */}
+        {opts.clearable && d && (
+          <button type="button" className="ef-soft" disabled={readOnly} onClick={() => onChange(unset())}>
+            {opts.clearable}
+          </button>
+        )}
         {/* A new item starts at "now", a moment after the form opens: only later times count. */}
-        {d && d.getTime() > openedAt + 60000 && <span className="ef-tag">Scheduled</span>}
+        {!opts.plain && d && d.getTime() > openedAt + 60000 && <span className="ef-tag">Scheduled</span>}
       </div>
     </div>
   );
@@ -196,9 +205,11 @@ export function SlugInput(props: SlugInputProps) {
 export function SummaryInput(props: TextInputProps) {
   const n = (props.value ?? "").length;
   const max = 250;
+  const typing = useThaanaTyping();
   return (
-    <div className="ef-stack">
+    <div className="ef-stack" ref={typing}>
       {props.renderDefault(props)}
+      <ThaanaNote text={props.value ?? ""} readOnly={props.readOnly} onFix={() => props.onChange(set(fixText(props.value ?? "")))} />
       <div className="ef-count">
         <span className="ef-bar" aria-hidden="true">
           <span style={{ width: `${Math.min(100, (n / max) * 100)}%` }} className={n > max ? "over" : ""} />

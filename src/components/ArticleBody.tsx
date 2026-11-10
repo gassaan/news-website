@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useState } from "react";
+import { Fragment, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { getAuthorSlug } from "@/lib/articles";
 import { getAuthorPhoto } from "@/lib/authorPhotos";
@@ -13,10 +13,13 @@ export default function ArticleBody({
   slug,
   paragraphs,
   author,
+  ad,
 }: {
   slug: string;
   paragraphs: string[];
   author: string;
+  // The advert inside the article (from the newsroom's Ads), when there is one.
+  ad?: ReactNode;
 }) {
   const [scale, setScale] = useState(1);
   const authorSlug = getAuthorSlug(author);
@@ -72,7 +75,7 @@ export default function ArticleBody({
             <RichBlock block={block} />
             {index === firstText && (
               <figure className="in-ad">
-                <ArticleImage slug={`${slug}-ad`} alt="" sizes="(max-width: 720px) 92vw, 570px" />
+                {ad ?? <ArticleImage slug={`${slug}-ad`} alt="" sizes="(max-width: 720px) 92vw, 570px" />}
                 <small>Sponsored</small>
               </figure>
             )}

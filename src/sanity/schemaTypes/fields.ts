@@ -6,6 +6,7 @@ export { formatWhen };
 import { ChoiceInput, DateTimeInput, FacebookSwitch, PhotoInput, SlugInput } from "../editor/inputs";
 import { RichTextInput } from "../editor/RichTextInput";
 import { FacebookTextInput } from "../editor/newsroom";
+import { ThaanaStringInput } from "../editor/thaana";
 
 // Category list mirrors the site's fixed categories (src/lib/articles.ts).
 export const CATEGORY_OPTIONS = [
@@ -17,8 +18,9 @@ export const CATEGORY_OPTIONS = [
   { title: "ރިޕޯޓު", value: "report" },
 ];
 
+// Typing help for Dhivehi punctuation (، ؟ ؛) and mixed-up letters: editor/thaana.tsx.
 export const titleField = (title = "ސުރުޚީ") =>
-  defineField({ name: "title", title, type: "string", validation: (r) => r.required() });
+  defineField({ name: "title", title, type: "string", components: { input: ThaanaStringInput }, validation: (r) => r.required() });
 
 // Web address part, filled from the title with one click ("From title").
 export const slugField = () =>

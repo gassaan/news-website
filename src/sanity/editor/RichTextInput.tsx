@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { set, unset, useClient, useFormValue, type TextInputProps } from "sanity";
 import {
   EditorContent,
+  Extension,
   Node,
   NodeViewWrapper,
   ReactNodeViewRenderer,
@@ -13,17 +14,50 @@ import {
   type JSONContent,
   type NodeViewProps,
 } from "@tiptap/react";
-import { TextSelection } from "@tiptap/pm/state";
+import { Plugin, PluginKey, TextSelection } from "@tiptap/pm/state";
+import { Decoration, DecorationSet } from "@tiptap/pm/view";
+import type { Node as PMNode } from "@tiptap/pm/model";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import { parseBlocks, parseInline, photoSrc, plainText, socialPost, videoEmbed } from "@/lib/richText";
 import { RichBlock } from "@/components/RichBlocks";
 import { photoUrl } from "./inputs";
+import { AFTER_THAANA, MARKS, ThaanaNote, fixText, isMixed } from "./thaana";
 
 // The article text: written like on the website, with a toolbar at the top of the
 // phone's screen while typing (bold, sub-heading, quote, list, link, undo), a + button for photos,
 // videos and the rest, and a Preview of the finished article. It is saved as lines
 // of text with a few marks (see src/lib/richText.ts), so older text needs no change.
+
+// ---------- Dhivehi typing help ----------
+
+// Words that mix Thaana and English letters get a wavy underline (see editor/thaana.tsx).
+const mixedKey = new PluginKey<DecorationSet>("mixedWords");
+function mixedDecorations(doc: PMNode) {
+  const found: Decoration[] = [];
+  doc.descendants((node, pos) => {
+    if (!node.isText || !node.text) return;
+    for (const m of node.text.matchAll(/[^\s.,،؟?!:;"'“”‘’()[\]{}«»…\-–—/*#>|_=+]+/g)) {
+      if (isMixed(m[0])) found.push(Decoration.inline(pos + m.index, pos + m.index + m[0].length, { class: "re-mixed" }));
+    }
+  });
+  return DecorationSet.create(doc, found);
+}
+const MixedWords = Extension.create({
+  name: "mixedWords",
+  addProseMirrorPlugins() {
+    return [
+      new Plugin<DecorationSet>({
+        key: mixedKey,
+        state: {
+          init: (_, state) => mixedDecorations(state.doc),
+          apply: (tr, old) => (tr.docChanged ? mixedDecorations(tr.doc) : old),
+        },
+        props: { decorations: (state) => mixedKey.getState(state) },
+      }),
+    ];
+  },
+});
 
 // ---------- Saved text <-> editor ----------
 
@@ -373,6 +407,7 @@ export function RichTextInput(props: TextInputProps) {
       Video,
       Post,
       FactBox,
+      MixedWords,
     ],
     content: toHtml(value ?? ""),
     editorProps: {
@@ -380,6 +415,22 @@ export function RichTextInput(props: TextInputProps) {
       // Keep the line being typed clear of the toolbar at the top.
       scrollMargin: { top: 90, bottom: 40, left: 0, right: 0 },
       scrollThreshold: { top: 90, bottom: 40, left: 0, right: 0 },
+      // Dhivehi punctuation: after a Thaana letter, "," "?" ";" become ، ؟ ؛ as they're typed,
+      // and a second space in a row is left out.
+      handleTextInput: (view, from, to, text) => {
+        const $from = view.state.doc.resolve(from);
+        const before = $from.parent.textBetween(Math.max(0, $from.parentOffset - 2), $from.parentOffset, undefined, "\ufffc");
+        const mark = MARKS[text];
+        if (mark) {
+          const m = before.match(AFTER_THAANA);
+          if (!m) return false;
+          view.dispatch(view.state.tr.insertText(mark, m[1] ? from - 1 : from, to).scrollIntoView());
+          return true;
+        }
+        return text === " " && from === to && before.endsWith(" ");
+      },
+      // Pasted text gets the same fixes.
+      transformPastedText: (pasted) => fixText(pasted),
       // A YouTube, Facebook video, X or Instagram link pasted on an empty line becomes the
       // player or the post straight away.
       handlePaste: (view, event) => {
@@ -622,6 +673,11 @@ export function RichTextInput(props: TextInputProps) {
       )}
       {busy && <p className="ef-note">Uploading the photo…</p>}
       {error && <p className="ef-photo-error">{error}</p>}
+      <ThaanaNote
+        text={text}
+        readOnly={readOnly}
+        onFix={() => editor?.commands.setContent(toHtml(fixText(text)), { emitUpdate: true })}
+      />
 
       {full &&
         createPortal(

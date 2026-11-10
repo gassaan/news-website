@@ -20,7 +20,7 @@ export default function PollsPage() {
 
         <PollList polls={polls} />
       </div>
-      <AdSlot />
+      <AdSlot place="other" />
     </>
   );
 }

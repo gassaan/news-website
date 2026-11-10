@@ -140,7 +140,7 @@ export default async function AuthorPage({
           </section>
         )}
       </div>
-      <AdSlot />
+      <AdSlot place="other" />
     </>
   );
 }

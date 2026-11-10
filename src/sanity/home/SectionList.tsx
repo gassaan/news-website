@@ -6,6 +6,8 @@ import { usePaneRouter } from "sanity/structure";
 import { API_URL } from "../../lib/api";
 import { STAGE_EN } from "../editor/newsroom";
 import { useIsEditor } from "../roles";
+import { useAdStats, shortDay } from "../editor/ads";
+import { adStatus, type AdStatus } from "../../lib/adPlaces";
 import "./home.css";
 
 // A section's list (articles, stories, polls, …), opened from a tile on the start
@@ -15,8 +17,8 @@ import "./home.css";
 // asks before anything is deleted.
 
 type Kind = "draft" | "changes" | "scheduled" | "published";
-type Raw = { _id: string; title?: string; sub?: string; img?: string; date?: string; slug?: string; stage?: string };
-type Item = { id: string; title: string; sub: string; img?: string; date?: string; slug?: string; kind: Kind; stage?: string };
+type Raw = { _id: string; title?: string; sub?: string; img?: string; date?: string; slug?: string; stage?: string; start?: string; end?: string; paused?: boolean };
+type Item = { id: string; title: string; sub: string; img?: string; date?: string; slug?: string; kind: Kind; stage?: string; ad?: AdStatus; start?: string; end?: string };
 
 type Config = {
   title: string;
@@ -27,6 +29,7 @@ type Config = {
   views?: boolean;
   stages?: boolean; // shows each unpublished item's status (Writing, Ready for edit, Approved)
   labels?: Partial<Record<Kind, string>>;
+  ads?: boolean; // adverts: Running / Starting soon / Ended instead of the publishing status
 };
 
 const IMG = (field: string) => `"img": ${field}.asset->url`;
@@ -37,6 +40,13 @@ const CONFIG: Record<string, Config> = {
   photoAlbum: { title: "ފޮޓޯ ގެލެރީ", unit: ["album", "albums"], date: "date", fields: `title, ${IMG("photos[0]")}`, icon: "image" },
   graphic: { title: "ގުރެފިކްސް", unit: ["graphic", "graphics"], date: "date", fields: `title, ${IMG("image")}`, icon: "pie" },
   poll: { title: "ޕޯލްސް", unit: ["poll", "polls"], date: "publishedAt", fields: `title, ${IMG("image")}`, icon: "bars" },
+  ad: {
+    title: "Ads",
+    unit: ["ad", "ads"],
+    fields: `"title": name, ${IMG("wide")}, "start": startsAt, "end": endsAt, paused`,
+    icon: "megaphone",
+    ads: true,
+  },
   comment: {
     title: "ކޮމެންޓްތައް",
     unit: ["comment", "comments"],
@@ -55,7 +65,23 @@ const ICONS: Record<string, string> = {
   pie: "M12 3v9h9M21 12a9 9 0 1 1-9-9",
   bars: "M6 20v-6M12 20V5M18 20v-10",
   chat: "M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z",
+  megaphone: "M3 10v4h4l6 4V6l-6 4zM16 9a4 4 0 0 1 0 6M19 6a8 8 0 0 1 0 12",
 };
+
+// Adverts: their own status names, colours and filters.
+const AD_LABELS: Record<AdStatus, string> = { running: "Running", soon: "Starting soon", ended: "Ended", paused: "Paused", draft: "Not published" };
+const AD_CHIPS: AdStatus[] = ["running", "soon", "ended", "paused", "draft"];
+const DAY = 86400000;
+function adText(i: Item, now: number) {
+  if (i.ad === "soon" && i.start) return `Starts ${shortDay(i.start)}`;
+  if (i.ad === "ended" && i.end) return `Ended ${shortDay(i.end)}`;
+  if (i.ad === "running") {
+    if (!i.end) return "No end date";
+    const left = Math.max(1, Math.ceil((Date.parse(i.end) - now) / DAY));
+    return `Ends ${shortDay(i.end)} · ${left} day${left === 1 ? "" : "s"} left`;
+  }
+  return "";
+}
 
 const LABELS: Record<Kind, string> = { draft: "Draft", changes: "Changes not published", scheduled: "Scheduled", published: "Published" };
 const CHIPS: { kind: Kind | "all"; name: string }[] = [
@@ -107,7 +133,7 @@ export default function SectionList(props: { options?: { type?: string } }) {
   const { ChildLink, BackLink, routerPanesState, groupIndex } = usePaneRouter();
   const [raw, setRaw] = useState<Raw[] | null>(null);
   const [views, setViews] = useState<Record<string, number>>({});
-  const [show, setShow] = useState<Kind | "all" | "ready">("all");
+  const [show, setShow] = useState<Kind | "all" | "ready" | AdStatus>("all");
   const [search, setSearch] = useState("");
   const [now, setNow] = useState(0);
   // Swipe to delete: the row left open, the row being dragged, and the item being asked about.
@@ -163,12 +189,19 @@ export default function SectionList(props: { options?: { type?: string } }) {
       const r = (draft ?? pub)!;
       const date = r.date;
       const kind: Kind = !pub ? "draft" : draft ? "changes" : date && cfg.date === "publishedAt" && Date.parse(date) > now ? "scheduled" : "published";
-      list.push({ id, title: r.title?.trim() || "—", sub: r.sub ?? "", img: r.img, date, slug: pub?.slug, kind, stage: kind === "published" ? undefined : r.stage });
+      // An advert's status follows what's on the site (the published version).
+      const live = pub ?? r;
+      const ad = cfg.ads ? adStatus(live, now, Boolean(pub)) : undefined;
+      list.push({ id, title: r.title?.trim() || "—", sub: r.sub ?? "", img: r.img, date, slug: pub?.slug, kind, stage: kind === "published" ? undefined : r.stage, ad, start: live.start, end: live.end });
     }
     return list.sort((a, b) =>
-      cfg.date ? (b.date ?? "9999").localeCompare(a.date ?? "9999") : a.title.localeCompare(b.title),
+      cfg.ads
+        ? AD_CHIPS.indexOf(a.ad!) - AD_CHIPS.indexOf(b.ad!) || (b.start ?? "").localeCompare(a.start ?? "")
+        : cfg.date
+          ? (b.date ?? "9999").localeCompare(a.date ?? "9999")
+          : a.title.localeCompare(b.title),
     );
-  }, [raw, cfg.date, now]);
+  }, [raw, cfg.date, cfg.ads, now]);
 
   // Reads for published articles, from the site's online service.
   const slugs = useMemo(() => (cfg.views ? items.filter((i) => i.slug).map((i) => cleanSlug(i.slug)) : []), [items, cfg.views]);
@@ -181,10 +214,16 @@ export default function SectionList(props: { options?: { type?: string } }) {
     ).then((all) => setViews(Object.assign({}, ...all)));
   }, [slugs]);
 
+  // Advert numbers (people who saw and tapped each one), for editors.
+  const adIds = useMemo(() => (cfg.ads ? items.filter((i) => i.ad !== "draft").map((i) => i.id) : []), [items, cfg.ads]);
+  const { stats: adNums } = useAdStats(adIds);
+
   const counts = useMemo(() => {
     const c: Record<string, number> = { all: items.length };
     for (const i of items) {
-      c[i.kind] = (c[i.kind] ?? 0) + 1;
+      // Adverts are counted by their own status (one of which is also called "draft").
+      const key = i.ad ?? i.kind;
+      c[key] = (c[key] ?? 0) + 1;
       if (i.stage === "ready") c.ready = (c.ready ?? 0) + 1;
     }
     return c;
@@ -192,7 +231,7 @@ export default function SectionList(props: { options?: { type?: string } }) {
 
   const q = search.trim().toLowerCase();
   const visible = items.filter(
-    (i) => (show === "all" || i.kind === show || (show === "ready" && i.stage === "ready")) && (!q || i.title.toLowerCase().includes(q) || i.sub.toLowerCase().includes(q)),
+    (i) => (show === "all" || (cfg.ads ? i.ad === show : i.kind === show) || (show === "ready" && i.stage === "ready")) && (!q || i.title.toLowerCase().includes(q) || i.sub.toLowerCase().includes(q)),
   );
 
   // Month groups for dated lists; one group for writers.
@@ -227,7 +266,9 @@ export default function SectionList(props: { options?: { type?: string } }) {
   }) => ReactNode;
   const Back = BackLink as unknown as (p: { className: string; "aria-label": string; children: ReactNode }) => ReactNode;
   const label = (k: Kind) => cfg.labels?.[k] ?? LABELS[k];
-  const chips: { kind: Kind | "all" | "ready"; name: string }[] = CHIPS.filter((c) => c.kind === "all" || c.kind === "published" || counts[c.kind]);
+  const chips: { kind: Kind | "all" | "ready" | AdStatus; name: string }[] = cfg.ads
+    ? [{ kind: "all", name: "All" }, ...AD_CHIPS.filter((k) => counts[k]).map((k) => ({ kind: k, name: AD_LABELS[k] }))]
+    : CHIPS.filter((c) => c.kind === "all" || c.kind === "published" || counts[c.kind]);
   // Articles waiting for an editor get their own filter.
   if (cfg.stages && counts.ready) chips.splice(1, 0, { kind: "ready", name: "Ready for edit" });
 
@@ -387,7 +428,10 @@ export default function SectionList(props: { options?: { type?: string } }) {
                     onPointerUp={() => up(i.id)}
                     onPointerCancel={() => up(i.id)}
                   >
-                  {i.img ? (
+                  {i.img && cfg.ads ? (
+                    // eslint-disable-next-line @next/next/no-img-element -- the CMS loads Sanity's own resized pictures
+                    <img className="sl-wide" src={`${i.img}?w=200&h=124&fit=crop&auto=format`} alt="" loading="lazy" />
+                  ) : i.img ? (
                     // eslint-disable-next-line @next/next/no-img-element -- the CMS loads Sanity's own resized pictures
                     <img src={`${i.img}?w=120&h=120&fit=crop&auto=format`} alt="" loading="lazy" />
                   ) : (
@@ -400,7 +444,13 @@ export default function SectionList(props: { options?: { type?: string } }) {
                   <span className="sl-text">
                     <span className="sl-t">{i.title}</span>
                     {i.sub && <span className="sl-sub">{i.sub}</span>}
-                    {(i.date || i.kind !== "published") && (
+                    {i.ad && (
+                      <span className="sl-meta sl-ad">
+                        <span className={`sl-adpill ${i.ad}`}>{AD_LABELS[i.ad]}</span>
+                        {adText(i, now) && <span>{adText(i, now)}</span>}
+                      </span>
+                    )}
+                    {!cfg.ads && (i.date || i.kind !== "published") && (
                       <span className="sl-meta">
                         <span className={`sl-dot ${i.kind}`} />
                         {i.date && <span className="sl-date">{when(i.date)}</span>}
@@ -409,6 +459,12 @@ export default function SectionList(props: { options?: { type?: string } }) {
                     )}
                     {i.stage && STAGE_EN[i.stage] && <span className={`sl-stage ${i.stage}`}>{STAGE_EN[i.stage]}</span>}
                   </span>
+                  {cfg.ads && adNums?.[i.id] && (
+                    <span className="sl-adnums" aria-label={`${adNums[i.id].seen} people saw it, ${adNums[i.id].taps} tapped it`}>
+                      <b>{short(adNums[i.id].seen)}</b>
+                      <span>seen · {short(adNums[i.id].taps)} taps</span>
+                    </span>
+                  )}
                   {cfg.views && i.slug && views[cleanSlug(i.slug)] !== undefined && (
                     <span className="sl-views" aria-label={`${views[cleanSlug(i.slug)]} reads`}>
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">

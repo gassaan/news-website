@@ -41,7 +41,7 @@ export default async function CategoryPage({
           <CardGrid articles={categoryArticles} />
         )}
       </div>
-      <AdSlot />
+      <AdSlot place="category" />
     </>
   );
 }

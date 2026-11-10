@@ -20,8 +20,8 @@ class Stmt {
     return new Stmt(this.sql, a);
   }
   run() {
-    db.prepare(this.sql).run(...this.args);
-    return { success: true };
+    const r = db.prepare(this.sql).run(...this.args);
+    return { success: true, meta: { changes: Number(r.changes) } };
   }
   all() {
     const rows = db.prepare(this.sql).all(...this.args);
@@ -142,6 +142,34 @@ const before = sanityCalls;
 for (let i = 0; i < 70; i++) last = await call("/voice/clips", { token: `guess${i}`, ip: "203.0.113.9" });
 check(last.status === 429 && sanityCalls - before === 60, "recordings: after 60 refused logins an hour, guessing stops without asking Sanity");
 check((await call("/voice/clips", { token: "admin", ip: "203.0.113.9" })).status === 200, "recordings: the administrator still gets in from a blocked address");
+
+// --- Reading now and best time to publish
+const dev = (n) => `device-live-${String(n).padStart(8, "0")}`;
+await post("/view", { slug: "article-1", voter: dev(1) });
+await post("/view", { slug: "article-1", voter: dev(2) });
+await post("/view", { slug: "article-2", voter: dev(3) });
+await post("/view", { slug: "article-2", voter: dev(1) }); // the same person moves on
+let live = await (await call("/live")).json();
+check(live.now === 3 && live.top[0].slug === "article-2" && live.top[0].n === 2, "reading now: each person counted once, on their latest article");
+db.prepare("UPDATE live SET at = at - 600000 WHERE device = ?").run(`d:${dev(2)}`);
+live = await (await call("/live")).json();
+check(live.now === 2, "reading now: people who opened nothing for 5 minutes drop off");
+const stats = await (await call("/stats")).json();
+check(Array.isArray(stats.hours) && stats.hours.length === 24 && stats.hours.reduce((a, b) => a + b, 0) === 4 && stats.hourDays === 1, "best time: views are counted by hour");
+
+// --- Adverts: counted once per person a day; the numbers are for the administrator only
+check((await post("/ad", { event: "click", ads: ["ad-1"] })).status === 400, "adverts: an unknown event is refused");
+check((await post("/ad", { event: "seen", ads: ["drafts.ad-1"] })).status === 400, "adverts: unpublished adverts are refused");
+check((await post("/ad", { event: "seen", ads: Array.from({ length: 11 }, (_, i) => `ad-${i}`) })).status === 400, "adverts: too many at once is refused");
+await post("/ad", { event: "seen", ads: ["ad-1", "ad-2"], voter: dev(1) });
+await post("/ad", { event: "seen", ads: ["ad-1"], voter: dev(1) });
+await post("/ad", { event: "seen", ads: ["ad-1"], voter: dev(2) });
+await post("/ad", { event: "tap", ads: ["ad-1"], voter: dev(2) });
+await post("/ad", { event: "tap", ads: ["ad-1"], voter: dev(2) });
+check((await call("/ads/stats?ids=ad-1")).status === 403, "adverts: numbers refused without a login");
+check((await call("/ads/stats?ids=ad-1", { token: "editor" })).status === 403, "adverts: numbers refused for an editor");
+const adNums = await (await call("/ads/stats?ids=ad-1,ad-2", { token: "admin" })).json();
+check(adNums["ad-1"]?.seen === 2 && adNums["ad-1"]?.taps === 1 && adNums["ad-2"]?.seen === 1, "adverts: seen and tapped once per person a day, shown to the administrator");
 
 // --- Errors never show internals
 const broken = await worker.fetch(new Request("https://api.test/stats", { headers: { Origin: SITE } }), { ...env, DB: null });

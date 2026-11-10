@@ -1,3 +1,4 @@
+import { ad } from "./ad";
 import { article } from "./article";
 import { author } from "./author";
 import { breakingNews } from "./breakingNews";
@@ -9,4 +10,4 @@ import { privacyPolicy, termsOfUse } from "./policyPages";
 import { story } from "./story";
 import { voiceTraining } from "./voiceTraining";
 
-export const schemaTypes = [article, story, author, photoAlbum, graphic, poll, contactInfo, privacyPolicy, termsOfUse, breakingNews, featuredArticles, comment, voiceTraining];
+export const schemaTypes = [article, story, author, photoAlbum, graphic, poll, contactInfo, privacyPolicy, termsOfUse, breakingNews, featuredArticles, comment, voiceTraining, ad];

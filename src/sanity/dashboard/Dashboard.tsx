@@ -21,7 +21,11 @@ type Stats = {
   week: Record<string, number>;
   month: Record<string, number>;
   polls: Record<string, Record<string, number>>;
+  // Views by hour of the day (Maldives time) over the last 4 weeks, and on how many days.
+  hours?: number[];
+  hourDays?: number;
 };
+type Live = { now: number; top: { slug: string; n: number }[] };
 type Ratings = Record<string, Record<string, { avg: number; n: number }>>;
 type Row = { name: string; views: number; visits: number };
 type Readers = {
@@ -146,6 +150,84 @@ function Trend({ points }: { points: { day: string; n: number }[] }) {
   );
 }
 
+// Best time to publish: views by hour of the day, the busiest two hours, and the
+// busiest days of the week.
+const hourName = (h: number) => {
+  const x = ((h % 24) + 24) % 24;
+  return x === 0 ? "12 am" : x === 12 ? "12 pm" : x < 12 ? `${x} am` : `${x - 12} pm`;
+};
+const span = (from: number, to: number) => {
+  const a = hourName(from), b = hourName(to);
+  // "8 and 10 pm" rather than "8 pm and 10 pm" when both are in the same half of the day.
+  return a.slice(-2) === b.slice(-2) ? `${a.slice(0, -3)} and ${b}` : `${a} and ${b}`;
+};
+const WEEK = ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"];
+const DAY_NAMES: Record<string, string> = { Sat: "Saturday", Sun: "Sunday", Mon: "Monday", Tue: "Tuesday", Wed: "Wednesday", Thu: "Thursday", Fri: "Friday" };
+
+function BestTime({ hours, hourDays, points }: { hours: number[]; hourDays: number; points: { day: string; n: number }[] }) {
+  const total = hours.reduce((a, b) => a + b, 0);
+  if (hourDays < 3 || total < 30) {
+    return (
+      <p className="hd-empty">
+        Counting by the hour started recently{hourDays ? ` (${hourDays} day${hourDays === 1 ? "" : "s"} so far)` : ""}. The chart fills in over the next few days.
+      </p>
+    );
+  }
+  const pair = (h: number) => hours[h] + hours[(h + 1) % 24];
+  const best = hours.map((_, h) => h).reduce((a, h) => (pair(h) > pair(a) ? h : a), 0);
+  const three = (h: number) => hours[h] + hours[(h + 1) % 24] + hours[(h + 2) % 24];
+  const quiet = hours.map((_, h) => h).reduce((a, h) => (three(h) < three(a) ? h : a), 0);
+  const max = Math.max(1, ...hours);
+  // Busiest days: the average day of the week over the last 4 weeks (not today, it isn't over).
+  const sums: Record<string, { n: number; days: number }> = {};
+  for (const p of points.slice(0, -1).slice(-28)) {
+    const name = WEEK[(new Date(`${p.day}T00:00:00Z`).getUTCDay() + 1) % 7];
+    sums[name] = { n: (sums[name]?.n ?? 0) + p.n, days: (sums[name]?.days ?? 0) + 1 };
+  }
+  const avg = WEEK.map((d) => (sums[d]?.days ? sums[d].n / sums[d].days : 0));
+  const topDay = Math.max(1, ...avg);
+  const bestDay = avg.indexOf(Math.max(...avg));
+  return (
+    <>
+      <div className="hd-hours" role="img" aria-label={`Most readers between ${span(best, best + 2)}`}>
+        {hours.map((n, h) => (
+          <span key={h} className={h === best || h === (best + 1) % 24 ? "top" : ""} style={{ height: `${4 + (n / max) * 96}%` }} title={`${hourName(h)}: ${fmt(n)} views`} />
+        ))}
+      </div>
+      <div className="hd-hours-axis">
+        <span>12 am</span>
+        <span>6 am</span>
+        <span>12 pm</span>
+        <span>6 pm</span>
+        <span>11 pm</span>
+      </div>
+      <p className="hd-best">
+        <span aria-hidden="true">⏰</span>
+        <span>
+          Most readers between <b>{span(best, best + 2)}</b>
+          {avg.some(Boolean) && (
+            <>
+              , busiest on <b>{DAY_NAMES[WEEK[bestDay]]}s</b>
+            </>
+          )}
+          .<br />
+          <small>Quietest: {hourName(quiet).slice(-2) === hourName(quiet + 3).slice(-2) ? `${hourName(quiet).slice(0, -3)}–${hourName(quiet + 3)}` : `${hourName(quiet)}–${hourName(quiet + 3)}`}</small>
+        </span>
+      </p>
+      {avg.some(Boolean) && (
+        <div className="hd-days" role="img" aria-label="Average views by day of the week">
+          {WEEK.map((d, i) => (
+            <span key={d} className={i === bestDay ? "top" : ""} title={`${DAY_NAMES[d]}: ${fmt(avg[i])} views on average`}>
+              <i style={{ height: `${6 + (avg[i] / topDay) * 54}px` }} />
+              {d}
+            </span>
+          ))}
+        </div>
+      )}
+    </>
+  );
+}
+
 export default function Dashboard() {
   const client = useClient({ apiVersion: "2025-02-19" });
   const [tab, setTab] = useState<"overview" | "comments" | "sections" | "readers">("overview");
@@ -154,6 +236,8 @@ export default function Dashboard() {
   const [readers, setReaders] = useState<Readers | null | undefined>(undefined);
   const [stats, setStats] = useState<Stats | null>(null);
   const [ratings, setRatings] = useState<Ratings>({});
+  // Reading now: people who opened an article or story in the last 5 minutes, every 30 seconds.
+  const [live, setLive] = useState<Live | null>(null);
   const [failed, setFailed] = useState("");
   // The time the dashboard was opened; "ends in" and "ago" are counted from it.
   const [now] = useState(() => Date.now());
@@ -186,6 +270,35 @@ export default function Dashboard() {
       sub.unsubscribe();
     };
   }, [client]);
+
+  useEffect(() => {
+    if (!API_URL) return;
+    let gone = false;
+    const load = () => {
+      if (document.visibilityState !== "visible") return;
+      fetch(`${API_URL}/live`, { cache: "no-store" })
+        .then((r) => (r.ok ? r.json() : null))
+        .then((d: Live | null) => !gone && d && setLive(d), () => {});
+    };
+    const first = setTimeout(load, 0);
+    const every = setInterval(load, 30000);
+    document.addEventListener("visibilitychange", load);
+    return () => {
+      gone = true;
+      clearTimeout(first);
+      clearInterval(every);
+      document.removeEventListener("visibilitychange", load);
+    };
+  }, []);
+
+  // Titles for what people are reading now.
+  const liveRows = useMemo(() => {
+    if (!live || !content) return [];
+    const titles = new Map<string, { title: string; id?: string; type: string }>();
+    for (const a of content.articles) titles.set(a.slug, { title: a.title, id: a._id, type: "article" });
+    for (const st of content.stories) titles.set(st.slug, { title: st.title, type: "story" });
+    return live.top.map((r) => ({ ...r, ...(titles.get(r.slug) ?? { title: r.slug, type: "" }) }));
+  }, [live, content]);
 
   const view = useMemo(() => {
     if (!content || !stats) return null;
@@ -287,6 +400,14 @@ export default function Dashboard() {
         {view && tab === "overview" && (
           <>
             <div className="hd-kpis">
+              <div className="hd-kpi hd-live">
+                <span className="hd-label">
+                  <span className="hd-pulse" aria-hidden="true" />
+                  Reading now
+                </span>
+                <span className="hd-value">{live ? fmt(live.now) : "…"}</span>
+                <span className="hd-chip flat">In the last 5 minutes</span>
+              </div>
               <div className="hd-kpi">
                 <span className="hd-label">Views today</span>
                 <span className="hd-value">{fmt(view.today)}</span>
@@ -313,10 +434,44 @@ export default function Dashboard() {
             </div>
 
             <section className="hd-card">
+              <h2>What they&apos;re reading now</h2>
+              {liveRows.length ? (
+                <div className="hd-live-list">
+                  {liveRows.map((r) => (
+                    <div key={r.slug} className="hd-live-row">
+                      <span className="hd-ppl" aria-hidden="true">
+                        {Array.from({ length: Math.min(r.n, 12) }, (_, i) => (
+                          <i key={i} />
+                        ))}
+                      </span>
+                      <span className="hd-live-n">{r.n}</span>
+                      {r.id ? (
+                        <IntentLink intent="edit" params={{ id: r.id, type: r.type }} className="hd-link dv">
+                          {r.title}
+                        </IntentLink>
+                      ) : (
+                        <span className="dv">{r.title}</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="hd-empty">{live ? "Nobody has opened an article in the last 5 minutes." : "Loading…"}</p>
+              )}
+            </section>
+
+            <section className="hd-card">
               <h2>
                 Daily views <small>last 30 days</small>
               </h2>
               <Trend points={view.points} />
+            </section>
+
+            <section className="hd-card">
+              <h2>
+                Best time to publish <small>last 4 weeks</small>
+              </h2>
+              <BestTime hours={stats?.hours ?? Array(24).fill(0)} hourDays={stats?.hourDays ?? 0} points={view.points} />
             </section>
 
             <section className="hd-card">
