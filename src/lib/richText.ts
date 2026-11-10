@@ -22,7 +22,51 @@ export type Block =
   | { type: "img"; src: string; caption: string }
   | { type: "video"; url: string }
   | { type: "post"; url: string }
-  | { type: "hr" };
+  | { type: "hr" }
+  | ({ type: "table" } & TableData)
+  | ({ type: "chart" } & ChartData);
+
+// A table or chart inside the article, saved as one line: @[table]{…} or @[chart]{…}
+// (the data as JSON, made in the newsroom's Table and Chart sheets).
+export type TableData = { title: string; rows: string[][]; source: string };
+export type ChartKind = "bar" | "col" | "pie";
+export type ChartData = { kind: ChartKind; title: string; items: { label: string; value: number }[]; source: string };
+
+const TABLE = /^@\[table\](\{.*\})$/;
+const CHART = /^@\[chart\](\{.*\})$/;
+const str = (v: unknown, max: number) => (typeof v === "string" ? v.replace(/\s+/g, " ").trim().slice(0, max) : "");
+
+export function cleanTable(raw: unknown): TableData | null {
+  const d = (raw ?? {}) as Partial<Record<keyof TableData, unknown>>;
+  const rows = (Array.isArray(d.rows) ? d.rows : [])
+    .slice(0, 40)
+    .map((r) => (Array.isArray(r) ? r.slice(0, 8).map((c) => str(c, 120)) : []))
+    .filter((r) => r.some(Boolean));
+  if (!rows.length) return null;
+  const cols = Math.max(...rows.map((r) => r.length));
+  return { title: str(d.title, 160), rows: rows.map((r) => [...r, ...Array(cols - r.length).fill("")]), source: str(d.source, 160) };
+}
+
+export function cleanChart(raw: unknown): ChartData | null {
+  const d = (raw ?? {}) as Partial<Record<keyof ChartData, unknown>>;
+  const kind: ChartKind = d.kind === "col" || d.kind === "pie" ? d.kind : "bar";
+  const items = (Array.isArray(d.items) ? d.items : [])
+    .slice(0, 12)
+    .map((i) => ({ label: str((i as { label?: unknown })?.label, 60), value: Number((i as { value?: unknown })?.value) }))
+    .filter((i) => i.label && Number.isFinite(i.value) && i.value >= 0);
+  if (!items.length) return null;
+  return { kind, title: str(d.title, 160), items, source: str(d.source, 160) };
+}
+
+const json = (text: string) => {
+  try {
+    return JSON.parse(text) as unknown;
+  } catch {
+    return null;
+  }
+};
+export const tableLine = (t: TableData) => `@[table]${JSON.stringify(t)}`;
+export const chartLine = (c: ChartData) => `@[chart]${JSON.stringify(c)}`;
 
 const IMG = /^!\[(.*)\]\((\S+)\)$/;
 const VIDEO = /^@\[video\]\((\S+)\)$/;
@@ -53,6 +97,13 @@ export function parseBlocks(lines: string[]): Block[] {
     else if ((m = line.match(IMG))) blocks.push({ type: "img", caption: m[1], src: m[2] });
     else if ((m = line.match(VIDEO))) blocks.push({ type: "video", url: m[1] });
     else if ((m = line.match(POST))) blocks.push({ type: "post", url: m[1] });
+    else if ((m = line.match(TABLE))) {
+      const t = cleanTable(json(m[1]));
+      if (t) blocks.push({ type: "table", ...t });
+    } else if ((m = line.match(CHART))) {
+      const c = cleanChart(json(m[1]));
+      if (c) blocks.push({ type: "chart", ...c });
+    }
     else blocks.push({ type: "p", text: line });
   }
   return blocks;

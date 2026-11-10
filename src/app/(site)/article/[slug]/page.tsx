@@ -116,6 +116,7 @@ export default async function ArticlePage({
               slug={article.slug}
               paragraphs={article.body}
               author={article.author}
+              countRead
               ad={<InArticleAd placeholder={<ArticleImage slug={`${article.slug}-ad`} alt="" sizes="(max-width: 720px) 92vw, 570px" />} />}
             />
             <ArticleActions

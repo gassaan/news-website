@@ -97,6 +97,7 @@ export function StatsInput() {
   const slug = String((useFormValue(["slug"]) as { current?: string } | undefined)?.current ?? "");
   const [published, setPublished] = useState<boolean | null>(null);
   const [nums, setNums] = useState<{ total?: number; week?: number; month?: number; approved?: number; waiting?: number }>({});
+  const [readers, setReaders] = useState<Readers | null>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -121,6 +122,9 @@ export function StatsInput() {
       fetch(`${API_URL}/views?slugs=${encodeURIComponent(key)}`)
         .then((r) => (r.ok ? r.json() : {}))
         .then((v: Record<string, number>) => live && setNums((n) => ({ ...n, total: v[key] ?? 0 })), () => {});
+      fetch(`${API_URL}/article?slug=${encodeURIComponent(key)}`)
+        .then((r) => (r.ok ? r.json() : null))
+        .then((a: Readers | null) => live && a && setReaders(a), () => {});
       fetch(`${API_URL}/stats`)
         .then((r) => (r.ok ? r.json() : null))
         .then((s: Stats | null) => {
@@ -153,12 +157,67 @@ export function StatsInput() {
           </div>
         ))}
       </div>
+      <ReadersBox readers={readers} />
       {slug && (
         <a className="nr-link" href={`${SITE_URL}/article/${slug}/`} target="_blank" rel="noopener noreferrer">
           Open on the website ↗
         </a>
       )}
     </div>
+  );
+}
+
+// Read to the end, and where this article's readers came from (counted since these
+// numbers began, so older articles start from zero).
+type Readers = { views: number; done: number; sources: Record<string, number>; site: number | null };
+const SOURCE_NAMES: [string, string][] = [
+  ["facebook", "Facebook"],
+  ["shared", "Shared links*"],
+  ["site", "Hulhangu pages"],
+  ["search", "Google and search"],
+  ["instagram", "Instagram"],
+  ["x", "X"],
+  ["other", "Other websites"],
+];
+function ReadersBox({ readers }: { readers: Readers | null }) {
+  if (!readers) return null;
+  if (readers.views < 5) {
+    return <p className="ef-note">Read to the end and where readers came from show here once a few more people have read it.</p>;
+  }
+  const pct = Math.round((readers.done / readers.views) * 100);
+  const rows = SOURCE_NAMES.map(([key, name]) => ({ name, n: readers.sources[key] ?? 0 }))
+    .filter((r) => r.n > 0)
+    .sort((a, b) => b.n - a.n);
+  const top = Math.max(1, ...rows.map((r) => r.n));
+  return (
+    <>
+      <div className="nr-ring">
+        <svg viewBox="0 0 42 42" aria-hidden="true">
+          <circle cx="21" cy="21" r="16" fill="none" className="nr-ring-track" strokeWidth="6" />
+          <circle cx="21" cy="21" r="16" fill="none" className="nr-ring-fill" strokeWidth="6" pathLength="100" strokeDasharray={`${pct} 100`} strokeLinecap="round" transform="rotate(-90 21 21)" />
+          <text x="21" y="24.2" textAnchor="middle">
+            {pct}%
+          </text>
+        </svg>
+        <span>
+          <b>Read to the end</b>
+          <small>
+            {pct} of every 100 readers reached the last paragraph.{readers.site !== null ? ` Site average: ${readers.site}%.` : ""}
+          </small>
+        </span>
+      </div>
+      <div className="nr-src">
+        <b>Where readers came from</b>
+        {rows.map((r) => (
+          <div key={r.name} className="nr-src-row">
+            <span>{r.name}</span>
+            <i style={{ width: `${(r.n / top) * 100}%` }} />
+            <em>{Math.round((r.n / readers.views) * 100)}%</em>
+          </div>
+        ))}
+        {rows.some((r) => r.name.endsWith("*")) && <small>*WhatsApp, Viber and links typed in: these apps don&apos;t say where a reader came from.</small>}
+      </div>
+    </>
   );
 }
 

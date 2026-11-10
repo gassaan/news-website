@@ -157,6 +157,22 @@ check(live.now === 2, "reading now: people who opened nothing for 5 minutes drop
 const stats = await (await call("/stats")).json();
 check(Array.isArray(stats.hours) && stats.hours.length === 24 && stats.hours.reduce((a, b) => a + b, 0) === 4 && stats.hourDays === 1, "best time: views are counted by hour");
 
+// --- Read to the end, and where readers came from
+await post("/view", { slug: "article-9", voter: dev(11), from: "facebook" });
+await post("/view", { slug: "article-9", voter: dev(12), from: "facebook" });
+await post("/view", { slug: "article-9", voter: dev(13), from: "search" });
+await post("/view", { slug: "article-9", voter: dev(14), from: "<script>" });
+await post("/view", { slug: "article-9", voter: dev(11), from: "facebook" }); // same person again today
+await post("/read", { slug: "article-9", voter: dev(11) });
+await post("/read", { slug: "article-9", voter: dev(11) });
+await post("/read", { slug: "article-9", voter: dev(13) });
+check((await post("/read", { slug: "../x" })).status === 400, "read to the end: a bad article address is refused");
+const art = await (await call("/article?slug=article-9")).json();
+check(art.sources.facebook === 2 && art.sources.search === 1 && !("<script>" in art.sources) && art.views === 3, "where readers came from: counted once per person, unknown sources left out");
+check(art.done === 2, "read to the end: each person once a day");
+const held = (await (await call("/stats")).json()).held;
+check(Array.isArray(held), "held readers best: listed in the dashboard numbers");
+
 // --- Adverts: counted once per person a day; the numbers are for the administrator only
 check((await post("/ad", { event: "click", ads: ["ad-1"] })).status === 400, "adverts: an unknown event is refused");
 check((await post("/ad", { event: "seen", ads: ["drafts.ad-1"] })).status === 400, "adverts: unpublished adverts are refused");

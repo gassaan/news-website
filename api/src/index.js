@@ -10,7 +10,7 @@ const DOC_ID = /^[A-Za-z0-9][A-Za-z0-9._-]{0,99}$/;
 const VOTER = /^[A-Za-z0-9-]{16,64}$/;
 
 // Requests allowed per reader per hour, by action.
-const LIMITS = { view: 600, vote: 60, rate: 120, like: 300, comment: 6, ad: 300, voiceDenied: 60 };
+const LIMITS = { view: 600, read: 600, vote: 60, rate: 120, like: 300, comment: 6, ad: 300, voiceDenied: 60 };
 
 // Days are counted in Maldives time (UTC+5), so "today" starts at local midnight.
 const MV_MS = 5 * 3600000;
@@ -19,6 +19,8 @@ const today = () => mvDay(Date.now());
 const hour = () => new Date().toISOString().slice(0, 13);
 // The hour of the day in the Maldives (0-23).
 const mvHour = (ms) => new Date(ms + MV_MS).getUTCHours();
+// Where a reader came from, as the page works it out (see the site's ViewCount).
+const SOURCES = new Set(["facebook", "instagram", "x", "search", "site", "other", "shared"]);
 // "Reading now" means an article or story opened in the last 5 minutes.
 const LIVE_MS = 5 * 60000;
 
@@ -209,7 +211,7 @@ async function voice(request, env, path, h) {
 
 // ---------- Views ----------
 
-async function addView(env, who, slug) {
+async function addView(env, who, slug, source) {
   const now = Date.now();
   const day = mvDay(now);
   const [fresh] = await env.DB.batch([
@@ -222,6 +224,13 @@ async function addView(env, who, slug) {
       env.DB.prepare(
         "INSERT INTO views_hourly (day, hour, n) VALUES (?1, ?2, 1) ON CONFLICT(day, hour) DO UPDATE SET n = n + 1",
       ).bind(day, mvHour(now)),
+      ...(SOURCES.has(source)
+        ? [
+            env.DB.prepare(
+              "INSERT INTO view_sources (slug, day, source, n) VALUES (?1, ?2, ?3, 1) ON CONFLICT(slug, day, source) DO UPDATE SET n = n + 1",
+            ).bind(slug, day, source),
+          ]
+        : []),
       env.DB.prepare(
         "INSERT INTO views (slug, n) VALUES (?1, 1) ON CONFLICT(slug) DO UPDATE SET n = n + 1",
       ).bind(slug),
@@ -242,6 +251,35 @@ async function topViewed(env, days, limit) {
     .bind(since, limit)
     .all();
   return results;
+}
+
+// A reader reached the end of an article: each person once a day.
+async function addRead(env, who, slug) {
+  const day = today();
+  const fresh = await env.DB.prepare("INSERT OR IGNORE INTO seen (key, day) VALUES (?1, ?2)").bind(`done|${slug}|${who}|${day}`, day).run();
+  if (fresh.meta.changes)
+    await env.DB.prepare("INSERT INTO reads_done (slug, day, n) VALUES (?1, ?2, 1) ON CONFLICT(slug, day) DO UPDATE SET n = n + 1").bind(slug, day).run();
+}
+
+// One article's readers: where they came from, and how many reached the end, next to
+// the whole site's share over the last 4 weeks. Counted since these numbers began.
+async function articleReaders(env, slug) {
+  const since = mvDay(Date.now() - 27 * 86400000);
+  const [sources, done, siteViews, siteDone] = await env.DB.batch([
+    env.DB.prepare("SELECT source, SUM(n) AS n FROM view_sources WHERE slug = ?1 GROUP BY source").bind(slug),
+    env.DB.prepare("SELECT SUM(n) AS n FROM reads_done WHERE slug = ?1").bind(slug),
+    env.DB.prepare("SELECT SUM(n) AS n FROM view_sources WHERE day >= ?1").bind(since),
+    env.DB.prepare("SELECT SUM(n) AS n FROM reads_done WHERE day >= ?1").bind(since),
+  ]);
+  const bySource = Object.fromEntries(sources.results.map((r) => [r.source, r.n]));
+  const views = Object.values(bySource).reduce((a, b) => a + b, 0);
+  const sv = siteViews.results[0]?.n ?? 0;
+  return {
+    views,
+    done: Math.min(done.results[0]?.n ?? 0, views),
+    sources: bySource,
+    site: sv ? Math.min(100, Math.round(((siteDone.results[0]?.n ?? 0) / sv) * 100)) : null,
+  };
 }
 
 // People who opened an article or story in the last 5 minutes, and what they're reading.
@@ -298,7 +336,7 @@ async function adStats(env, ids, days = false) {
 // this week and this month, and poll votes. All of it is counts the site shows anyway.
 async function dashboardStats(env) {
   const day = (back) => mvDay(Date.now() - back * 86400000);
-  const [daily, week, month, polls, hours, hourDays] = await env.DB.batch([
+  const [daily, week, month, polls, hours, hourDays, held] = await env.DB.batch([
     env.DB.prepare("SELECT day, SUM(n) AS n FROM views_daily WHERE day >= ?1 GROUP BY day ORDER BY day").bind(day(29)),
     env.DB.prepare("SELECT slug, SUM(n) AS n FROM views_daily WHERE day >= ?1 GROUP BY slug").bind(day(6)),
     env.DB.prepare("SELECT slug, SUM(n) AS n FROM views_daily WHERE day >= ?1 GROUP BY slug").bind(day(29)),
@@ -306,6 +344,13 @@ async function dashboardStats(env) {
     // Best time to publish: views by hour of the day over the last 4 weeks.
     env.DB.prepare("SELECT hour, SUM(n) AS n FROM views_hourly WHERE day >= ?1 GROUP BY hour").bind(day(27)),
     env.DB.prepare("SELECT COUNT(DISTINCT day) AS n FROM views_hourly WHERE day >= ?1").bind(day(27)),
+    // Held readers best this week: the share who reached the end (10 or more readers).
+    env.DB.prepare(
+      `SELECT v.slug, v.n AS views, COALESCE(d.n, 0) AS done
+       FROM (SELECT slug, SUM(n) AS n FROM view_sources WHERE day >= ?1 GROUP BY slug) v
+       LEFT JOIN (SELECT slug, SUM(n) AS n FROM reads_done WHERE day >= ?1 GROUP BY slug) d ON d.slug = v.slug
+       WHERE v.n >= 10 ORDER BY CAST(COALESCE(d.n, 0) AS REAL) / v.n DESC, v.n DESC LIMIT 8`,
+    ).bind(day(6)),
   ]);
   const byHour = Array(24).fill(0);
   for (const r of hours.results) if (r.hour >= 0 && r.hour < 24) byHour[r.hour] = r.n;
@@ -320,6 +365,7 @@ async function dashboardStats(env) {
     polls: pollVotes,
     hours: byHour,
     hourDays: hourDays.results[0]?.n ?? 0,
+    held: held.results.map((r) => ({ slug: r.slug, views: r.views, done: Math.min(r.done, r.views) })),
   };
 }
 
@@ -532,6 +578,11 @@ async function handle(request, env) {
     if (path === "/ratings") return json(await allRatings(env), 200, h, 30);
     if (path === "/stats") return json(await dashboardStats(env), 200, h, 60);
     if (path === "/live") return json(await liveReaders(env), 200, h, 15);
+    if (path === "/article") {
+      const slug = q.get("slug") ?? "";
+      if (!SLUG.test(slug)) return json({ error: "invalid" }, 400, h);
+      return json(await articleReaders(env, slug), 200, h, 60);
+    }
     // Advert numbers are for the newsroom's administrator only.
     if (path === "/ads/stats") {
       const refused = await adminOnly(request, env, path, h);
@@ -550,7 +601,7 @@ async function handle(request, env) {
   const data = await body(request);
   if (!data || typeof data !== "object") return json({ error: "invalid" }, 400, h);
   const who = await reader(request, env);
-  const action = { "/view": "view", "/vote": "vote", "/rate": "rate", "/like": "like", "/comment": "comment", "/ad": "ad" }[path];
+  const action = { "/view": "view", "/read": "read", "/vote": "vote", "/rate": "rate", "/like": "like", "/comment": "comment", "/ad": "ad" }[path];
   if (!action) return json({ error: "not found" }, 404, h);
   if (!(await allow(env, who, action))) {
     console.warn(JSON.stringify({ event: "rate-limited", reader: who, action }));
@@ -563,7 +614,15 @@ async function handle(request, env) {
     // Counted once per device per day. Many readers in the Maldives share one internet
     // address, so the device's own id is used, with the address only as a fallback.
     const device = VOTER.test(String(data.voter ?? "")) ? `d:${data.voter}` : `a:${who}`;
-    return json({ views: await addView(env, device, slug) }, 200, h);
+    return json({ views: await addView(env, device, slug, String(data.from ?? "")) }, 200, h);
+  }
+
+  if (action === "read") {
+    const slug = String(data.slug ?? "");
+    if (!SLUG.test(slug)) return json({ error: "invalid" }, 400, h);
+    const device = VOTER.test(String(data.voter ?? "")) ? `d:${data.voter}` : `a:${who}`;
+    await addRead(env, device, slug);
+    return json({ ok: true }, 200, h);
   }
 
   if (action === "ad") {

@@ -19,10 +19,11 @@ import { Decoration, DecorationSet } from "@tiptap/pm/view";
 import type { Node as PMNode } from "@tiptap/pm/model";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
-import { parseBlocks, parseInline, photoSrc, plainText, socialPost, videoEmbed } from "@/lib/richText";
+import { chartLine, cleanChart, cleanTable, parseBlocks, parseInline, photoSrc, plainText, socialPost, tableLine, videoEmbed, type Block, type TableData } from "@/lib/richText";
 import { RichBlock } from "@/components/RichBlocks";
 import { photoUrl } from "./inputs";
 import { AFTER_THAANA, MARKS, ThaanaNote, fixText, isMixed } from "./thaana";
+import { ChartEditor, TableEditor, chartToDraft, draftToChart, emptyChart, emptyTable, type ChartDraft } from "./dataSheets";
 
 // The article text: written like on the website, with a toolbar at the top of the
 // phone's screen while typing (bold, sub-heading, quote, list, link, undo), a + button for photos,
@@ -99,6 +100,14 @@ function toHtml(text: string): string {
           return `<div data-post="${esc(b.url)}"></div>`;
         case "hr":
           return "<hr>";
+        case "table": {
+          const { type: _t, ...data } = b; // eslint-disable-line @typescript-eslint/no-unused-vars
+          return `<div data-table="${esc(JSON.stringify(data))}"></div>`;
+        }
+        case "chart": {
+          const { type: _c, ...data } = b; // eslint-disable-line @typescript-eslint/no-unused-vars
+          return `<div data-chart="${esc(JSON.stringify(data))}"></div>`;
+        }
       }
     })
     .join("");
@@ -165,6 +174,21 @@ function toText(doc: JSONContent): string {
       case "post":
         if (b.attrs?.url) out.push(`@[post](${b.attrs.url})`);
         break;
+      case "dataTable":
+      case "chart": {
+        let raw: unknown = null;
+        try {
+          raw = JSON.parse(String(b.attrs?.data ?? ""));
+        } catch {}
+        if (b.type === "dataTable") {
+          const t = cleanTable(raw);
+          if (t) out.push(tableLine(t));
+        } else {
+          const c = cleanChart(raw);
+          if (c) out.push(chartLine(c));
+        }
+        break;
+      }
     }
   }
   return out.join("\n");
@@ -283,6 +307,59 @@ const Video = Node.create({
   addNodeView: () => ReactNodeViewRenderer(VideoView),
 });
 
+// A table or chart: shown as on the website, with Edit (opens its sheet) and ×.
+type DataKind = "table" | "chart";
+// Edit tells the text box (RichTextInput) to open the sheet, through an event on the editor.
+type DataEditDetail = { kind: DataKind; pos: number; data: string };
+
+function DataView({ node, deleteNode, editor, getPos }: NodeViewProps) {
+  const kind: DataKind = node.type.name === "chart" ? "chart" : "table";
+  let block: Block | null = null;
+  try {
+    const raw = JSON.parse(String(node.attrs.data));
+    const t = kind === "table" ? cleanTable(raw) : null;
+    const c = kind === "chart" ? cleanChart(raw) : null;
+    block = t ? { type: "table", ...t } : c ? { type: "chart", ...c } : null;
+  } catch {}
+  const edit = () => {
+    const pos = typeof getPos === "function" ? getPos() : undefined;
+    if (typeof pos === "number")
+      editor.view.dom.dispatchEvent(new CustomEvent<DataEditDetail>("re-data-edit", { detail: { kind, pos, data: String(node.attrs.data) } }));
+  };
+  return (
+    <NodeViewWrapper className="re-data" contentEditable={false}>
+      <div className="re-pv re-data-pv" dir="rtl">
+        {block ? <RichBlock block={block} /> : <p className="ef-note">Empty {kind}</p>}
+      </div>
+      {editor.isEditable && (
+        <>
+          <button type="button" className="re-pill re-data-edit" onClick={edit}>
+            Edit {kind}
+          </button>
+          <button type="button" className="re-x" aria-label={`Remove the ${kind}`} onClick={deleteNode}>
+            ×
+          </button>
+        </>
+      )}
+    </NodeViewWrapper>
+  );
+}
+
+const dataNode = (name: string, attr: string) =>
+  Node.create({
+    name,
+    group: "block",
+    atom: true,
+    addAttributes() {
+      return { data: { default: "", parseHTML: (el) => el.getAttribute(attr) ?? "", renderHTML: (a) => ({ [attr]: a.data }) } };
+    },
+    parseHTML: () => [{ tag: `div[${attr}]` }],
+    renderHTML: ({ HTMLAttributes }) => ["div", HTMLAttributes],
+    addNodeView: () => ReactNodeViewRenderer(DataView),
+  });
+const DataTableNode = dataNode("dataTable", "data-table");
+const ChartNode = dataNode("chart", "data-chart");
+
 const FactBox = Node.create({
   name: "factBox",
   group: "block",
@@ -316,13 +393,15 @@ const ICONS = {
   instagram: <I d="M7 3h10a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4zM12 16a4 4 0 1 0 0-8a4 4 0 0 0 0 8zM17.5 6.5h.01" />,
   divider: <I d="M4 12h16" />,
   box: <I d="M4 5h16v14H4zM12 9v.01M12 12v4" />,
+  table: <I d="M4 5h16v14H4zM4 10h16M4 15h16M10 5v14" />,
+  chart: <I d="M5 20V11M12 20V5M19 20v-6M3 20h18" />,
   eye: <I d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12zM12 15a3 3 0 1 0 0-6a3 3 0 0 0 0 6z" />,
 };
 
 // Keeps the editor's cursor (and the phone's keyboard) while a toolbar button is pressed.
 const keepFocus = (e: MouseEvent | React.PointerEvent) => e.preventDefault();
 
-type Sheet = null | "add" | "link" | "video" | "post" | "preview";
+type Sheet = null | "add" | "link" | "video" | "post" | "preview" | "table" | "chart";
 
 function Popup({ scheme, label, onClose, wide, children }: { scheme: string; label: string; onClose: () => void; wide?: boolean; children: ReactNode }) {
   return createPortal(
@@ -407,6 +486,8 @@ export function RichTextInput(props: TextInputProps) {
       Video,
       Post,
       FactBox,
+      DataTableNode,
+      ChartNode,
       MixedWords,
     ],
     content: toHtml(value ?? ""),
@@ -586,6 +667,57 @@ export function RichTextInput(props: TextInputProps) {
         ed.chain().focus().insertContent({ type: "text", text: href, marks: [{ type: "link", attrs: { href } }] }).run();
       else ed.chain().focus().extendMarkRange("link").setLink({ href }).run();
     });
+  // Tables and charts: the sheet's draft, and where the one being edited sits (null: a new one).
+  const [tableDraft, setTableDraft] = useState<TableData>(emptyTable);
+  const [chartDraft, setChartDraft] = useState<ChartDraft>(emptyChart);
+  const [editPos, setEditPos] = useState<number | null>(null);
+  const openData = (kind: DataKind, e?: MouseEvent<HTMLElement>, pos: number | null = null, data?: string) => {
+    let raw: unknown = null;
+    try {
+      raw = data ? JSON.parse(data) : null;
+    } catch {}
+    if (kind === "table") setTableDraft(cleanTable(raw) ?? emptyTable());
+    else {
+      const c = cleanChart(raw);
+      setChartDraft(c ? chartToDraft(c) : emptyChart());
+    }
+    setEditPos(pos);
+    open(kind, e);
+  };
+  const openDataRef = useRef(openData);
+  useEffect(() => {
+    openDataRef.current = openData;
+  });
+  useEffect(() => {
+    let dom: HTMLElement | undefined;
+    try {
+      dom = editor?.view.dom;
+    } catch {
+      return; // not on screen yet
+    }
+    if (!dom) return;
+    const onEdit = (e: Event) => {
+      const { kind, pos, data } = (e as CustomEvent<DataEditDetail>).detail;
+      openDataRef.current(kind, undefined, pos, data);
+    };
+    dom.addEventListener("re-data-edit", onEdit);
+    return () => dom?.removeEventListener("re-data-edit", onEdit);
+  }, [editor]);
+  const saveData = (kind: DataKind) =>
+    run((ed) => {
+      const data = kind === "table" ? cleanTable(tableDraft) : draftToChart(chartDraft);
+      if (!data) return;
+      const attrs = { data: JSON.stringify(data) };
+      if (editPos !== null && ed.state.doc.nodeAt(editPos)?.type.name === (kind === "table" ? "dataTable" : "chart")) {
+        ed.chain()
+          .focus()
+          .command(({ tr }) => {
+            tr.setNodeMarkup(editPos, undefined, attrs);
+            return true;
+          })
+          .run();
+      } else ed.chain().focus().insertContent([{ type: kind === "table" ? "dataTable" : "chart", attrs }, { type: "paragraph" }]).run();
+    });
   const videoOk = Boolean(videoEmbed(url.trim()));
   const postOk = Boolean(socialPost(url.trim()));
 
@@ -608,6 +740,8 @@ export function RichTextInput(props: TextInputProps) {
     { key: "s", dv: "ސޯޝަލް ޕޯސްޓް", en: "Social post", icon: ICONS.social, act: (e) => open("post", e) },
     { key: "hr", dv: "ލައިނެއް", en: "Divider", icon: ICONS.divider, act: () => run((ed) => ed.chain().focus().setHorizontalRule().run()) },
     { key: "b", dv: "ފެކްޓް ބޮކްސް", en: "Fact box", icon: ICONS.box, on: state?.box, act: () => run((ed) => ed.chain().focus().setParagraph().toggleWrap("factBox").run()) },
+    { key: "t", dv: "ޖަދުވަލު", en: "Table", icon: ICONS.table, act: (e) => openData("table", e) },
+    { key: "c", dv: "ޗާޓް", en: "Chart", icon: ICONS.chart, act: (e) => openData("chart", e) },
   ];
 
   // Phones: the toolbar floats at the top of the screen while typing. Computers: it sits
@@ -786,6 +920,32 @@ export function RichTextInput(props: TextInputProps) {
           <div className="re-sheet-actions">
             <button type="button" className="re-pill re-solid" disabled={!postOk} onClick={() => run((ed) => ed.chain().focus().insertContent([{ type: "post", attrs: { url: url.trim() } }, { type: "paragraph" }]).run())}>
               Add post
+            </button>
+          </div>
+        </Popup>
+      )}
+
+      {sheet === "table" && (
+        <Popup scheme={scheme} label={editPos !== null ? "Edit the table" : "Add a table"} onClose={() => setSheet(null)} wide>
+          <div className="ef-lib-scroll">
+            <TableEditor value={tableDraft} onChange={setTableDraft} />
+          </div>
+          <div className="re-sheet-actions">
+            <button type="button" className="re-pill re-solid" disabled={!cleanTable(tableDraft)} onClick={() => saveData("table")}>
+              {editPos !== null ? "Save table" : "Add table"}
+            </button>
+          </div>
+        </Popup>
+      )}
+
+      {sheet === "chart" && (
+        <Popup scheme={scheme} label={editPos !== null ? "Edit the chart" : "Add a chart"} onClose={() => setSheet(null)} wide>
+          <div className="ef-lib-scroll">
+            <ChartEditor value={chartDraft} onChange={setChartDraft} />
+          </div>
+          <div className="re-sheet-actions">
+            <button type="button" className="re-pill re-solid" disabled={!draftToChart(chartDraft)} onClick={() => saveData("chart")}>
+              {editPos !== null ? "Save chart" : "Add chart"}
             </button>
           </div>
         </Popup>

@@ -24,6 +24,8 @@ type Stats = {
   // Views by hour of the day (Maldives time) over the last 4 weeks, and on how many days.
   hours?: number[];
   hourDays?: number;
+  // This week's articles that kept readers to the end (10 or more readers).
+  held?: { slug: string; views: number; done: number }[];
 };
 type Live = { now: number; top: { slug: string; n: number }[] };
 type Ratings = Record<string, Record<string, { avg: number; n: number }>>;
@@ -349,6 +351,10 @@ export default function Dashboard() {
       .slice(0, 5);
 
     const titleOf = (slug?: string) => (slug ? bySlug.get(slug)?.title : undefined);
+    const held = (stats.held ?? [])
+      .filter((h) => bySlug.has(h.slug))
+      .slice(0, 5)
+      .map((h) => ({ article: bySlug.get(h.slug)!, views: h.views, done: h.done }));
     const waitingOn = new Set(waiting.map((w) => w.target).filter(Boolean)).size;
 
     return {
@@ -365,6 +371,7 @@ export default function Dashboard() {
       writers: [...writers.entries()].sort((a, b) => b[1].views - a[1].views),
       rated,
       titleOf,
+      held,
       waitingOn,
       endingSoon: pollsOpen.filter((p) => p.closesAt && Date.parse(p.closesAt) - now < 2 * DAY),
     };
@@ -489,6 +496,29 @@ export default function Dashboard() {
                   ),
                 }))}
               />
+            </section>
+
+            <section className="hd-card">
+              <h2>
+                Held readers best <small>this week · read to the end</small>
+              </h2>
+              {view.held.length ? (
+                <div className="hd-held">
+                  {view.held.map(({ article, views, done }) => (
+                    <div key={article._id} className="hd-held-row">
+                      <IntentLink intent="edit" params={{ id: article._id, type: "article" }} className="hd-link dv">
+                        {article.title}
+                      </IntentLink>
+                      <span className="hd-held-n">
+                        <b>{Math.round((done / views) * 100)}%</b>
+                        <small>{fmt(views)} readers</small>
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="hd-empty">Shows once articles have 10 or more readers this week (counting started recently).</p>
+              )}
             </section>
 
             <section className="hd-card">

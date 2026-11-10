@@ -594,3 +594,39 @@ button.hd-btn {
     animation: none;
   }
 }
+
+/* Held readers best: title, then the share who reached the end. */
+.hd-held {
+  display: grid;
+}
+.hd-held-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 8px 0;
+  border-top: 1px solid var(--hd-line);
+}
+.hd-held-row:first-child {
+  border-top: 0;
+}
+.hd-held-row .dv {
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 14px;
+}
+.hd-held-n {
+  display: grid;
+  justify-items: end;
+  font-variant-numeric: tabular-nums;
+}
+.hd-held-n b {
+  font-size: 15px;
+  color: var(--hd-good);
+}
+.hd-held-n small {
+  font-size: 11px;
+  color: var(--hd-muted);
+}

@@ -1847,3 +1847,171 @@
 .ef-choices.ad-weights {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
+
+/* Tables and charts in the article text (dataSheets.tsx, RichTextInput DataView). */
+.re-data {
+  position: relative;
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 20px;
+  border: 1px dashed var(--ef-edge);
+}
+.re-data-pv {
+  font-size: 16px;
+  line-height: 1.9;
+}
+.re-data-pv .rt-data {
+  margin: 0;
+}
+.re-data-edit {
+  margin-top: 8px;
+}
+.dt-ed {
+  display: grid;
+  gap: 10px;
+}
+.dt-scroll {
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+.dt-grid {
+  display: grid;
+  gap: 4px;
+  min-width: min-content;
+}
+.dt-cell {
+  min-width: 0;
+  height: 40px;
+  padding: 0 9px;
+  border-radius: 10px;
+  border: 1px solid var(--ef-line);
+  background: var(--ef-field);
+  color: var(--ef-text);
+  font: 400 15px var(--font-thaana), Inter, sans-serif;
+}
+.dt-cell.head {
+  background: #3e2180;
+  color: #fff;
+  font-weight: 700;
+}
+.dt-cell:focus {
+  outline: 2px solid #a882ff;
+  outline-offset: 1px;
+}
+.dt-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.dt-kinds {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+.dt-kind {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 44px;
+  border-radius: 14px;
+  border: 1px solid var(--ef-line);
+  background: transparent;
+  color: var(--ef-muted);
+  font: 600 13px Inter, sans-serif;
+  cursor: pointer;
+}
+.dt-kind[aria-checked="true"] {
+  border-color: #a882ff;
+  color: var(--ef-text);
+  background: color-mix(in srgb, #a882ff 18%, transparent);
+}
+.dt-items {
+  display: grid;
+  gap: 6px;
+}
+.dt-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 96px 34px;
+  gap: 6px;
+  align-items: center;
+}
+.dt-num {
+  font-family: Inter, sans-serif;
+}
+.dt-x {
+  height: 34px;
+  border-radius: 50%;
+  border: 0;
+  background: transparent;
+  color: var(--ef-muted);
+  font-size: 20px;
+  cursor: pointer;
+}
+.dt-x:disabled {
+  opacity: 0.3;
+}
+.dt-add {
+  justify-self: start;
+}
+.dt-preview {
+  font-size: 16px;
+  line-height: 1.9;
+}
+
+/* An article's readers (newsroom.tsx ReadersBox): read to the end, and where they came from. */
+.nr-ring {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 4px;
+}
+.nr-ring svg {
+  width: 76px;
+  flex: none;
+}
+.nr-ring-track {
+  stroke: var(--ef-line);
+}
+.nr-ring-fill {
+  stroke: var(--ef-ok);
+}
+.nr-ring text {
+  font: 800 9px Inter, sans-serif;
+  fill: var(--ef-text);
+}
+.nr-ring b,
+.nr-src > b {
+  display: block;
+  font: 700 14.5px Inter, sans-serif;
+}
+.nr-ring small,
+.nr-src small {
+  display: block;
+  font: 500 12px/1.5 Inter, sans-serif;
+  color: var(--ef-muted);
+}
+.nr-src {
+  display: grid;
+  gap: 7px;
+  margin-top: 4px;
+}
+.nr-src-row {
+  display: grid;
+  grid-template-columns: 116px minmax(0, 1fr) 40px;
+  gap: 8px;
+  align-items: center;
+  font: 500 13px Inter, sans-serif;
+}
+.nr-src-row i {
+  display: block;
+  height: 9px;
+  min-width: 6px;
+  border-radius: 999px;
+  background: #a882ff;
+}
+.nr-src-row em {
+  font-style: normal;
+  font-weight: 700;
+  text-align: right;
+}
