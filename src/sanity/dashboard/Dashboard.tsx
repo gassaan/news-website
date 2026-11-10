@@ -12,7 +12,7 @@ import "./dashboard.css";
 type Article = { _id: string; slug: string; title: string; category: string; author: string | null };
 type Story = { slug: string; title: string; author: string | null };
 type Poll = { _id: string; title: string; options: string[] | null; closesAt?: string };
-type Waiting = { _id: string; target?: string; _createdAt: string };
+type Waiting = { _id: string; target?: string; kind?: string; name?: string; text?: string; parent?: string; _createdAt: string };
 type Content = { articles: Article[]; stories: Story[]; polls: Poll[]; approved: { target?: string }[] };
 type Stats = {
   today: string;
@@ -39,7 +39,7 @@ const CONTENT = `{
   "polls": *[_type == "poll"] | order(publishedAt desc){ _id, title, options, closesAt },
   "approved": *[_type == "comment"]{ target }
 }`;
-const WAITING = `*[_type == "comment" && _id in path("drafts.**")]{ _id, target, _createdAt } | order(_createdAt asc)`;
+const WAITING = `*[_type == "comment" && _id in path("drafts.**")]{ _id, target, kind, name, text, parent, _createdAt } | order(_createdAt asc)`;
 const READERS = `*[_id == "analytics.readers"][0].data`;
 
 const fmt = (n: number) => Math.round(n).toLocaleString("en-US");
@@ -147,7 +147,7 @@ function Trend({ points }: { points: { day: string; n: number }[] }) {
 
 export default function Dashboard() {
   const client = useClient({ apiVersion: "2025-02-19" });
-  const [tab, setTab] = useState<"overview" | "sections" | "readers">("overview");
+  const [tab, setTab] = useState<"overview" | "comments" | "sections" | "readers">("overview");
   const [content, setContent] = useState<Content | null>(null);
   const [waiting, setWaiting] = useState<Waiting[]>([]);
   const [readers, setReaders] = useState<Readers | null | undefined>(undefined);
@@ -160,6 +160,15 @@ export default function Dashboard() {
   useEffect(() => {
     client.fetch<Content>(CONTENT, {}, { perspective: "published" }).then(setContent, () => setFailed("content"));
     client.fetch<Waiting[]>(WAITING, {}, { perspective: "raw" }).then(setWaiting, () => {});
+    // Keep the waiting comments up to date while the dashboard is open.
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const sub = client.listen(`*[_type == "comment"]`, {}, { includeResult: false, visibility: "query" }).subscribe({
+      next: () => {
+        clearTimeout(timer);
+        timer = setTimeout(() => client.fetch<Waiting[]>(WAITING, {}, { perspective: "raw" }).then(setWaiting, () => {}), 600);
+      },
+      error: () => {},
+    });
     client
       .fetch<string | null>(READERS, {}, { perspective: "raw" })
       .then((raw) => setReaders(raw ? (JSON.parse(raw) as Readers) : null), () => setReaders(null));
@@ -171,6 +180,10 @@ export default function Dashboard() {
         .then((r) => (r.ok ? r.json() : {}))
         .then(setRatings, () => {});
     }
+    return () => {
+      clearTimeout(timer);
+      sub.unsubscribe();
+    };
   }, [client]);
 
   const view = useMemo(() => {
@@ -248,6 +261,7 @@ export default function Dashboard() {
       {(
         [
           ["overview", "Overview"],
+          ["comments", waiting.length ? `Comments (${waiting.length})` : "Comments"],
           ["sections", "Sections & writers"],
           ["readers", "Readers"],
         ] as const
@@ -333,9 +347,9 @@ export default function Dashboard() {
                       </b>
                       On {view.waitingOn} article{view.waitingOn === 1 ? "" : "s"}, oldest {ago(waiting[0]._createdAt, now)}
                     </span>
-                    <IntentLink intent="edit" params={{ id: waiting[0]._id.replace(/^drafts\./, ""), type: "comment" }} className="hd-btn">
+                    <button type="button" className="hd-btn" onClick={() => setTab("comments")}>
                       Review
-                    </IntentLink>
+                    </button>
                   </div>
                 )}
                 {view.endingSoon.map((p) => (
@@ -434,9 +448,131 @@ export default function Dashboard() {
           </>
         )}
 
+        {tab === "comments" && <CommentsTab waiting={waiting} setWaiting={setWaiting} content={content} now={now} />}
         {tab === "readers" && <ReadersTab readers={readers} now={now} />}
       </div>
     </Card>
+  );
+}
+
+// Comments waiting for approval, newest first, each with Approve and Delete. Approving
+// publishes it on the site (the same as pressing Publish on it); Delete removes it.
+function CommentsTab({
+  waiting,
+  setWaiting,
+  content,
+  now,
+}: {
+  waiting: Waiting[];
+  setWaiting: (fn: (w: Waiting[]) => Waiting[]) => void;
+  content: Content | null;
+  now: number;
+}) {
+  const client = useClient({ apiVersion: "2025-02-19" });
+  const [busy, setBusy] = useState<Record<string, "approve" | "delete">>({});
+  const [asking, setAsking] = useState<string | null>(null);
+  const [error, setError] = useState("");
+  const titles = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const a of content?.articles ?? []) m.set(a.slug, a.title);
+    for (const st of content?.stories ?? []) m.set(st.slug, st.title);
+    return m;
+  }, [content]);
+  const list = [...waiting].reverse();
+
+  const done = (id: string) => setWaiting((w) => w.filter((c) => c._id !== id));
+  const approve = async (id: string) => {
+    setBusy((b) => ({ ...b, [id]: "approve" }));
+    setError("");
+    try {
+      const doc = await client.getDocument(id);
+      if (doc) {
+        const { _rev, _updatedAt, ...rest } = doc; // eslint-disable-line @typescript-eslint/no-unused-vars
+        await client.transaction().createOrReplace({ ...rest, _id: id.replace(/^drafts\./, "") }).delete(id).commit();
+      }
+      done(id);
+    } catch {
+      setError("Couldn't approve that comment. Check the connection and try again.");
+    } finally {
+      setBusy(({ [id]: _, ...b }) => b); // eslint-disable-line @typescript-eslint/no-unused-vars
+    }
+  };
+  const remove = async (id: string) => {
+    setAsking(null);
+    setBusy((b) => ({ ...b, [id]: "delete" }));
+    setError("");
+    try {
+      await client.delete(id);
+      done(id);
+    } catch {
+      setError("Couldn't delete that comment. Check the connection and try again.");
+    } finally {
+      setBusy(({ [id]: _, ...b }) => b); // eslint-disable-line @typescript-eslint/no-unused-vars
+    }
+  };
+  const approveAll = async () => {
+    for (const c of list) await approve(c._id);
+  };
+
+  if (!list.length)
+    return (
+      <section className="hd-card">
+        <p className="hd-empty">No comments waiting. New ones from readers will appear here.</p>
+      </section>
+    );
+  return (
+    <section className="hd-card">
+      <h2>
+        {list.length} comment{list.length === 1 ? "" : "s"} waiting
+        {list.length > 1 && (
+          <button type="button" className="hd-btn" onClick={approveAll} disabled={Object.keys(busy).length > 0}>
+            Approve all
+          </button>
+        )}
+      </h2>
+      {error && <p className="hd-note">{error}</p>}
+      <div className="hd-inbox">
+        {list.map((c) => {
+          const title = c.target ? titles.get(c.target) : undefined;
+          const state = busy[c._id];
+          return (
+            <article key={c._id} className="hd-com">
+              <div className="hd-com-head">
+                <b className="dv">{c.name || "—"}</b>
+                <span className="hd-small">
+                  {c.parent ? "Reply · " : ""}
+                  {ago(c._createdAt, now)}
+                </span>
+              </div>
+              <p className="hd-com-text dv">{c.text}</p>
+              {title && <p className="hd-com-on dv">↳ {title}</p>}
+              <div className="hd-com-actions">
+                {asking === c._id ? (
+                  <>
+                    <span className="hd-small">Delete this comment?</span>
+                    <button type="button" className="hd-btn ghost" onClick={() => setAsking(null)}>
+                      Keep
+                    </button>
+                    <button type="button" className="hd-btn danger" onClick={() => remove(c._id)}>
+                      Delete
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button type="button" className="hd-btn ghost" disabled={Boolean(state)} onClick={() => setAsking(c._id)}>
+                      {state === "delete" ? "Deleting…" : "Delete"}
+                    </button>
+                    <button type="button" className="hd-btn" disabled={Boolean(state)} onClick={() => approve(c._id)}>
+                      {state === "approve" ? "Approving…" : "Approve"}
+                    </button>
+                  </>
+                )}
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    </section>
   );
 }
 

@@ -1,5 +1,6 @@
 import { defineType, defineField } from "sanity";
 import { AudioInput, ChoiceInput, PollPickInput, SummaryInput, WriterInput } from "../editor/inputs";
+import { ChecklistInput, STAGE_OPTIONS, StatsInput } from "../editor/newsroom";
 import { CATEGORY_OPTIONS, FACEBOOK_FIELDSET, facebookFields, bodyField, dateTimeField, formatPublish, photoField, slugField, titleField } from "./fields";
 
 export const article = defineType({
@@ -8,6 +9,16 @@ export const article = defineType({
   type: "document",
   fieldsets: [FACEBOOK_FIELDSET],
   fields: [
+    // Where the article is in the team's work. Only the newsroom sees it.
+    defineField({
+      name: "stage",
+      title: "ހާލަތު",
+      description: "ލިޔެ ނިމުމުން \"އެޑިޓަށް ތައްޔާރު\" ހޮއްވަވާ. އެޑިޓަރު ބަލައި ފާސްކުރުމުން \"އެޕްރޫވް ކުރެވިއްޖެ\".",
+      type: "string",
+      options: { list: STAGE_OPTIONS, layout: "radio" },
+      initialValue: "writing",
+      components: { input: ChoiceInput },
+    }),
     titleField(),
     slugField(),
     defineField({
@@ -69,6 +80,9 @@ export const article = defineType({
       components: { input: PollPickInput },
     }),
     ...facebookFields({ withPicture: true }),
+    // Nothing is saved from these two: they show the checklist and the article's numbers.
+    defineField({ name: "checklist", title: "ޕަބްލިޝް ކުރުމުގެ ކުރިން", type: "string", readOnly: true, components: { input: ChecklistInput } }),
+    defineField({ name: "stats", title: "ކިޔުންތެރިން", type: "string", readOnly: true, components: { input: StatsInput } }),
     defineField({
       name: "featured",
       title: "މައި ސްލައިޑަރުގައި ދައްކާ",

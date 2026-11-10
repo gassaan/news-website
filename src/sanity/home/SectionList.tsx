@@ -4,6 +4,7 @@ import { useClient } from "sanity";
 import { IntentLink } from "sanity/router";
 import { usePaneRouter } from "sanity/structure";
 import { API_URL } from "../../lib/api";
+import { STAGE_EN } from "../editor/newsroom";
 import "./home.css";
 
 // A section's list (articles, stories, polls, …), opened from a tile on the start
@@ -13,8 +14,8 @@ import "./home.css";
 // asks before anything is deleted.
 
 type Kind = "draft" | "changes" | "scheduled" | "published";
-type Raw = { _id: string; title?: string; sub?: string; img?: string; date?: string; slug?: string };
-type Item = { id: string; title: string; sub: string; img?: string; date?: string; slug?: string; kind: Kind };
+type Raw = { _id: string; title?: string; sub?: string; img?: string; date?: string; slug?: string; stage?: string };
+type Item = { id: string; title: string; sub: string; img?: string; date?: string; slug?: string; kind: Kind; stage?: string };
 
 type Config = {
   title: string;
@@ -23,12 +24,13 @@ type Config = {
   fields: string; // GROQ for title, sub (second line) and img (picture)
   icon: string; // used when an item has no picture
   views?: boolean;
+  stages?: boolean; // shows each unpublished item's status (Writing, Ready for edit, Approved)
   labels?: Partial<Record<Kind, string>>;
 };
 
 const IMG = (field: string) => `"img": ${field}.asset->url`;
 const CONFIG: Record<string, Config> = {
-  article: { title: "ޚަބަރު / ރިޕޯޓު", unit: ["article", "articles"], date: "publishedAt", fields: `title, ${IMG("image")}`, icon: "news", views: true },
+  article: { title: "ޚަބަރު / ރިޕޯޓު", unit: ["article", "articles"], date: "publishedAt", fields: `title, ${IMG("image")}`, icon: "news", views: true, stages: true },
   story: { title: "ވާހަކަ", unit: ["story", "stories"], date: "publishedAt", fields: `title, ${IMG("poster")}`, icon: "book" },
   author: { title: "ލިޔުންތެރިން", unit: ["writer", "writers"], fields: `title, "sub": role, ${IMG("photo")}`, icon: "user" },
   photoAlbum: { title: "ފޮޓޯ ގެލެރީ", unit: ["album", "albums"], date: "date", fields: `title, ${IMG("photos[0]")}`, icon: "image" },
@@ -102,7 +104,7 @@ export default function SectionList(props: { options?: { type?: string } }) {
   const { ChildLink, BackLink, routerPanesState, groupIndex } = usePaneRouter();
   const [raw, setRaw] = useState<Raw[] | null>(null);
   const [views, setViews] = useState<Record<string, number>>({});
-  const [show, setShow] = useState<Kind | "all">("all");
+  const [show, setShow] = useState<Kind | "all" | "ready">("all");
   const [search, setSearch] = useState("");
   const [now, setNow] = useState(0);
   // Swipe to delete: the row left open, the row being dragged, and the item being asked about.
@@ -115,7 +117,7 @@ export default function SectionList(props: { options?: { type?: string } }) {
   const start = useRef<{ id: string; x: number; y: number; base: number; moved: boolean } | null>(null);
   const justDragged = useRef(false);
 
-  const query = `*[_type == $type]{ _id, ${cfg.fields}${cfg.date ? `, "date": ${cfg.date}` : ""}${cfg.views ? `, "slug": slug.current` : ""} }`;
+  const query = `*[_type == $type]{ _id, ${cfg.fields}${cfg.date ? `, "date": ${cfg.date}` : ""}${cfg.views ? `, "slug": slug.current` : ""}${cfg.stages ? ", stage" : ""} }`;
   const refresh = useCallback(() => {
     client.fetch<Raw[]>(query, { type }, { perspective: "raw" }).then((r) => {
       setRaw(r);
@@ -158,7 +160,7 @@ export default function SectionList(props: { options?: { type?: string } }) {
       const r = (draft ?? pub)!;
       const date = r.date;
       const kind: Kind = !pub ? "draft" : draft ? "changes" : date && cfg.date === "publishedAt" && Date.parse(date) > now ? "scheduled" : "published";
-      list.push({ id, title: r.title?.trim() || "—", sub: r.sub ?? "", img: r.img, date, slug: pub?.slug, kind });
+      list.push({ id, title: r.title?.trim() || "—", sub: r.sub ?? "", img: r.img, date, slug: pub?.slug, kind, stage: kind === "published" ? undefined : r.stage });
     }
     return list.sort((a, b) =>
       cfg.date ? (b.date ?? "9999").localeCompare(a.date ?? "9999") : a.title.localeCompare(b.title),
@@ -178,13 +180,16 @@ export default function SectionList(props: { options?: { type?: string } }) {
 
   const counts = useMemo(() => {
     const c: Record<string, number> = { all: items.length };
-    for (const i of items) c[i.kind] = (c[i.kind] ?? 0) + 1;
+    for (const i of items) {
+      c[i.kind] = (c[i.kind] ?? 0) + 1;
+      if (i.stage === "ready") c.ready = (c.ready ?? 0) + 1;
+    }
     return c;
   }, [items]);
 
   const q = search.trim().toLowerCase();
   const visible = items.filter(
-    (i) => (show === "all" || i.kind === show) && (!q || i.title.toLowerCase().includes(q) || i.sub.toLowerCase().includes(q)),
+    (i) => (show === "all" || i.kind === show || (show === "ready" && i.stage === "ready")) && (!q || i.title.toLowerCase().includes(q) || i.sub.toLowerCase().includes(q)),
   );
 
   // Month groups for dated lists; one group for writers.
@@ -219,7 +224,9 @@ export default function SectionList(props: { options?: { type?: string } }) {
   }) => ReactNode;
   const Back = BackLink as unknown as (p: { className: string; "aria-label": string; children: ReactNode }) => ReactNode;
   const label = (k: Kind) => cfg.labels?.[k] ?? LABELS[k];
-  const chips = CHIPS.filter((c) => c.kind === "all" || c.kind === "published" || counts[c.kind]);
+  const chips: { kind: Kind | "all" | "ready"; name: string }[] = CHIPS.filter((c) => c.kind === "all" || c.kind === "published" || counts[c.kind]);
+  // Articles waiting for an editor get their own filter.
+  if (cfg.stages && counts.ready) chips.splice(1, 0, { kind: "ready", name: "Ready for edit" });
 
   // A sideways drag moves the row; an up-and-down one is left to scrolling.
   const down = (e: PointerEvent<HTMLElement>, id: string) => {
@@ -396,6 +403,7 @@ export default function SectionList(props: { options?: { type?: string } }) {
                         {i.kind !== "published" && <span className={`sl-kind ${i.kind}`}>{label(i.kind)}</span>}
                       </span>
                     )}
+                    {i.stage && STAGE_EN[i.stage] && <span className={`sl-stage ${i.stage}`}>{STAGE_EN[i.stage]}</span>}
                   </span>
                   {cfg.views && i.slug && views[cleanSlug(i.slug)] !== undefined && (
                     <span className="sl-views" aria-label={`${views[cleanSlug(i.slug)]} reads`}>
