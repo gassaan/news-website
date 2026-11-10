@@ -1388,6 +1388,78 @@
   font: 500 12px Inter, sans-serif;
   color: var(--ef-muted);
 }
+/* Full screen: the text box fills the screen (over the rest of the newsroom), with the
+   article's title and a Done button on top. Popups and the phone toolbar stay above it. */
+.re-full {
+  --ef-card: #150735;
+  --ef-edge: #3e2a72;
+  --ef-field: #0e0426;
+  --ef-text: #fbf8ff;
+  --ef-label: #c9b6f5;
+  --ef-muted: #b7a6e6;
+  position: fixed;
+  inset: 0;
+  z-index: 2147481000;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: #0e0426;
+  color: var(--ef-text);
+}
+[data-scheme="light"] .re-full {
+  --ef-card: #fff;
+  --ef-edge: rgba(62, 33, 128, 0.22);
+  --ef-field: #fff;
+  --ef-text: #1a0f3d;
+  --ef-label: #5b4691;
+  --ef-muted: #5b4691;
+  background: #fff;
+}
+.re-full-in {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: calc(64px + env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 40vh max(16px, env(safe-area-inset-left));
+}
+@media (pointer: fine) {
+  .re-full-in {
+    padding-top: 24px;
+  }
+}
+.re-full-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.re-full-head b {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 700 18px var(--font-thaana), Inter, sans-serif;
+  color: var(--ef-label);
+}
+.re-full .re-doc {
+  min-height: 70vh;
+  border: 0;
+  padding: 4px 2px;
+  background: transparent;
+  font-size: 20px;
+}
+.re-full .re-bar.re-bar-inline {
+  background: var(--ef-card);
+}
+.re-full-note {
+  width: 100%;
+  min-height: 120px;
+  border: 1px dashed var(--ef-edge);
+  border-radius: 16px;
+  background: var(--ef-field);
+  color: var(--ef-muted);
+  font: 500 14px Inter, sans-serif;
+  cursor: pointer;
+}
+
 /* Computers: the same toolbar on top of the text box, staying in view while scrolling. */
 .re-bar.re-bar-inline {
   position: sticky;

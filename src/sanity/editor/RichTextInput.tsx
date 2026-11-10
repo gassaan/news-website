@@ -267,6 +267,8 @@ const I = ({ d, fill = false }: { d: string; fill?: boolean }) => (
 );
 const ICONS = {
   plus: <I d="M12 5v14M5 12h14" />,
+  expand: <I d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />,
+  shrink: <I d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5" />,
   bold: <b className="re-glyph">B</b>,
   heading: <b className="re-glyph">H</b>,
   quote: <I fill d="M10 7H6a2 2 0 0 0-2 2v4h4v4l2-4V7zm10 0h-4a2 2 0 0 0-2 2v4h4v4l2-4V7z" />,
@@ -332,6 +334,8 @@ export function RichTextInput(props: TextInputProps) {
   const [url, setUrl] = useState("");
   const [touch] = useState(() => typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches);
   const [fileInput, setFileInput] = useState<HTMLInputElement | null>(null);
+  // Full screen: the text box fills the screen for writing without distractions.
+  const [full, setFull] = useState(false);
 
   // Sanity refuses changes while the page is (re)connecting. The text stays in the editor
   // and saving is tried again shortly, so nothing typed is lost.
@@ -437,6 +441,27 @@ export function RichTextInput(props: TextInputProps) {
 
   // Save what's typed before leaving the page.
   useEffect(() => () => flush(), []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Full screen: the page behind doesn't scroll, Escape closes it, and the cursor stays
+  // in the text after switching either way.
+  useEffect(() => {
+    if (!full) return;
+    const root = document.documentElement;
+    const before = root.style.overflow;
+    root.style.overflow = "hidden";
+    const esc = (e: KeyboardEvent) => e.key === "Escape" && !sheet && setFull(false);
+    document.addEventListener("keydown", esc);
+    return () => {
+      root.style.overflow = before;
+      document.removeEventListener("keydown", esc);
+    };
+  }, [full, sheet]);
+  const toggleFull = (e?: MouseEvent<HTMLElement>) => {
+    const from = e?.currentTarget ?? editor?.view.dom;
+    setScheme(from?.closest("[data-scheme]")?.getAttribute("data-scheme") ?? scheme);
+    setFull((f) => !f);
+    setTimeout(() => editor?.commands.focus(), 50);
+  };
 
   // Phones: the toolbar is pinned to the top of what's visible while typing. The bottom,
   // above the keyboard, is where iPhone Safari puts its own bar and the address pill.
@@ -564,6 +589,9 @@ export function RichTextInput(props: TextInputProps) {
       <button type="button" className="re-tb" aria-label="Undo" disabled={!state?.undo} onPointerDown={keepFocus} onMouseDown={keepFocus} onClick={() => editor?.chain().focus().undo().run()}>
         {ICONS.undo}
       </button>
+      <button type="button" className="re-tb" aria-label={full ? "Exit full screen" : "Full screen"} aria-pressed={full} onPointerDown={keepFocus} onMouseDown={keepFocus} onClick={toggleFull}>
+        {full ? ICONS.shrink : ICONS.expand}
+      </button>
     </div>
   );
 
@@ -582,10 +610,40 @@ export function RichTextInput(props: TextInputProps) {
           e.target.value = "";
         }}
       />
-      {!touch && editor?.isEditable && toolbar}
-      <EditorContent editor={editor} className="re-editor" />
+      {full ? (
+        <button type="button" className="re-full-note" onClick={() => toggleFull()}>
+          Writing in full screen. Tap here to come back.
+        </button>
+      ) : (
+        <>
+          {!touch && editor?.isEditable && toolbar}
+          <EditorContent editor={editor} className="re-editor" />
+        </>
+      )}
       {busy && <p className="ef-note">Uploading the photo…</p>}
       {error && <p className="ef-photo-error">{error}</p>}
+
+      {full &&
+        createPortal(
+          <div data-scheme={scheme}>
+            <div className="re-full" role="dialog" aria-modal="true" aria-label="Writing in full screen">
+              <div className="re-full-in">
+                <div className="re-full-head">
+                  <b dir="rtl">{parent?.title || "ލިޔުން"}</b>
+                  <button type="button" className="re-pill" onClick={(e) => toggleFull(e)}>
+                    {ICONS.shrink}
+                    Done
+                  </button>
+                </div>
+                {!touch && editor?.isEditable && toolbar}
+                <EditorContent editor={editor} className="re-editor" />
+                {busy && <p className="ef-note">Uploading the photo…</p>}
+                {error && <p className="ef-photo-error">{error}</p>}
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
 
       <div className="re-foot">
         {!readOnly && (
@@ -597,6 +655,10 @@ export function RichTextInput(props: TextInputProps) {
         <button type="button" className="re-pill" onClick={(e) => open("preview", e)}>
           {ICONS.eye}
           Preview
+        </button>
+        <button type="button" className="re-pill" onClick={(e) => toggleFull(e)}>
+          {ICONS.expand}
+          Full screen
         </button>
         {words > 0 && (
           <span className="re-count">
