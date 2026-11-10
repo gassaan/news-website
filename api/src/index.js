@@ -273,7 +273,8 @@ async function addAdEvent(env, who, ads, event) {
   }
 }
 
-async function adStats(env, ids) {
+// Totals per advert; with days, also each day's numbers (for the advertiser's report).
+async function adStats(env, ids, days = false) {
   if (!ids.length) return {};
   const marks = ids.map((_, i) => `?${i + 1}`).join(",");
   const { results } = await env.DB.prepare(
@@ -281,7 +282,14 @@ async function adStats(env, ids) {
   )
     .bind(...ids)
     .all();
-  return Object.fromEntries(results.map((r) => [r.ad, { seen: r.seen, taps: r.taps, first: r.first, last: r.last }]));
+  const out = Object.fromEntries(results.map((r) => [r.ad, { seen: r.seen, taps: r.taps, first: r.first, last: r.last }]));
+  if (days) {
+    const { results: rows } = await env.DB.prepare(`SELECT ad, day, seen, taps FROM ad_stats WHERE ad IN (${marks}) ORDER BY day`)
+      .bind(...ids)
+      .all();
+    for (const r of rows) if (out[r.ad]) (out[r.ad].days ??= []).push({ day: r.day, seen: r.seen, taps: r.taps });
+  }
+  return out;
 }
 
 // ---------- Dashboard ----------
@@ -529,7 +537,7 @@ async function handle(request, env) {
       const refused = await adminOnly(request, env, path, h);
       if (refused) return refused;
       const ids = (q.get("ids") ?? "").split(",").filter((s) => DOC_ID.test(s) && !s.startsWith("drafts.")).slice(0, 50);
-      return json(await adStats(env, ids), 200, h);
+      return json(await adStats(env, ids, q.get("days") === "1"), 200, h);
     }
     if (path === "/likes") {
       const ids = (q.get("ids") ?? "").split(",").filter((s) => DOC_ID.test(s)).slice(0, 100);

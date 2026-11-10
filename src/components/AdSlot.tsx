@@ -1,3 +1,4 @@
+import Link from "next/link";
 import AdBox from "./AdBox";
 import { adStatus, getAds, type AdPlace } from "@/lib/ads";
 
@@ -5,7 +6,12 @@ import { adStatus, getAds, type AdPlace } from "@/lib/ads";
 // newsroom under Ads) it shows one of them; otherwise "Advertise here".
 export default function AdSlot({ place, className = "" }: { place: AdPlace; className?: string }) {
   const ads = getAds(place);
-  const placeholder = <div className="slot">Advertise here</div>;
+  // The empty space leads businesses to the page about advertising.
+  const placeholder = (
+    <Link href="/advertise" className="slot">
+      Advertise here
+    </Link>
+  );
   if (!ads.length) {
     return (
       <div className={`wrap ad ${className}`}>

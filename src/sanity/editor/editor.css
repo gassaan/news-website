@@ -1779,3 +1779,71 @@
 .nr-tiles.ad-tiles {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
+
+/* An advert's share of each space (ads.tsx WeightInput). */
+.ad-share {
+  display: grid;
+  gap: 8px;
+  padding-top: 4px;
+}
+.ad-share b {
+  color: var(--ef-text);
+}
+.ad-share-bar {
+  display: flex;
+  height: 12px;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.ad-share-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 5px;
+  font: 500 12.5px Inter, sans-serif;
+  color: var(--ef-muted);
+}
+.ad-share-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ad-share-list i {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  flex: none;
+}
+.ad-share-list b {
+  margin-left: auto;
+}
+
+/* The advertiser's report (ads.tsx ReportButton). */
+.ad-report {
+  display: grid;
+  gap: 10px;
+  margin-top: 10px;
+}
+.ad-report-make,
+.ad-report-share {
+  background: #a882ff;
+  color: #150735;
+}
+.ad-report-pic {
+  width: min(100%, 360px);
+  border-radius: 14px;
+  justify-self: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+.ad-report-btns {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.ad-report-btns .ad-report-share {
+  flex: 1;
+}
+.ef-choices.ad-weights {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}

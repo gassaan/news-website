@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { API_URL, voterId } from "@/lib/api";
-import { adStatus, type Ad, type AdPicture } from "@/lib/adPlaces";
+import { adStatus, pickAd, type Ad, type AdPicture } from "@/lib/adPlaces";
 
 // One advert space: picks a running advert for this place (checking its dates in the
 // reader's browser, so adverts start and end on time between site updates), counts
@@ -12,7 +12,7 @@ import { adStatus, type Ad, type AdPicture } from "@/lib/adPlaces";
 // Seen adverts are sent together, a moment after they appear, in one small request.
 const queue = new Set<string>();
 let timer: ReturnType<typeof setTimeout> | undefined;
-function send(event: "seen" | "tap", ads: string[]) {
+export function send(event: "seen" | "tap", ads: string[]) {
   if (!API_URL || !ads.length) return;
   const body = JSON.stringify({ event, ads: ads.slice(0, 10), voter: voterId() });
   // A beacon still arrives when the tap opens another page.
@@ -20,7 +20,7 @@ function send(event: "seen" | "tap", ads: string[]) {
     fetch(`${API_URL}/ad`, { method: "POST", body, keepalive: true }).catch(() => {});
   }
 }
-function seen(id: string) {
+export function seen(id: string) {
   queue.add(id);
   clearTimeout(timer);
   timer = setTimeout(() => {
@@ -29,8 +29,8 @@ function seen(id: string) {
   }, 1500);
 }
 
-const running = (ads: Ad[], now: number) => ads.filter((a) => adStatus(a, now) === "running");
-const url = (p: AdPicture, w: number) => `${p.src}?w=${w}&auto=format&q=80`;
+export const running = (ads: Ad[], now: number) => ads.filter((a) => adStatus(a, now) === "running");
+export const url = (p: AdPicture, w: number) => `${p.src}?w=${w}&auto=format&q=80`;
 
 export default function AdBox({
   ads,
@@ -54,13 +54,10 @@ export default function AdBox({
   const [id, setId] = useState(first);
   const box = useRef<HTMLAnchorElement | HTMLDivElement | null>(null);
 
-  // On the reader's clock: keep the built-in choice if it's still running, otherwise
-  // (or when several are running) pick one at random; none running shows the placeholder.
+  // On the reader's clock: one of the adverts running now, the ones set to show more
+  // often picked more often; none running shows the placeholder.
   useEffect(() => {
-    const t = setTimeout(() => {
-      const now = running(ads, Date.now());
-      setId(now.length === 0 ? null : now.length === 1 ? now[0].id : now[Math.floor(Math.random() * now.length)].id);
-    }, 0);
+    const t = setTimeout(() => setId(pickAd(running(ads, Date.now()), Math.random())?.id ?? null), 0);
     return () => clearTimeout(t);
   }, [ads]);
 

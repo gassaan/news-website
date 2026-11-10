@@ -17,8 +17,8 @@ import "./home.css";
 // asks before anything is deleted.
 
 type Kind = "draft" | "changes" | "scheduled" | "published";
-type Raw = { _id: string; title?: string; sub?: string; img?: string; date?: string; slug?: string; stage?: string; start?: string; end?: string; paused?: boolean };
-type Item = { id: string; title: string; sub: string; img?: string; date?: string; slug?: string; kind: Kind; stage?: string; ad?: AdStatus; start?: string; end?: string };
+type Raw = { _id: string; title?: string; sub?: string; img?: string; date?: string; slug?: string; stage?: string; start?: string; end?: string; paused?: boolean; weight?: string };
+type Item = { id: string; title: string; sub: string; img?: string; date?: string; slug?: string; kind: Kind; stage?: string; ad?: AdStatus; start?: string; end?: string; weight?: string };
 
 type Config = {
   title: string;
@@ -43,7 +43,7 @@ const CONFIG: Record<string, Config> = {
   ad: {
     title: "Ads",
     unit: ["ad", "ads"],
-    fields: `"title": name, ${IMG("wide")}, "start": startsAt, "end": endsAt, paused`,
+    fields: `"title": name, ${IMG("wide")}, "start": startsAt, "end": endsAt, paused, weight`,
     icon: "megaphone",
     ads: true,
   },
@@ -192,7 +192,7 @@ export default function SectionList(props: { options?: { type?: string } }) {
       // An advert's status follows what's on the site (the published version).
       const live = pub ?? r;
       const ad = cfg.ads ? adStatus(live, now, Boolean(pub)) : undefined;
-      list.push({ id, title: r.title?.trim() || "—", sub: r.sub ?? "", img: r.img, date, slug: pub?.slug, kind, stage: kind === "published" ? undefined : r.stage, ad, start: live.start, end: live.end });
+      list.push({ id, title: r.title?.trim() || "—", sub: r.sub ?? "", img: r.img, date, slug: pub?.slug, kind, stage: kind === "published" ? undefined : r.stage, ad, start: live.start, end: live.end, weight: live.weight });
     }
     return list.sort((a, b) =>
       cfg.ads
@@ -448,6 +448,7 @@ export default function SectionList(props: { options?: { type?: string } }) {
                       <span className="sl-meta sl-ad">
                         <span className={`sl-adpill ${i.ad}`}>{AD_LABELS[i.ad]}</span>
                         {adText(i, now) && <span>{adText(i, now)}</span>}
+                        {i.weight && i.weight !== "normal" && <span>· Shows {i.weight === "less" ? "less" : i.weight === "most" ? "most" : "more"} often</span>}
                       </span>
                     )}
                     {!cfg.ads && (i.date || i.kind !== "published") && (

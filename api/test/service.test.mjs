@@ -170,6 +170,8 @@ check((await call("/ads/stats?ids=ad-1")).status === 403, "adverts: numbers refu
 check((await call("/ads/stats?ids=ad-1", { token: "editor" })).status === 403, "adverts: numbers refused for an editor");
 const adNums = await (await call("/ads/stats?ids=ad-1,ad-2", { token: "admin" })).json();
 check(adNums["ad-1"]?.seen === 2 && adNums["ad-1"]?.taps === 1 && adNums["ad-2"]?.seen === 1, "adverts: seen and tapped once per person a day, shown to the administrator");
+const adDays = await (await call("/ads/stats?ids=ad-1&days=1", { token: "admin" })).json();
+check(adDays["ad-1"]?.days?.length === 1 && adDays["ad-1"].days[0].seen === 2, "adverts: each day's numbers for the advertiser's report");
 
 // --- Errors never show internals
 const broken = await worker.fetch(new Request("https://api.test/stats", { headers: { Origin: SITE } }), { ...env, DB: null });

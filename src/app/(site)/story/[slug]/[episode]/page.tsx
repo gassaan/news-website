@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import StoryBreakAd from "@/components/StoryBreakAd";
+import { getAds } from "@/lib/ads";
 import { stories } from "@/lib/articles";
 import ArticleBody from "@/components/ArticleBody";
 import EpisodeRatingWidget from "@/components/EpisodeRatingWidget";
@@ -66,12 +68,12 @@ export default async function StoryEpisodePage({
         {/* Full-width buttons, easy to reach with a thumb: next on top, previous below. */}
         <nav className="ep-nav" aria-label="ބައިތައް">
           {nextHref ? (
-            <Link href={nextHref} className="ep-btn solid">
+            <StoryBreakAd href={nextHref} ads={getAds("story-break")} episode={episodeNumber + 1} className="ep-btn solid">
               ދެން އޮތް ބައި ކިޔާލާ
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <path d="M19 12H5M11 6l-6 6 6 6" />
               </svg>
-            </Link>
+            </StoryBreakAd>
           ) : (
             <p className="ep-end">ވާހަކަ ނިމިއްޖެ</p>
           )}

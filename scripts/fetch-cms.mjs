@@ -45,7 +45,7 @@ const QUERY = `{
   "commentTargets": *[_type == "comment" && kind == "article"].target,
   "breaking": *[_id == "breakingNews"][0] { on, headline, "slug": article->slug.current, "title": article->title },
   "ads": *[_type == "ad" && paused != true && (!defined(endsAt) || endsAt > now())] | order(startsAt desc) {
-    _id, name, link, places, "start": startsAt, "end": endsAt,
+    _id, name, link, places, weight, "start": startsAt, "end": endsAt,
     "wide": wide.asset->{ url, "w": metadata.dimensions.width, "h": metadata.dimensions.height },
     "square": square.asset->{ url, "w": metadata.dimensions.width, "h": metadata.dimensions.height } },
   "stamp": { "latest": *[_type != "comment"] | order(_updatedAt desc)[0]._updatedAt, "count": count(*[_type != "comment"]), "due": ${DUE} }
@@ -199,7 +199,7 @@ if (r.breaking?.on) {
 
 // Adverts that haven't ended (the page itself hides them once their time is up, and
 // shows ones that start later on their day). Links only to web addresses.
-const AD_PLACES = new Set(["home", "article-top", "article-in", "article-end", "category", "other"]);
+const AD_PLACES = new Set(["home", "article-top", "article-in", "article-end", "category", "other", "story-break"]);
 const adPicture = (p) => (p?.url && p.w && p.h ? { src: p.url, w: p.w, h: p.h } : undefined);
 const ads = (r.ads ?? [])
   .map((a) => ({
@@ -209,6 +209,7 @@ const ads = (r.ads ?? [])
     places: (a.places ?? []).filter((p) => AD_PLACES.has(p)),
     ...(a.start ? { start: a.start } : {}),
     ...(a.end ? { end: a.end } : {}),
+    ...(["less", "more", "most"].includes(a.weight) ? { weight: a.weight } : {}),
     ...(adPicture(a.wide) ? { wide: adPicture(a.wide) } : {}),
     ...(adPicture(a.square) ? { square: adPicture(a.square) } : {}),
   }))

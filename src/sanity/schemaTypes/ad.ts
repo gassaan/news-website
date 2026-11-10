@@ -1,7 +1,7 @@
 import { defineField, defineType } from "sanity";
-import { AD_PLACES } from "../../lib/adPlaces";
+import { AD_PLACES, AD_WEIGHTS } from "../../lib/adPlaces";
 import { DateTimeInput, PhotoInput } from "../editor/inputs";
-import { AdStatsInput, PlacesInput } from "../editor/ads";
+import { AdStatsInput, PlacesInput, WeightInput } from "../editor/ads";
 
 // An advert: shown in the "Advertise here" spaces on the site between its dates.
 export const ad = defineType({
@@ -38,9 +38,19 @@ export const ad = defineType({
       type: "array",
       of: [{ type: "string" }],
       options: { list: AD_PLACES },
-      initialValue: AD_PLACES.map((p) => p.value),
+      // Everywhere except the full-screen one between story episodes, which is picked on purpose.
+      initialValue: AD_PLACES.filter((p) => p.value !== "story-break").map((p) => p.value),
       components: { input: PlacesInput },
       validation: (r) => r.required().min(1),
+    }),
+    defineField({
+      name: "weight",
+      title: "How often it shows",
+      description: "When other ads share the same space",
+      type: "string",
+      options: { list: AD_WEIGHTS.map(({ title, value }) => ({ title, value })) },
+      initialValue: "normal",
+      components: { input: WeightInput },
     }),
     defineField({
       name: "startsAt",
