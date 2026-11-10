@@ -1,0 +1,16 @@
+{
+  "name": "Hulhangu Newsroom",
+  "short_name": "Newsroom",
+  "description": "Write and publish for Hulhangu.",
+  "id": "./studio/",
+  "start_url": "./studio/",
+  "scope": "./studio/",
+  "display": "standalone",
+  "background_color": "#150735",
+  "theme_color": "#150735",
+  "icons": [
+    { "src": "studio-icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "studio-icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "studio-icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

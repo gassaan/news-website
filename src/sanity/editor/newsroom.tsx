@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
-import { useClient, useFormValue } from "sanity";
+import { useClient, useDocumentOperation, useFormValue, type DocumentActionDescription, type DocumentActionProps, type StringInputProps, type TextInputProps } from "sanity";
+import { ChoiceInput, photoUrl } from "./inputs";
+import { useIsEditor } from "../roles";
 import { API_URL } from "../../lib/api";
 import { plainText } from "../../lib/richText";
 
@@ -84,7 +86,7 @@ export function ChecklistInput() {
   );
 }
 
-type Stats = { week: Record<string, number>; month: Record<string, number> };
+type Stats = { week?: Record<string, number>; month?: Record<string, number> };
 const cleanSlug = (slug: string) => slug.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 const fmt = (n: number) => Math.round(n).toLocaleString("en-US");
 
@@ -123,7 +125,7 @@ export function StatsInput() {
         .then((r) => (r.ok ? r.json() : null))
         .then((s: Stats | null) => {
           if (!live || !s) return;
-          setNums((n) => ({ ...n, week: s.week[slug] ?? s.week[key] ?? 0, month: s.month[slug] ?? s.month[key] ?? 0 }));
+          setNums((n) => ({ ...n, week: s.week?.[slug] ?? s.week?.[key] ?? 0, month: s.month?.[slug] ?? s.month?.[key] ?? 0 }));
         }, () => {});
     }
     return () => {
@@ -156,6 +158,96 @@ export function StatsInput() {
           Open on the website ↗
         </a>
       )}
+    </div>
+  );
+}
+
+type FbDoc = {
+  title?: string;
+  excerpt?: string;
+  facebookText?: string;
+  facebookImage?: string;
+  sensitivePhoto?: boolean;
+  image?: { asset?: { _ref?: string } };
+  poster?: { asset?: { _ref?: string } };
+};
+
+// The Facebook caption box, with a preview of the post below it: the page, the text
+// (or the headline and summary when the box is left empty) and the link card.
+export function FacebookTextInput(props: TextInputProps) {
+  const client = useClient({ apiVersion: "2025-02-19" });
+  const { projectId = "", dataset = "" } = client.config();
+  const doc = (useFormValue([]) ?? {}) as FbDoc;
+  const own = (props.value ?? "").trim();
+  const text = own || [doc.title, doc.excerpt].filter(Boolean).join("\n\n");
+  const ref = (doc.image ?? doc.poster)?.asset?._ref;
+  const photo = ref ? `${photoUrl(ref, projectId, dataset, 800)}${doc.sensitivePhoto ? "&blur=120" : ""}` : "";
+  const card = doc.facebookImage === "card";
+  // Facebook folds long posts after about three lines on phones.
+  const folds = text.split("\n").length > 3 || text.length > 240;
+  return (
+    <div className="ef-stack">
+      {props.renderDefault(props)}
+      <p className="ef-note">How the post will look on Facebook:</p>
+      <div className="fbp" dir="rtl">
+        <div className="fbp-head">
+          <span className="fbp-av">H</span>
+          <span className="fbp-who">
+            <b>Hulhangu</b>
+            <small>Just now · 🌐</small>
+          </span>
+        </div>
+        <p className={`fbp-text${folds ? " folds" : ""}`}>{text || "…"}</p>
+        {folds && <span className="fbp-more">See more</span>}
+        {card ? (
+          <div className="fbp-card-pic">The share picture (headline, summary and photo)</div>
+        ) : (
+          <div className="fbp-link" dir="ltr">
+            {photo ? (
+              // eslint-disable-next-line @next/next/no-img-element -- Sanity's own resized picture
+              <img src={photo} alt="" />
+            ) : (
+              <div className="fbp-nopic">No main photo yet</div>
+            )}
+            <div className="fbp-link-meta">
+              <small>GASSAAN.GITHUB.IO</small>
+              <b dir="rtl">{doc.title || "…"}</b>
+            </div>
+          </div>
+        )}
+      </div>
+      {!own && <p className="ef-note">The box is empty, so the headline and summary are used.</p>}
+    </div>
+  );
+}
+
+// Writers send a finished article to an editor (its status becomes Ready for edit)
+// instead of publishing it themselves.
+export function SendToEditorAction(props: DocumentActionProps): DocumentActionDescription {
+  const { patch } = useDocumentOperation(props.id, props.type);
+  const doc = (props.draft ?? props.published) as { stage?: string } | null;
+  const sent = doc?.stage === "ready" || doc?.stage === "approved";
+  return {
+    label: sent ? (doc?.stage === "approved" ? "Approved by an editor" : "Sent to an editor") : "Send to editor",
+    tone: "primary",
+    disabled: sent || !props.draft,
+    title: props.draft ? undefined : "Write or change something first",
+    onHandle: () => {
+      patch.execute([{ set: { stage: "ready" } }]);
+      props.onComplete();
+    },
+  };
+}
+
+// Article status buttons: only editors can mark an article Approved.
+export function StageInput(props: StringInputProps) {
+  const editor = useIsEditor();
+  const list = props.schemaType.options?.list ?? [];
+  const shown = editor ? list : list.filter((o) => typeof o === "string" || o.value !== "approved" || props.value === "approved");
+  return (
+    <div className="ef-stack">
+      <ChoiceInput {...props} schemaType={{ ...props.schemaType, options: { ...props.schemaType.options, list: shown } }} />
+      {!editor && <p className="ef-note">An editor marks the article Approved and publishes it.</p>}
     </div>
   );
 }

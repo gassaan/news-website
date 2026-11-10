@@ -31,6 +31,8 @@ export type Article = {
   audio?: string;
   // Who took or supplied the main photo, shown on it only when filled in.
   photoCredit?: string;
+  // The main photo is distressing: blurred on the site until the reader chooses to see it.
+  sensitive?: boolean;
   episodes?: Episode[];
 };
 

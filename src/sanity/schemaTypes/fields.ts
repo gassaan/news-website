@@ -5,6 +5,7 @@ import { formatWhen } from "../dates";
 export { formatWhen };
 import { ChoiceInput, DateTimeInput, FacebookSwitch, PhotoInput, SlugInput } from "../editor/inputs";
 import { RichTextInput } from "../editor/RichTextInput";
+import { FacebookTextInput } from "../editor/newsroom";
 
 // Category list mirrors the site's fixed categories (src/lib/articles.ts).
 export const CATEGORY_OPTIONS = [
@@ -144,6 +145,7 @@ export const facebookFields = ({ withPicture = false } = {}) => [
     description: "ހުސްކޮށް ބާއްވައިފިނަމަ، ސުރުޚީ އާއި ކުރު ޚުލާސާ ލިޔެވޭނެ.",
     type: "text",
     rows: 3,
+    components: { input: FacebookTextInput },
     fieldset: "facebook",
     hidden: ({ document }) => !ticked(document),
     readOnly: ({ document }) => posted(document),

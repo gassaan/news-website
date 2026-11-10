@@ -5,6 +5,7 @@ import { IntentLink } from "sanity/router";
 import { usePaneRouter } from "sanity/structure";
 import { API_URL } from "../../lib/api";
 import { STAGE_EN } from "../editor/newsroom";
+import { useIsEditor } from "../roles";
 import "./home.css";
 
 // A section's list (articles, stories, polls, …), opened from a tile on the start
@@ -101,6 +102,8 @@ export default function SectionList(props: { options?: { type?: string } }) {
   const type = props.options?.type ?? "article";
   const cfg = CONFIG[type] ?? CONFIG.article;
   const client = useClient({ apiVersion: "2025-02-19" });
+  // Only editors can swipe an item away to delete it.
+  const editor = useIsEditor();
   const { ChildLink, BackLink, routerPanesState, groupIndex } = usePaneRouter();
   const [raw, setRaw] = useState<Raw[] | null>(null);
   const [views, setViews] = useState<Record<string, number>>({});
@@ -230,6 +233,7 @@ export default function SectionList(props: { options?: { type?: string } }) {
 
   // A sideways drag moves the row; an up-and-down one is left to scrolling.
   const down = (e: PointerEvent<HTMLElement>, id: string) => {
+    if (!editor) return;
     justDragged.current = false; // phones send no tap after a swipe, so clear it here
     start.current = { id, x: e.clientX, y: e.clientY, base: swiped === id ? OPEN : 0, moved: false };
   };

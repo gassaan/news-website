@@ -1,7 +1,18 @@
+import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import "./studio.css";
 
-export const metadata = { title: "Hulhangu – Studio" };
+const base = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
+// Added to a phone's home screen, the newsroom opens full screen like an app,
+// with its own icon and name.
+export const metadata: Metadata = {
+  title: "Hulhangu – Studio",
+  manifest: `${base}/studio.webmanifest`,
+  appleWebApp: { capable: true, title: "Newsroom", statusBarStyle: "black" },
+  icons: { apple: `${base}/studio-icons/apple-touch-icon.png` },
+};
+export const viewport: Viewport = { themeColor: "#150735" };
 
 // The website's Thaana fonts, used across the dashboard (English stays in Sanity's Inter).
 const thaana = localFont({

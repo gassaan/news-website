@@ -1,6 +1,6 @@
 import { defineType, defineField } from "sanity";
 import { AudioInput, ChoiceInput, PollPickInput, SummaryInput, WriterInput } from "../editor/inputs";
-import { ChecklistInput, STAGE_OPTIONS, StatsInput } from "../editor/newsroom";
+import { ChecklistInput, STAGE_OPTIONS, StageInput, StatsInput } from "../editor/newsroom";
 import { CATEGORY_OPTIONS, FACEBOOK_FIELDSET, facebookFields, bodyField, dateTimeField, formatPublish, photoField, slugField, titleField } from "./fields";
 
 export const article = defineType({
@@ -17,7 +17,7 @@ export const article = defineType({
       type: "string",
       options: { list: STAGE_OPTIONS, layout: "radio" },
       initialValue: "writing",
-      components: { input: ChoiceInput },
+      components: { input: StageInput },
     }),
     titleField(),
     slugField(),
@@ -46,6 +46,15 @@ export const article = defineType({
       description: "ބޭނުންނަމަ ފޮޓޯ ނެގި ފަރާތް ލިޔުއްވާ. ލިޔުއްވައިފިނަމަ ސައިޓުގައި މައި ފޮޓޯގެ މަތީގައި ފެންނާނެ.",
       type: "string",
       validation: (r) => r.max(60),
+    }),
+    defineField({
+      name: "sensitivePhoto",
+      title: "ހިތްހަމަނުޖެހޭ ފޮޓޯއެއް",
+      // On: the website blurs the main photo until the reader chooses to see it.
+      description: "ބިރުވެރި ނުވަތަ ހިތާމަވެރި ފޮޓޯއެއްނަމަ މި ބަޓަން ހުޅުއްވާ. ސައިޓުގައި ފޮޓޯ ފޮރުވިފައި ހުންނާނީ، ކިޔާ މީހާ ބޭނުންނަމަ ފިއްތުމުން ފެންނާނެ.",
+      type: "boolean",
+      initialValue: false,
+      options: { layout: "switch" },
     }),
     defineField({
       name: "audio",

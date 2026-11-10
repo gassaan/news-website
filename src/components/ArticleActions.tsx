@@ -8,11 +8,13 @@ export default function ArticleActions({
   slug,
   summary,
   date,
+  sensitive = false,
 }: {
   title: string;
   slug: string;
   summary: string;
   date: string;
+  sensitive?: boolean;
 }) {
   const [toastVisible, setToastVisible] = useState(false);
   // The share button opens a small strip: Facebook, X and copy link.
@@ -108,7 +110,7 @@ export default function ArticleActions({
             </svg>
           </button>
         </div>
-        <ShareImage slug={slug} title={title} summary={summary} date={date} />
+        <ShareImage slug={slug} title={title} summary={summary} date={date} sensitive={sensitive} />
       </div>
       <p className="toast" id="toast" role="status" hidden={!toastVisible}>
         ލިންކު ކޮޕީ ކުރެވިއްޖެ

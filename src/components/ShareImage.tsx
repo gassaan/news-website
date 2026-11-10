@@ -90,9 +90,11 @@ function wrap(
   return lines;
 }
 
-async function loadPhoto(slug: string): Promise<ImageBitmap | null> {
-  const url = fullImage(slug);
-  if (!url) return null;
+async function loadPhoto(slug: string, blur = false): Promise<ImageBitmap | null> {
+  const full = fullImage(slug);
+  if (!full) return null;
+  // A distressing photo goes on the picture blurred (by the image service).
+  const url = blur && full.includes("cdn.sanity.io") ? `${full}${full.includes("?") ? "&" : "?"}blur=120` : full;
   try {
     const res = await fetch(url);
     if (!res.ok) return null;
@@ -128,6 +130,7 @@ async function drawPicture(
   title: string,
   summary: string,
   date: string,
+  sensitive = false,
 ): Promise<Blob | null> {
   const headEl = document.querySelector("h1.headline");
   const bodyEl = document.querySelector(".art-body p") ?? document.body;
@@ -143,7 +146,7 @@ async function drawPicture(
     document.fonts.load(dateFont, date),
     document.fonts.load(siteFont, SITE),
   ]).catch(() => {});
-  const [photo, logo] = await Promise.all([loadPhoto(slug), loadLogo()]);
+  const [photo, logo] = await Promise.all([loadPhoto(slug, sensitive), loadLogo()]);
 
   const canvas = document.createElement("canvas");
   canvas.width = W * SCALE;
@@ -280,11 +283,13 @@ export default function ShareImage({
   title,
   summary,
   date,
+  sensitive = false,
 }: {
   slug: string;
   title: string;
   summary: string;
   date: string;
+  sensitive?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [picture, setPicture] = useState<{ file: File; url: string } | null>(
@@ -295,17 +300,17 @@ export default function ShareImage({
   const triggerRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    window.hulhanguSharePicture = () => drawPicture(slug, title, summary, date);
+    window.hulhanguSharePicture = () => drawPicture(slug, title, summary, date, sensitive);
     return () => {
       delete window.hulhanguSharePicture;
     };
-  }, [slug, title, summary, date]);
+  }, [slug, title, summary, date, sensitive]);
 
   async function start() {
     setOpen(true);
     if (picture) return;
     setFailed(false);
-    const blob = await drawPicture(slug, title, summary, date);
+    const blob = await drawPicture(slug, title, summary, date, sensitive);
     if (!blob) {
       setFailed(true);
       return;

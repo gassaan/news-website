@@ -41,6 +41,7 @@ export async function generateMetadata({ params }: PageProps<"/article/[slug]">)
     description: article.excerpt,
     path: `/article/${article.slug}/`,
     imageKey: article.slug,
+    blurImage: article.sensitive,
   });
 }
 
@@ -73,7 +74,7 @@ export default async function ArticlePage({
 
       <article className="story-page">
         <figure className="lead lead-hero">
-          <ArticleImage slug={article.slug} alt={article.title} className="lead-img" priority />
+          <ArticleImage slug={article.slug} alt={article.title} className="lead-img" priority sensitive={article.sensitive} reveal />
           <figcaption>
             {article.photoCredit && (
               <span className="credit">
@@ -117,6 +118,7 @@ export default async function ArticlePage({
               slug={article.slug}
               summary={article.excerpt.trim() || plainText(article.body).slice(0, 600)}
               date={formatDhivehiDate(article.publishedAt)}
+              sensitive={article.sensitive}
             />
           </div>
         </div>

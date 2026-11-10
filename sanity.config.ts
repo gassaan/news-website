@@ -13,6 +13,8 @@ import StudioHome from "./src/sanity/home/StudioHome";
 import VoiceTraining from "./src/sanity/voice/VoiceTraining";
 import SectionList from "./src/sanity/home/SectionList";
 import { CardField } from "./src/sanity/editor/inputs";
+import { SendToEditorAction } from "./src/sanity/editor/newsroom";
+import { EDITOR_ACTIONS, isEditor } from "./src/sanity/roles";
 
 export default defineConfig({
   name: "hulhangu",
@@ -66,6 +68,14 @@ export default defineConfig({
   // The editors' dashboard: views, waiting comments, polls and readers.
   tools: (prev) => [...prev, { name: "dashboard", title: "Dashboard", icon: DashboardIcon, component: Dashboard }],
   schema: { types: schemaTypes },
+  // Writers write and send articles to an editor; only editors publish, unpublish,
+  // schedule and delete (see src/sanity/roles.ts).
+  document: {
+    actions: (prev, { currentUser, schemaType }) =>
+      isEditor(currentUser)
+        ? prev
+        : [...(schemaType === "article" ? [SendToEditorAction] : []), ...prev.filter((a) => !EDITOR_ACTIONS.includes(a.action ?? ""))],
+  },
   // The editing form: every field in its own rounded card.
   form: { components: { field: CardField } },
 });

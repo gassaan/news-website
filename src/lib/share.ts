@@ -6,11 +6,11 @@ export const SITE_URL = `https://gassaan.github.io${process.env.NEXT_PUBLIC_BASE
 
 // A 1200 × 630 JPEG of a dashboard photo, cut around its chosen focus point:
 // the size Facebook and WhatsApp show for a shared link.
-function shareImage(key: string): string | undefined {
+function shareImage(key: string, blur = false): string | undefined {
   const image = cmsImage(key);
   if (!image) return undefined;
   const [x, y] = (image.pos ?? "50% 50%").split(" ").map((v) => parseFloat(v) / 100);
-  return `${image.src.split("?")[0]}?w=1200&h=630&fit=crop&crop=focalpoint&fp-x=${x}&fp-y=${y}&fm=jpg&q=85`;
+  return `${image.src.split("?")[0]}?w=1200&h=630&fit=crop&crop=focalpoint&fp-x=${x}&fp-y=${y}&fm=jpg&q=85${blur ? "&blur=120" : ""}`;
 }
 
 // Title, summary and picture for a page's shared-link preview.
@@ -20,15 +20,18 @@ export function shareMetadata({
   path,
   imageKey,
   type = "article",
+  blurImage = false,
 }: {
   title: string;
   description?: string;
   path: string;
   imageKey: string;
   type?: "article" | "website";
+  // A distressing photo: link previews (Facebook, WhatsApp) show it blurred.
+  blurImage?: boolean;
 }): Metadata {
   const url = `${SITE_URL}${path}`;
-  const image = shareImage(imageKey);
+  const image = shareImage(imageKey, blurImage);
   const images = image ? [{ url: image, width: 1200, height: 630, alt: title }] : undefined;
   return {
     title: `${title} · Hulhangu`,

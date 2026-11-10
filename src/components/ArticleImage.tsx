@@ -1,6 +1,7 @@
 import { pseudoHue } from "@/lib/hue";
 import { cmsImage } from "@/lib/cmsImages";
 import EagerImg from "./EagerImg";
+import SensitiveCover from "./SensitiveCover";
 
 // Widths the dashboard's image service makes on request, so each phone or
 // computer downloads a picture no bigger than the slot it fills.
@@ -30,6 +31,8 @@ export default function ArticleImage({
   className = "",
   sizes,
   priority = false,
+  sensitive = false,
+  reveal = false,
 }: {
   slug: string;
   src?: string;
@@ -40,6 +43,9 @@ export default function ArticleImage({
   // The main picture at the top of the page: fetched straight away instead of
   // waiting until the page is laid out.
   priority?: boolean;
+  // A distressing photo: shown blurred. With reveal, a button lets the reader see it.
+  sensitive?: boolean;
+  reveal?: boolean;
 }) {
   const hue = pseudoHue(slug);
   // A photo from the dashboard fills the slot when no image was passed in.
@@ -49,7 +55,8 @@ export default function ArticleImage({
   const slotSizes = sizes ?? className.split(/\s+/).map((c) => CLASS_SIZES[c]).find(Boolean) ?? "100vw";
 
   return (
-    <div className={`ph ${className}`} style={{ "--h": hue } as React.CSSProperties}>
+    <div className={`ph ${className}${sensitive ? " ph-sensitive" : ""}`} style={{ "--h": hue } as React.CSSProperties}>
+      {sensitive && imageSrc && <SensitiveCover reveal={reveal} />}
       {imageSrc && (
         // Order matters when the browser builds the picture: lazy, then the slot
         // width, then the sizes, then the address. Any other order can start a

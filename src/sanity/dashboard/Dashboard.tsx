@@ -4,6 +4,7 @@ import { IntentLink } from "sanity/router";
 import { Card } from "@sanity/ui";
 import { API_URL } from "../../lib/api";
 import { SECTIONS } from "../../lib/sections";
+import { useIsEditor } from "../roles";
 import "./dashboard.css";
 
 // The editors' dashboard: how the site is read (from the site's online service),
@@ -469,6 +470,8 @@ function CommentsTab({
   now: number;
 }) {
   const client = useClient({ apiVersion: "2025-02-19" });
+  // Only editors approve or delete comments; writers can read them here.
+  const editor = useIsEditor();
   const [busy, setBusy] = useState<Record<string, "approve" | "delete">>({});
   const [asking, setAsking] = useState<string | null>(null);
   const [error, setError] = useState("");
@@ -524,13 +527,14 @@ function CommentsTab({
     <section className="hd-card">
       <h2>
         {list.length} comment{list.length === 1 ? "" : "s"} waiting
-        {list.length > 1 && (
+        {editor && list.length > 1 && (
           <button type="button" className="hd-btn" onClick={approveAll} disabled={Object.keys(busy).length > 0}>
             Approve all
           </button>
         )}
       </h2>
       {error && <p className="hd-note">{error}</p>}
+      {!editor && <p className="hd-small">Only editors can approve or delete comments.</p>}
       <div className="hd-inbox">
         {list.map((c) => {
           const title = c.target ? titles.get(c.target) : undefined;
@@ -546,6 +550,7 @@ function CommentsTab({
               </div>
               <p className="hd-com-text dv">{c.text}</p>
               {title && <p className="hd-com-on dv">↳ {title}</p>}
+              {editor && (
               <div className="hd-com-actions">
                 {asking === c._id ? (
                   <>
@@ -568,6 +573,7 @@ function CommentsTab({
                   </>
                 )}
               </div>
+              )}
             </article>
           );
         })}

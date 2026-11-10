@@ -3,6 +3,7 @@ import { useClient } from "sanity";
 import { IntentLink } from "sanity/router";
 import { usePaneRouter } from "sanity/structure";
 import { useNotifications } from "../notifications/useNotifications";
+import HomeScreenTip from "./HomeScreenTip";
 import "./home.css";
 
 // The CMS start screen: a purple welcome card with one-tap "new …" buttons, the
@@ -220,6 +221,8 @@ export default function StudioHome() {
           );
         })}
       </div>
+
+      <HomeScreenTip />
 
       <h2 className="sh-label">Site pages</h2>
       <div className="sh-pages">
