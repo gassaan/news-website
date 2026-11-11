@@ -13,6 +13,7 @@ import {
 } from "@/lib/articles";
 import ArticleImage from "@/components/ArticleImage";
 import ArticleBody from "@/components/ArticleBody";
+import ArticleTools from "@/components/ArticleTools";
 import ArticleListen from "@/components/ArticleListen";
 import DateStamp from "@/components/DateStamp";
 import ArticleActions from "@/components/ArticleActions";
@@ -72,7 +73,7 @@ export default async function ArticlePage({
       )}
       <AdSlot place="article-top" className="art-top-ad" />
 
-      <article className="story-page">
+      <article className="story-page art-page">
         <figure className="lead lead-hero">
           <ArticleImage slug={article.slug} alt={article.title} className="lead-img" priority sensitive={article.sensitive} reveal />
           <figcaption>
@@ -105,10 +106,13 @@ export default async function ArticlePage({
               </Link>
             )}
             <h1 className="headline art-headline">{article.title}</h1>
+            {/* Computers only: the summary under the headline, beside the photo. */}
+            {article.excerpt.trim() && <p className="art-sum">{article.excerpt.trim()}</p>}
             <DateStamp className="art-date" date={article.publishedAt} />
             {article.audio && (
               <ArticleListen src={article.audio} title={article.title} image={cmsImage(article.slug)?.src} />
             )}
+            <ArticleTools author={article.author} />
           </header>
 
           <div className="wrap">
@@ -116,6 +120,7 @@ export default async function ArticlePage({
               slug={article.slug}
               paragraphs={article.body}
               author={article.author}
+              tools={false}
               countRead
               ad={<InArticleAd placeholder={<ArticleImage slug={`${article.slug}-ad`} alt="" sizes="(max-width: 720px) 92vw, 570px" />} />}
             />

@@ -2,13 +2,11 @@
 
 import { Fragment, useEffect, useState, type ReactNode } from "react";
 import { apiOn, apiPost, voterId } from "@/lib/api";
-import Link from "next/link";
-import { getAuthorSlug } from "@/lib/articles";
-import { getAuthorPhoto } from "@/lib/authorPhotos";
 import { parseBlocks } from "@/lib/richText";
 import ArticleImage from "./ArticleImage";
 import { RichBlock } from "./RichBlocks";
 import ReadProgress from "./ReadProgress";
+import ArticleTools from "./ArticleTools";
 
 export default function ArticleBody({
   slug,
@@ -16,6 +14,7 @@ export default function ArticleBody({
   author,
   ad,
   countRead = false,
+  tools = true,
 }: {
   slug: string;
   paragraphs: string[];
@@ -24,8 +23,19 @@ export default function ArticleBody({
   ad?: ReactNode;
   // Articles only: noted once the reader reaches the last paragraph ("read to the end").
   countRead?: boolean;
+  // The writer and text size row above the text; false when the page shows it elsewhere.
+  tools?: boolean;
 }) {
   const [scale, setScale] = useState(1);
+  // Text size buttons (ArticleTools), wherever they are on the page.
+  useEffect(() => {
+    const zoom = (e: Event) => {
+      const step = (e as CustomEvent<number>).detail;
+      setScale((s) => Math.round(Math.min(1.5, Math.max(0.8, s + step * 0.1)) * 10) / 10);
+    };
+    window.addEventListener("art-zoom", zoom);
+    return () => window.removeEventListener("art-zoom", zoom);
+  }, []);
 
   // Read to the end: the last paragraph is on screen, after at least 8 seconds on the
   // page (so a short article seen at a glance doesn't count). Sent once per visit.
@@ -58,7 +68,6 @@ export default function ArticleBody({
       io.disconnect();
     };
   }, [countRead, slug]);
-  const authorSlug = getAuthorSlug(author);
   // Lines from the dashboard, with their sub-headings, quotes, lists, photos and videos.
   const blocks = parseBlocks(paragraphs);
   // The advert goes after the first paragraph, wherever it is.
@@ -66,38 +75,7 @@ export default function ArticleBody({
 
   return (
     <>
-      <div className="art-tools">
-        <Link href={`/author/${authorSlug}`} className="author">
-          <ArticleImage slug={`author-${authorSlug}`} src={getAuthorPhoto(authorSlug)} alt={author} className="avatar" />
-          <span>{author}</span>
-        </Link>
-        <div className="zoom">
-          <button
-            type="button"
-            id="zoomIn"
-            aria-label="ލިޔުން ބޮޑުކުރޭ"
-            className="round-btn"
-            onClick={() => setScale((s) => Math.min(1.5, s + 0.1))}
-          >
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-              <circle cx="11" cy="11" r="8" />
-              <path d="M21 21l-4.3-4.3M11 8v6M8 11h6" />
-            </svg>
-          </button>
-          <button
-            type="button"
-            id="zoomOut"
-            aria-label="ލިޔުން ކުޑަކުރޭ"
-            className="round-btn"
-            onClick={() => setScale((s) => Math.max(0.8, s - 0.1))}
-          >
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-              <circle cx="11" cy="11" r="8" />
-              <path d="M21 21l-4.3-4.3M8 11h6" />
-            </svg>
-          </button>
-        </div>
-      </div>
+      {tools && <ArticleTools author={author} />}
 
       <ReadProgress targetId="artBody" />
       <div

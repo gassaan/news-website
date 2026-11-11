@@ -4986,3 +4986,121 @@ a.slot:focus-visible {
   opacity: 0.85;
   text-align: center;
 }
+
+/* ---------- Article page: the writer row in the headline card ----------
+   (ArticleTools sits in the header on article pages.) Phones: as before, under the
+   date across the width; the summary shows on computers only. */
+.art-head > .art-tools {
+  align-self: stretch;
+}
+.art-sum {
+  display: none;
+}
+
+/* Computers (D1): the headline beside the photo. The headline card on the right with
+   the category, headline, summary, and one row with the writer, the date and the text
+   size buttons; the photo on the left. The article text continues below in the middle. */
+@media (min-width: 981px) {
+  .art-page {
+    display: grid;
+    grid-template-columns: minmax(24px, 1fr) minmax(0, 580px) minmax(0, 640px) minmax(24px, 1fr);
+    align-items: center;
+  }
+  .art-page > *,
+  .art-page > .art-sheet > * {
+    grid-column: 1 / -1;
+  }
+  /* The card's background and rounded top aren't needed here: its parts join the grid. */
+  .art-page > .art-sheet {
+    display: contents;
+  }
+  .art-page > .lead-hero {
+    grid-column: 3;
+    grid-row: 1;
+    position: relative;
+    top: auto;
+    max-width: none;
+    margin: 44px 0 40px;
+    margin-inline-start: 28px;
+    padding: 0;
+  }
+  .art-page .lead-hero .lead-img {
+    height: clamp(380px, 34vw, 500px);
+  }
+  .art-page .lead-hero figcaption,
+  .art-page:has(.listen-btn) .lead-hero figcaption {
+    bottom: 14px;
+    inset-inline: 14px;
+  }
+  .art-page > .art-sheet > .art-head {
+    grid-column: 2;
+    grid-row: 1;
+    position: relative;
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    align-items: center;
+    justify-items: start;
+    column-gap: 18px;
+    margin: 44px 0 40px;
+    margin-inline-end: 28px;
+    padding: 0;
+    max-width: none;
+    text-align: right;
+  }
+  .art-page .art-head::before {
+    display: none;
+  }
+  .art-page .art-head > * {
+    grid-column: 1 / -1;
+  }
+  .art-page .art-head .headline.art-headline {
+    font-size: clamp(36px, 3.4vw, 52px);
+    line-height: 1.7;
+    max-width: none;
+    margin: 18px 0 10px;
+  }
+  .art-page .art-sum {
+    display: block;
+    margin: 0 0 20px;
+    font-family: var(--font-reading);
+    font-weight: 400;
+    font-size: clamp(17px, 1.4vw, 20px);
+    line-height: 2;
+    color: var(--art-ink);
+  }
+  /* One row: the writer, the date, then the text size buttons at the far end. */
+  .art-page .art-head > .art-tools {
+    display: contents;
+  }
+  .art-page .art-head .author {
+    grid-row: 4;
+    grid-column: 1;
+  }
+  .art-page .art-head .art-date {
+    grid-row: 4;
+    grid-column: 2;
+  }
+  .art-page .art-head .zoom {
+    grid-row: 4;
+    grid-column: 3;
+    justify-self: end;
+  }
+  .art-page .art-head .listen-wave {
+    grid-row: 5;
+    margin: 16px 0 0;
+  }
+  /* The play button sits on the photo's corner, as on phones. */
+  .art-page .art-head .listen-btn {
+    top: auto;
+    bottom: -30px;
+    inset-inline-end: auto;
+    inset-inline-start: calc(100% + 56px + 18px);
+  }
+  /* The article text keeps the page's full width (auto side margins would shrink it
+     to fit inside the grid). */
+  .art-page > .art-sheet > .wrap {
+    width: 100%;
+    max-width: none;
+    margin: 8px 0 0;
+  }
+}
