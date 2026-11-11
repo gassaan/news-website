@@ -518,12 +518,18 @@ header.site::before {
   gap: 24px;
   height: 76px;
 }
-/* Computers: the logo, the menu and the icons sit together in the middle of the bar,
-   with the logo a little bigger than on phones. */
+/* Computers: the bar is as wide as the article's headline and photo together, so
+   the logo starts where the headline starts and the search and light/dark icons end
+   where the photo ends (same width as .art-page's middle columns: 580 + 640, with a
+   24px edge). The logo is a little bigger than on phones. */
 @media (min-width: 981px) {
+  header.site .wrap {
+    max-width: calc(1220px + 48px);
+    padding-inline: 24px;
+  }
   .bar {
-    justify-content: center;
-    gap: clamp(40px, 4.5vw, 72px);
+    justify-content: space-between;
+    gap: 24px;
   }
   header.site .logo > span {
     height: 38px;
