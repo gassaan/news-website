@@ -5102,11 +5102,65 @@ a.slot:focus-visible {
     inset-inline-end: auto;
     inset-inline-start: calc(100% + 56px + 18px);
   }
-  /* The article text keeps the page's full width (auto side margins would shrink it
-     to fit inside the grid). */
-  .art-page > .art-sheet > .wrap {
+  /* The article text area: the same width as the top bar, headline and photo. */
+  .art-page > .art-sheet > .wrap,
+  .art-page > .art-sheet > .wrap:has(#artBody) {
     width: 100%;
+    max-width: var(--wrap);
+    margin: 8px auto 0;
+  }
+}
+
+/* ---------- Computers: one width for everything ----------
+   Every page section shares the top bar's edges: 1220px of content (24px edges), so
+   the logo, headlines, text, banners and footer line up on the right, and the icons,
+   photos and adverts on the left. */
+@media (min-width: 981px) {
+  :root {
+    --wrap: 1268px;
+  }
+  .wrap,
+  header.site .wrap {
+    padding-inline: 24px;
+  }
+  .hero {
+    --wrap: 1268px;
+  }
+  /* Article page: the text starts under the headline (right) and the share buttons,
+     poll and comments follow it; the banners use the full width. */
+  .art-page .art-body,
+  .art-page .art-actions,
+  main:has(.art-page #artBody) .comments-wrap > *,
+  main:has(.art-page #artBody) .poll {
+    max-width: var(--art-col);
+    margin-inline: 0 auto;
+  }
+  main:has(.art-page #artBody) .art-end-ad > * {
     max-width: none;
-    margin: 8px 0 0;
+  }
+  main:has(.art-page #artBody) .narrow {
+    max-width: var(--wrap);
+  }
+}
+/* Wider screens: the text under the headline, the square advert under the photo
+   (its left edge on the photo's), both inside the same width. */
+@media (min-width: 1200px) {
+  .art-page .art-body {
+    max-width: none;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    column-gap: 56px;
+  }
+  .art-page .art-body > * {
+    grid-column: 1;
+  }
+  .art-page .art-body > .in-ad {
+    grid-column: 2;
+    justify-self: stretch;
+    width: 100%;
+  }
+  .art-page .art-actions,
+  main:has(.art-page #artBody) .comments-wrap > *,
+  main:has(.art-page #artBody) .poll {
+    max-width: calc(100% - 340px - 56px);
   }
 }
