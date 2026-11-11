@@ -518,6 +518,17 @@ header.site::before {
   gap: 24px;
   height: 76px;
 }
+/* Computers: the logo, the menu and the icons sit together in the middle of the bar,
+   with the logo a little bigger than on phones. */
+@media (min-width: 981px) {
+  .bar {
+    justify-content: center;
+    gap: clamp(40px, 4.5vw, 72px);
+  }
+  header.site .logo > span {
+    height: 38px;
+  }
+}
 .logo {
   font-family: var(--font-head);
   font-weight: 900;
