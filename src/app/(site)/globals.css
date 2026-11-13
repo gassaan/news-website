@@ -1249,10 +1249,18 @@ section {
 .cat:hover span {
   transform: scale(1.06);
 }
-/* Computers: a name sized to the tile, the same share of it as on phones. */
+/* Computers: smaller tiles (about a quarter smaller than a news card), with the name
+   sized to match. */
 @media (min-width: 981px) {
+  .cats {
+    gap: 22px;
+  }
+  .cat {
+    width: 220px;
+    border-radius: 26px;
+  }
   .cat span {
-    font-size: 32px;
+    font-size: 26px;
   }
 }
 
